@@ -46,7 +46,7 @@ G.UI = (() => {
 
   function menu() {
     show('scr-menu');
-    const s = G.Save.data, c = G.Crew.BY_ID[s.captain];
+    const s = G.Save.data, c = G.Crew.LIST.find(o => o.id === s.captain) || G.Crew.LIST[0];
     $('menu-berries').innerHTML = G.Icons.html('coin', 20) + ' ' + G.U.fmt(s.berries) + ' ฿';
     $('menu-captain').innerHTML = poster(c, true);
     const best = s.best[c.id];

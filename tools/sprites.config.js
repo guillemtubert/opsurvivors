@@ -1,0 +1,54 @@
+/* ============ sprites.config.js — de assets/ref/ a assets/chars/ ============
+ * Lo lee tools/build-sprites.js. Por personaje:
+ *
+ *   height   alto final en píxeles (contorno incluido) del primer fotograma de `idle`;
+ *            todos los fotogramas usan la MISMA escala, así no "cambian de talla"
+ *   colors   colores de la paleta (común a todos sus fotogramas)
+ *   flip     true si en el original miran a la izquierda (el juego los quiere a la derecha)
+ *   bg       color de fondo a quitar (si la hoja no es transparente)
+ *   fps      velocidad de cada animación
+ *   anims    idle (quieto) · walk (andando) · attack (al lanzar una técnica) · hurt (golpe recibido)
+ *            Cada fotograma es un fichero (relativo a `dir`) o un recuadro [x, y, w, h] de `sheet`.
+ *            { f: ..., dx: 2 } mueve ese fotograma 2 px a la derecha si queda descentrado.
+ *            Con un solo fotograma en walk, el juego lo anima con un rebote.
+ */
+const LUFFY = 'assets/ref/#0002 - Monkey D. Luffy - Gum-Gum Pistol/Left (Normal - Playable)/';
+
+module.exports = {
+  luffy: {
+    height: 40, colors: 20, dir: LUFFY,
+    fps: { idle: 5, walk: 8, attack: 10, hurt: 1 },
+    anims: {
+      idle: ['Assembled Sprites/motion_0002_wait/0000.png', 'Assembled Sprites/motion_0002_wait/0011.png',
+             'Assembled Sprites/motion_0002_wait/0017.png', 'Assembled Sprites/motion_0002_wait/0037.png'],
+      walk: ['Assembled Sprites/motion_0002_go/0000.png'],
+      attack: ['Split Sprites/attack_02__finish__ready.png', 'Split Sprites/attack_03.png'],
+      hurt: ['Split Sprites/damage.png']
+    }
+  },
+
+  marine: {
+    height: 36, colors: 16,
+    sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0180 - Saber Apprentice - Navy.png',
+    fps: { idle: 4, walk: 8, attack: 6, hurt: 1 },
+    anims: {
+      idle: [[45, 37, 132, 170], [237, 38, 128, 169], [429, 39, 126, 168]],
+      walk: [[43, 309, 143, 159]],
+      attack: [[335, 817, 135, 190], [656, 619, 223, 164]],
+      hurt: [[277, 289, 125, 171]]
+    }
+  },
+
+  morgan: {
+    height: 58, colors: 20,
+    sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0035 - Axe-Hand Morgan.png',
+    bg: '#e69900',                         // el marco naranja de la hoja
+    fps: { idle: 4, walk: 8, attack: 5, hurt: 1 },
+    anims: {
+      idle: [[32, 65, 128, 190], [223, 60, 129, 195], [410, 57, 135, 198]],
+      walk: [[74, 889, 165, 164]],
+      attack: [[288, 889, 170, 164], [537, 889, 186, 164]],
+      hurt: [[811, 882, 123, 172]]
+    }
+  }
+};

@@ -64,7 +64,7 @@ G.Game = (() => {
 
   function startRun() {
     const save = G.Save.data;
-    const crew = G.Crew.BY_ID[save.captain] || G.Crew.BY_ID.luffy;
+    const crew = G.Crew.LIST.find(c => c.id === save.captain) || G.Crew.LIST[0];
     G.UI.hideAll();
     G.FX.clear(); G.Projectiles.clear(); G.Combat.clear(); G.EnemyMgr.clear();
     G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();

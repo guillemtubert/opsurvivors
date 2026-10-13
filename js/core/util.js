@@ -7,7 +7,7 @@ G.PX = 2;
 /** Lado de un tile en unidades de mundo (16 px de arte). */
 G.TILE = 32;
 /** Altura a la que vuelan proyectiles y efectos sobre el plano del suelo. */
-G.LIFT = 14;
+G.LIFT = 26;
 
 G.U = {
   clamp(v, a, b) { return v < a ? a : v > b ? b : v; },

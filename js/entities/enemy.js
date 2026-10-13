@@ -11,7 +11,8 @@ G.Enemy = class Enemy {
     this.sprite = def.sprite;
     const s = G.Pix.sprite(def.sprite);
     this.scale = s.scale || 1;
-    this.r = 9 * this.scale;
+    // Radio del cuerpo (no de la celda entera, que incluye el hueco de los ataques).
+    this.r = Math.max(8, s.body[2] * G.PX * this.scale * 0.3);
     this.x = o.x || 0; this.y = o.y || 0;
     this.boss = !!o.boss;
     this.elite = !!o.elite;
@@ -32,6 +33,7 @@ G.Enemy = class Enemy {
     this.state = 'walk'; this.stateT = 0;
     this.dashX = 0; this.dashY = 0;
     this.hitT = 0;                          // último golpe al jugador
+    this.atkAt = -9; this.hurtAt = -9;      // para las poses de ataque y de daño
   }
 
   update(dt, pl, now) {
@@ -65,6 +67,7 @@ G.Enemy = class Enemy {
         if (this.t1 <= 0 && d < 340) {
           this.t1 = G.U.rand(2.0, 2.8);
           this.shoot(nx, ny, 170, this.def.shot || this.dmg);
+          this.atkAt = now;
         }
         break;
       }
@@ -125,6 +128,7 @@ G.Enemy = class Enemy {
             this.shoot(Math.cos(a), Math.sin(a), ring ? 140 : 200, this.dmg * 0.6, 'knife');
           }
           G.Audio.sfx('slash');
+          this.atkAt = now;
         }
         break;
       }
@@ -133,6 +137,7 @@ G.Enemy = class Enemy {
         this.t1 -= dt;
         if (this.t1 <= 0 && d < 420) {
           this.t1 = G.U.rand(2.6, 3.4);
+          this.atkAt = now;
           for (let i = 0; i < 3; i++) {
             const zx = pl.x + (i ? G.U.rand(-70, 70) : 0), zy = pl.y + (i ? G.U.rand(-50, 50) : 0);
             const m = G.FX.mark(zx, zy, 34, '#e0c070', 1.0);
@@ -164,6 +169,7 @@ G.Enemy = class Enemy {
     // Golpe al tocarte.
     if (!pl.dead && d < this.r + pl.r && now - this.hitT > 0.7) {
       this.hitT = now;
+      this.atkAt = now;
       pl.hurt(this.dmg, now);
     }
   }
@@ -182,6 +188,8 @@ G.Enemy = class Enemy {
     if (src && src.owner && Math.random() < src.owner.crit) { amount *= 2; crit = true; }
     this.hp -= amount;
     this.flash = 0.1;
+    // Pose de daño, pero no en cada golpe (con golpes seguidos se quedaría congelado).
+    if (now - this.hurtAt > 0.7) this.hurtAt = now;
     if (src) {
       if (src.knock) {
         const [nx, ny] = src.vx !== undefined ? G.U.norm(src.vx, src.vy) : G.U.norm(this.x - src.ox, this.y - src.oy);
@@ -207,12 +215,17 @@ G.Enemy = class Enemy {
   draw(ctx, now) {
     const s = G.Pix.sprite(this.sprite);
     const sc = this.scale * G.PX;
-    let f = 0;
-    if (this.moving) f = [1, 0, 2, 0][Math.floor(this.animT * 7) % 4];
+    let anim = this.moving ? 'walk' : 'idle', t = this.animT;
+    if (this.state === 'aim' || this.state === 'dash') { anim = 'attack'; t = 9; }
+    else if (now - this.hurtAt < 0.18) { anim = 'hurt'; t = now - this.hurtAt; }
+    else if (now - this.atkAt < 0.35) { anim = 'attack'; t = now - this.atkAt; }
+    const f = G.Pix.pose(s, anim, t);
+    // Un solo fotograma para andar: rebote.
+    const hop = anim === 'walk' && G.Pix.bounces(s) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
     const flip = this.face < 0;
     const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
-    const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2;
+    const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2 - hop;
     // Sombra.
     ctx.fillStyle = 'rgba(0,0,0,.28)';
     ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.45, 0, 0, 6.283); ctx.fill();

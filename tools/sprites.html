@@ -169,6 +169,7 @@ pre { white-space: pre-wrap; word-break: break-all; background: #1a0e06; border:
 <script src="../js/core/util.js"></script>
 <script src="../js/core/pixel.js"></script>
 <script src="../js/data/sprites.js"></script>
+<script src="pixelize.js"></script>
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -523,39 +524,8 @@ pre { white-space: pre-wrap; word-break: break-all; background: #1a0e06; border:
     return o;
   }
 
-  function medianCut(colors, n) {
-    if (!colors.length) return [[0, 0, 0]];
-    let boxes = [colors];
-    while (boxes.length < n) {
-      // Parte la caja con más variación por su canal más ancho.
-      let bi = -1, best = -1, ch = 0;
-      boxes.forEach((b, i) => {
-        if (b.length < 2) return;
-        for (let c = 0; c < 3; c++) {
-          let lo = 255, hi = 0;
-          for (const p of b) { if (p[c] < lo) lo = p[c]; if (p[c] > hi) hi = p[c]; }
-          if (hi - lo > best) { best = hi - lo; bi = i; ch = c; }
-        }
-      });
-      if (bi < 0 || best < 4) break;
-      const b = boxes[bi].sort((p, q) => p[ch] - q[ch]);
-      boxes.splice(bi, 1, b.slice(0, b.length >> 1), b.slice(b.length >> 1));
-    }
-    return boxes.map(b => {
-      const s = [0, 0, 0];
-      for (const p of b) { s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; }
-      return s.map(v => Math.round(v / b.length));
-    });
-  }
-
-  function nearest(pal, r, g, b) {
-    let best = pal[0], bd = Infinity;
-    for (const p of pal) {
-      const d = (p[0] - r) ** 2 * 0.3 + (p[1] - g) ** 2 * 0.59 + (p[2] - b) ** 2 * 0.11;
-      if (d < bd) { bd = d; best = p; }
-    }
-    return best;
-  }
+  // Paleta y color más cercano: los mismos que el generador (tools/pixelize.js).
+  const medianCut = Pixelize.medianCut, nearest = Pixelize.nearest;
 
   function addFrame(r) {
     if (!src) return;

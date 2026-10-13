@@ -87,9 +87,21 @@ G.Pix = (() => {
 
   const cache = new Map();
 
-  function build(frames) {
+  // Animaciones por defecto de los dibujos en código: quieto, y dos pasos al andar.
+  const FPS = { idle: 4, walk: 8, attack: 10, hurt: 1 };
+  const PROC_ANIMS = { idle: [0], walk: [1, 0, 2, 0], attack: [0], hurt: [0] };
+
+  /**
+   * Un sprite: todos sus fotogramas (normales, volteados y en blanco para el
+   * destello) y qué fotogramas forman cada animación.
+   *   anims  { idle, walk, attack, hurt } -> índices de `frames`
+   *   body   [x, y, w, h] del cuerpo en el primer fotograma (radio y retratos)
+   */
+  function build(frames, anims, fps, body) {
+    const w = frames[0].width, h = frames[0].height;
     return {
-      w: frames[0].width, h: frames[0].height, frames,
+      w, h, frames, anims, fps: Object.assign({}, FPS, fps),
+      body: body || [0, 0, w, h],
       flip: frames.map(flip), white: frames.map(white), whiteFlip: frames.map(f => white(flip(f)))
     };
   }
@@ -100,16 +112,30 @@ G.Pix = (() => {
     const def = G.SPRITES[id];
     if (!def) throw new Error('Sprite desconocido: ' + id);
     const rows = clean(def.rows, 16, true);
-    s = build([paint(rows, def.pal), paint(stepRows(rows, 0), def.pal), paint(stepRows(rows, 1), def.pal)]);
+    s = build([paint(rows, def.pal), paint(stepRows(rows, 0), def.pal), paint(stepRows(rows, 1), def.pal)], PROC_ANIMS);
     s.scale = def.scale || 1;
     cache.set(id, s);
     return s;
   }
 
   /**
-   * Hojas propias (js/data/custom-sprites.js, hechas con tools/sprites.html):
-   * una tira horizontal de fotogramas mirando a la derecha. Se cargan al
-   * arrancar y sustituyen al dibujo en código sin tocar nada más.
+   * Fotograma de la animación `anim` tras `t` segundos. Las que no se repiten
+   * (attack, hurt) se quedan en el último. Si no la tiene, usa idle.
+   */
+  function pose(s, anim, t) {
+    const list = s.anims[anim] && s.anims[anim].length ? s.anims[anim] : s.anims.idle;
+    const i = Math.floor(t * (s.fps[anim] || 6));
+    const once = anim === 'attack' || anim === 'hurt';
+    return list[once ? Math.min(i, list.length - 1) : i % list.length];
+  }
+
+  /** ¿Anda con un solo fotograma? Entonces se anima con un rebote. */
+  function bounces(s) { return (s.anims.walk || []).length === 1; }
+
+  /**
+   * Hojas propias (js/data/sprites-built.js, generado por tools/build-sprites.js,
+   * y js/data/custom-sprites.js): una tira horizontal de fotogramas mirando a
+   * la derecha. Se cargan al arrancar y sustituyen al dibujo en código.
    * Resuelve siempre (si una falla, se queda el dibujo en código).
    */
   function preloadCustom() {
@@ -125,9 +151,9 @@ G.Pix = (() => {
           c.getContext('2d').drawImage(img, i * fw, 0, fw, fh, 0, 0, fw, fh);
           frames.push(c);
         }
-        // Siempre 3: quieto, paso A, paso B.
-        while (frames.length < 3) frames.push(frames[frames.length - 1]);
-        const s = build(frames.slice(0, 3));
+        // Sin animaciones declaradas: tira clásica de quieto, paso A, paso B.
+        const anims = cfg.anims || { idle: [0], walk: n >= 3 ? [1, 0, 2, 0] : [Math.min(1, n - 1)], attack: [0], hurt: [0] };
+        const s = build(frames, anims, cfg.fps, cfg.body);
         s.scale = cfg.scale || 1;
         s.file = cfg.file; s.n = n;
         cache.set(id, s);
@@ -159,15 +185,16 @@ G.Pix = (() => {
   /** <img> pixelado de un sprite, para el DOM. */
   function portrait(id, size) {
     const s = sprite(id);
-    const w = Math.round(size * s.w / s.h);
     // Hoja propia: abierto con doble clic (file://) el navegador no deja sacar
-    // un data URL de una imagen del disco, así que se recorta con CSS.
+    // un data URL de una imagen del disco, así que se recorta con CSS (sólo el
+    // cuerpo del primer fotograma, sin el hueco de los ataques).
     if (s.file) {
-      return '<span class="px" style="display:inline-block;width:' + w + 'px;height:' + size + 'px;background:url(' + s.file +
-        ') 0 0 / ' + (w * s.n) + 'px ' + size + 'px no-repeat;image-rendering:pixelated"></span>';
+      const [bx, by, bw, bh] = s.body, k = size / bh;
+      return '<span class="px" style="display:inline-block;width:' + Math.round(bw * k) + 'px;height:' + size + 'px;background:url(' + s.file +
+        ') ' + (-bx * k) + 'px ' + (-by * k) + 'px / ' + (s.w * s.n * k) + 'px ' + (s.h * k) + 'px no-repeat;image-rendering:pixelated"></span>';
     }
     return '<img class="px" src="' + url(s.frames[0]) + '" width="' + Math.round(size * s.w / s.h) + '" height="' + size + '" alt="">';
   }
 
-  return { paint, sprite, white, flip, big, url, portrait, clean, preloadCustom };
+  return { paint, sprite, pose, bounces, white, flip, big, url, portrait, clean, preloadCustom };
 })();

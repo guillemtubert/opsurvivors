@@ -4,7 +4,7 @@
  *   start  técnica con la que empieza
  */
 G.Crew = (() => {
-  const LIST = [
+  const ALL = [
     { id: 'luffy', name: 'Monkey D. Luffy', title: 'Sombrero de Paja', bounty: '3.000.000.000',
       hp: 120, spd: 112, atk: 1.0, cost: 0, start: 'pistol',
       desc: 'Hombre de goma. Golpes que se estiran y empujan a los enemigos.' },
@@ -28,6 +28,8 @@ G.Crew = (() => {
       desc: 'Arqueóloga de la Hana Hana: brazos que brotan bajo los enemigos.' }
   ];
   const BY_ID = {};
-  for (const c of LIST) BY_ID[c.id] = c;
-  return { LIST, BY_ID };
+  for (const c of ALL) BY_ID[c.id] = c;
+  // Los que se pueden elegir ahora (ver data/scope.js).
+  const LIST = ALL.filter(c => !G.SCOPE || G.SCOPE.crew.includes(c.id));
+  return { ALL, LIST, BY_ID };
 })();

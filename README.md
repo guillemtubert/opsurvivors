@@ -64,10 +64,14 @@ assets/fonts/         Pixelify Sans (OFL), copiada de PokéSurvivor
 assets/chars/         hojas de sprites propias (ver "el taller")
 tools/serve.js        servidor local mínimo
 tools/sprites.html    taller de sprites (recortar hojas / convertir dibujos)
+tools/build-sprites.js  generador: assets/ref/ -> assets/chars/ (config en sprites.config.js)
+tools/png.js, pixelize.js  PNG sin dependencias y conversión a pixel art
+assets/ref/           originales de One Piece Treasure Cruise
 js/
   core/     util, save (localStorage), pixel (mapas de píxeles -> canvas),
             camera, input (teclado + joystick táctil), audio (sintetizador chiptune)
-  data/     sprites (pixel art de personajes), custom-sprites (hojas propias),
+  data/     scope (qué está activo), sprites (pixel art en código),
+            sprites-built (generado), custom-sprites (hojas a mano),
             moves, crew, enemies, upgrades
   world/    world (islas por ruido, horneado por chunks, objetos, colisiones)
   entities/ fx, projectile, enemy (+ gestor y rejilla espacial), pickup, player
@@ -77,28 +81,39 @@ js/
   main.js   arranque
 ```
 
-## Sprites propios: el taller
+## Alcance actual
 
-Los personajes vienen dibujados en código (`js/data/sprites.js`, 16×20). Para
-cambiarlos por sprites mejores está **`tools/sprites.html`** (doble clic):
+Mientras se diseña el estilo, sólo están activos **Luffy**, el **marine** y
+**Morgan** (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
+en los datos y se activa añadiéndolo ahí.
 
-1. Arrastra una hoja de sprites o un dibujo (o pégalo con Ctrl+V).
-2. Quita el fondo: lo detecta solo por las esquinas, o elige el color con un clic.
-3. Modo:
-   - **Pixel art**, para hojas de juegos de GBA, DS, etc. Se recorta tal cual,
-     o se reduce ×2, ×3... si la hoja viene ampliada (lo adivina).
-   - **Convertir**, para dibujos o capturas. Se reduce a la altura que digas,
-     se limita la paleta y se le pone contorno.
-4. Haz clic en los recuadros numerados (o arrastra para recortar a mano) en este
-   orden: **quieto, paso A, paso B**.
-5. Mira la vista previa al lado de un marine, elige el personaje y **Descargar PNG**.
-6. Guarda el PNG en `assets/chars/` y pega la línea que te da en
-   `js/data/custom-sprites.js`.
+## Sprites
 
-Formato que espera el juego: tira horizontal de fotogramas del mismo tamaño,
-mirando a la derecha, con los pies en el borde de abajo. Con `scale: 1` cada
-píxel de la hoja mide lo mismo que uno del mapa, así que un sprite de 32 px
-de alto sale el doble de grande que los dibujos actuales (con el doble de detalle).
+Los personajes salen de las ilustraciones de *One Piece Treasure Cruise*
+(`assets/ref/`), convertidas a pixel art por un generador:
+
+```
+node tools/build-sprites.js          # todos
+node tools/build-sprites.js luffy    # sólo uno
+```
+
+- `tools/sprites.config.js` dice, por personaje, qué fotogramas forman cada
+  animación (`idle`, `walk`, `attack`, `hurt`), el alto final, los colores y
+  si hay que quitar un fondo.
+- Todos los fotogramas de un personaje usan la **misma escala y la misma
+  paleta**, y se alinean por los pies.
+- Escribe `assets/chars/<id>.png` y `js/data/sprites-built.js` (generado: no
+  editar a mano).
+- Lo que no tiene hoja usa el dibujo en código de `js/data/sprites.js`.
+- Si `walk` tiene un solo fotograma, el juego lo anima con un rebote.
+
+### El taller (`tools/sprites.html`)
+
+Para probar una imagen suelta a mano (doble clic): arrastra o pega una hoja o un
+dibujo, quita el fondo, recorta los fotogramas (clic en los recuadros o
+arrastrando), mira la vista previa junto a un marine y descarga el PNG. Lo hecho
+aquí se registra en `js/data/custom-sprites.js` y manda sobre lo generado.
+Convierte igual que el generador (los dos usan `tools/pixelize.js`).
 
 ## Depurar
 

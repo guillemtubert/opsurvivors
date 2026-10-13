@@ -7,7 +7,8 @@ G.Player = class Player {
     this.crew = crew;
     this.sprite = crew.id;
     this.x = 0; this.y = 0;
-    this.r = 10;
+    // Radio del cuerpo, según el sprite (un poco justo: es más agradable).
+    this.r = Math.max(9, G.Pix.sprite(crew.id).body[2] * G.PX * 0.24);
 
     this.atkMul = crew.atk * (perks.atkMul || 1);
     this.spdMul = perks.spdMul || 1;
@@ -43,6 +44,7 @@ G.Player = class Player {
     this.animT = 0;
     this.target = null;
     this.dead = false;
+    this.atkAt = -9; this.hurtAt = -9;   // poses de ataque y de daño
   }
 
   static xpFor(level) { return Math.floor(8 + level * 5 + Math.pow(level, 1.75) * 1.6); }
@@ -85,6 +87,7 @@ G.Player = class Player {
     d *= 1 - this.reduction;
     this.hp -= d;
     this.invuln = 0.4;
+    this.hurtAt = now;
     this.flash = 0.15;
     G.Camera.kick(0.35);
     G.Audio.sfx('hurt');
@@ -101,6 +104,13 @@ G.Player = class Player {
     if (this.hp - before >= 1) G.FX.text(this.x, this.y - 34, '+' + Math.round(this.hp - before), '#7fe08a');
   }
   addMaxHp(n) { this.maxHp += n; this.hp += n; }
+
+  /** Se lanza una técnica: pose de ataque mirando al objetivo. */
+  onCast(m, now) {
+    if (['aura', 'buff', 'mine', 'orbit'].includes(m.kind)) return;
+    this.atkAt = now;
+    this.face = Math.cos(this.aim) >= 0 ? 1 : -1;
+  }
 
   // ---------------- buffs ----------------
   addBuff(stat, amount, max, dur) {
@@ -143,31 +153,39 @@ G.Player = class Player {
       this.aim = Math.atan2(ay, ax);
     }
     // Mira hacia donde ataca si está parado.
-    if (!this.walking && this.target) this.face = this.target.x > this.x ? 1 : -1;
+    if (!this.walking && this.target && now - this.atkAt > 0.35) this.face = this.target.x > this.x ? 1 : -1;
   }
 
   draw(ctx, now) {
     const s = G.Pix.sprite(this.sprite);
     const sc = (s.scale || 1) * G.PX;
-    let f = 0;
-    if (this.walking) f = [1, 0, 2, 0][Math.floor(this.animT * 8) % 4];
+    let anim = this.walking ? 'walk' : 'idle', t = this.walking ? this.animT : now;
+    if (now - this.hurtAt < 0.25) { anim = 'hurt'; t = now - this.hurtAt; }
+    else if (now - this.atkAt < 0.3) { anim = 'attack'; t = now - this.atkAt; }
+    const f = G.Pix.pose(s, anim, t);
     const flip = this.face < 0;
-    const white = this.flash > 0 || (this.invuln > 0 && Math.floor(now * 20) % 2);
+    // Golpe: destello blanco cortito y luego parpadeo transparente mientras eres invulnerable.
+    const white = this.flash > 0.08;
     const img = white ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
-    const bob = !this.walking && Math.floor(now * 2) % 2 ? 2 : 0;
+    // Dibujo en código: respira 1 px quieto. Hoja con una sola pose de correr: rebota al andar.
+    let bob = 0;
+    if (anim === 'idle' && s.anims.idle.length === 1) bob = Math.floor(now * 2) % 2 ? 2 : 0;
+    if (anim === 'walk' && G.Pix.bounces(s)) bob = -Math.round(Math.abs(Math.sin(this.animT * 12)) * 2) * 2;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2 + bob) / 2) * 2;
     ctx.fillStyle = 'rgba(0,0,0,.3)';
-    ctx.beginPath(); ctx.ellipse(this.x, this.y, 11, 4, 0, 0, 6.283); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.4, 0, 0, 6.283); ctx.fill();
     // Aura de buff.
     const bf = this.buffs;
     if (bf.atk.n || bf.def.n || bf.spd.n || bf.regen.n) {
       const col = bf.atk.n ? '#b06bff' : bf.def.n ? '#4fb4ff' : bf.spd.n ? '#ffe14d' : '#7fe08a';
       ctx.globalAlpha = 0.35 + Math.sin(now * 6) * 0.15;
       ctx.strokeStyle = col; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.ellipse(this.x, this.y, 16, 6, 0, 0, 6.283); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.6, this.r * 0.6, 0, 0, 6.283); ctx.stroke();
       ctx.globalAlpha = 1;
     }
+    if (this.invuln > 0 && Math.floor(now * 16) % 2) ctx.globalAlpha = 0.45;
     ctx.drawImage(img, x, y, w, h);
+    ctx.globalAlpha = 1;
   }
 };

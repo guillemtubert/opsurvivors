@@ -5,17 +5,11 @@
  */
 G.Camera = {
   x: 0, y: 0,
-  VIEW_W: 768,
-  MIN_VIEW_H: 420,
+  VIEW_W: 960,              // los sprites de One Piece Treasure Cruise son grandes: se ve más mapa
+  MIN_VIEW_H: 525,
   scale: 1,                 // píxeles CSS por unidad de mundo
   w: 768, h: 432,           // tamaño de la vista en unidades de mundo
   shake: 0, _sx: 0, _sy: 0,
-
-  resize(cssW, cssH) {
-    this.scale = Math.min(cssW / this.VIEW_W, cssH / this.MIN_VIEW_H);
-    this.w = cssW / this.scale;
-    this.h = cssH / this.scale;
-  },
 
   follow(tx, ty, dt) {
     this.x = G.U.damp(this.x, tx, 9, dt);

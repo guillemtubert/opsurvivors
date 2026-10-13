@@ -34,6 +34,7 @@ G.Combat = (() => {
       return;
     }
     m.t = Math.max(0.08, m.cd * pl.cdMul);
+    pl.onCast(m, now);
     if (m.sfx) G.Audio.sfx(m.sfx);
     switch (m.kind) {
       case 'projectile': projectile(pl, m); break;

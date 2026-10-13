@@ -4,7 +4,7 @@
  * (más vida, daño y experiencia) para que la dificultad no baje.
  */
 G.Spawner = (() => {
-  const CAP = 110;
+  const CAP = 90;
   let acc = 0, bossIdx = 0, surgeT = 40, warned = -1;
 
   function reset() { acc = 0; bossIdx = 0; surgeT = 40; warned = -1; }

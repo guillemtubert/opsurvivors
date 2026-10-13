@@ -30,17 +30,22 @@ G.Enemies = (() => {
   // Tras el último, vuelven en bucle cada 3 minutos y cada vuelta más fuertes.
   const LOOP_EVERY = 180;
 
+  // Los activos ahora (ver data/scope.js).
+  const on = (list, key) => list.filter(e => !G.SCOPE || G.SCOPE[key].includes(e.id));
+  const ACTIVE = on(LIST, 'enemies'), ACTIVE_BOSSES = on(BOSSES, 'bosses');
+
   /** Jefe que toca en el índice i (0, 1, 2...). */
   function bossAt(i) {
-    const round = Math.floor(i / BOSSES.length);
-    const b = BOSSES[i % BOSSES.length];
+    const n = ACTIVE_BOSSES.length;
+    const round = Math.floor(i / n);
+    const b = ACTIVE_BOSSES[i % n];
     const k = Math.pow(2.2, round);
-    const at = i < BOSSES.length ? b.at : BOSSES[BOSSES.length - 1].at + (i - BOSSES.length + 1) * LOOP_EVERY;
+    const at = i < n ? b.at : ACTIVE_BOSSES[n - 1].at + (i - n + 1) * LOOP_EVERY;
     return Object.assign({}, b, { at, hp: b.hp * k, dmg: b.dmg * (1 + round * 0.4), xp: b.xp * (1 + round) });
   }
 
   /** Enemigos que pueden salir en el segundo t (con sus pesos). */
-  function bagAt(t) { return LIST.filter(e => t >= e.from); }
+  function bagAt(t) { return ACTIVE.filter(e => t >= e.from); }
 
   return { LIST, BOSSES, bossAt, bagAt };
 })();
