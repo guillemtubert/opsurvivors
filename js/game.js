@@ -41,13 +41,19 @@ G.Game = (() => {
   }
 
   function resize() {
-    dpr = Math.min(2, window.devicePixelRatio || 1);
+    // Hasta 3: en móvil da más escalones enteros entre los que elegir el zoom.
+    dpr = Math.min(3, window.devicePixelRatio || 1);
     const w = cv.clientWidth, h = cv.clientHeight;
     cv.width = Math.round(w * dpr);
     cv.height = Math.round(h * dpr);
     // Píxeles de pantalla por píxel de arte: entero, para que el pixel art quede limpio.
-    const artW = G.Camera.VIEW_W / G.PX, artH = G.Camera.MIN_VIEW_H / G.PX;
-    k = Math.max(1, Math.round(Math.min(cv.width / artW, cv.height / artH)));
+    // En pantallas pequeñas (móvil, en horizontal o vertical) manda el lado corto,
+    // con una vista más cercana para que los personajes no queden diminutos.
+    const cam = G.Camera;
+    const fit = Math.min(w, h) < cam.MOBILE_BELOW
+      ? Math.min(cv.width, cv.height) / (cam.MOBILE_VIEW / G.PX)
+      : Math.min(cv.width / (cam.VIEW_W / G.PX), cv.height / (cam.MIN_VIEW_H / G.PX));
+    k = Math.max(1, Math.round(fit));
     low.width = Math.ceil(cv.width / k);
     low.height = Math.ceil(cv.height / k);
     G.Camera.w = low.width * G.PX;

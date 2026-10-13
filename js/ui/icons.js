@@ -52,6 +52,12 @@ G.Icons = (() => {
     pause: { pal: { w: '#f4f1ea' }, rows: [
       '............', '..kkk..kkk..', '..kwk..kwk..', '..kwk..kwk..', '..kwk..kwk..', '..kwk..kwk..',
       '..kwk..kwk..', '..kwk..kwk..', '..kwk..kwk..', '..kkk..kkk..', '............', '............'] },
+    fullscreen: { pal: { w: '#f4f1ea' }, rows: [
+      'kkkkk..kkkkk', 'kwwwk..kwwwk', 'kwkkk..kkkwk', 'kwk......kwk', 'kkk......kkk', '............',
+      '............', 'kkk......kkk', 'kwk......kwk', 'kwkkk..kkkwk', 'kwwwk..kwwwk', 'kkkkk..kkkkk'] },
+    windowed: { pal: { w: '#f4f1ea' }, rows: [
+      '..kkk..kkk..', '..kwk..kwk..', 'kkkwk..kwkkk', 'kwwwk..kwwwk', 'kkkkk..kkkkk', '............',
+      '............', 'kkkkk..kkkkk', 'kwwwk..kwwwk', 'kkkwk..kwkkk', '..kwk..kwk..', '..kkk..kkk..'] },
     sound: { pal: { w: '#f4f1ea', y: '#ffd23f' }, rows: [
       '............', '.....k......', '....kwk..y..', '..kkwwk...y.', '.kwwwwk.y..y', '.kwwwwk..y.y',
       '.kwwwwk..y.y', '.kwwwwk.y..y', '..kkwwk...y.', '....kwk..y..', '.....k......', '............'] },

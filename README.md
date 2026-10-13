@@ -25,7 +25,10 @@ node tools/serve.js      # http://localhost:8080
 | `Esc` / `P` | Pausa |
 
 En móvil: arrastra el dedo para moverte (el joystick sale donde tocas) y toca
-una técnica de abajo para cambiarla.
+una técnica de abajo para cambiarla. Se juega en horizontal o en vertical: la
+cámara se acerca y el HUD se compacta en pantallas pequeñas. El botón de las
+cuatro esquinas (título, puerto y HUD, o en Ajustes) pone la pantalla completa;
+en iPhone, que no lo permite, usa «Añadir a pantalla de inicio».
 
 ## Cómo se juega
 

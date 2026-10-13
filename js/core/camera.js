@@ -7,6 +7,8 @@ G.Camera = {
   x: 0, y: 0,
   VIEW_W: 1280,             // ancho de mundo visible: los personajes ocupan ~1/8 del alto de pantalla
   MIN_VIEW_H: 720,
+  MOBILE_BELOW: 600,        // lado corto (px CSS) por debajo del cual se considera móvil
+  MOBILE_VIEW: 520,         // en móvil, mundo visible en el lado corto de la pantalla
   scale: 1,                 // píxeles CSS por unidad de mundo
   w: 768, h: 432,           // tamaño de la vista en unidades de mundo
   shake: 0, _sx: 0, _sy: 0,

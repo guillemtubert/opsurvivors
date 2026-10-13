@@ -37,9 +37,46 @@ G.UI = (() => {
     $('btn-pause-settings').addEventListener('click', () => settings(() => show('scr-pause')));
     $('btn-again').addEventListener('click', () => G.Game.toMenu());
     $('btn-retry').addEventListener('click', () => G.Game.startRun());
+    initFullscreen();
     addEventListener('keydown', e => {
       if (!$('scr-title').classList.contains('hidden') && (e.code === 'Enter' || e.code === 'Space')) $('scr-title').click();
     });
+  }
+
+  // ---------------- pantalla completa ----------------
+  // iPhone no deja poner una página a pantalla completa: allí no salen los botones
+  // (la alternativa es "Añadir a pantalla de inicio").
+
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
+  function toggleFullscreen() {
+    const d = document.documentElement;
+    if (fsEl()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    else {
+      const req = d.requestFullscreen || d.webkitRequestFullscreen;
+      const p = req.call(d, { navigationUI: 'hide' });
+      if (p && p.catch) p.catch(() => {});
+    }
+  }
+  function initFullscreen() {
+    if (!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+      document.body.classList.add('no-fs');
+      return;
+    }
+    const sync = () => {
+      const on = !!fsEl();
+      document.querySelectorAll('.fs-btn').forEach(b => {
+        b.innerHTML = G.Icons.html(on ? 'windowed' : 'fullscreen', 22);
+        b.setAttribute('aria-label', on ? 'Salir de pantalla completa' : 'Pantalla completa');
+      });
+      $('set-fs').checked = on;
+    };
+    document.querySelectorAll('.fs-btn').forEach(b => b.addEventListener('click', e => {
+      e.stopPropagation(); G.Audio.sfx('select'); toggleFullscreen();
+    }));
+    $('set-fs').onchange = toggleFullscreen;
+    document.addEventListener('fullscreenchange', sync);
+    document.addEventListener('webkitfullscreenchange', sync);
+    sync();
   }
 
   // ---------------- puerto (menú principal) ----------------
