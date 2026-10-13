@@ -222,10 +222,9 @@ G.Enemy = class Enemy {
     if (this.state === 'aim' || this.state === 'dash') { anim = 'attack'; t = 9; }
     else if (now - this.hurtAt < 0.18) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.35) { anim = 'attack'; t = now - this.atkAt; }
-    const f = G.Pix.pose(s, anim, t, this.dir);
+    const { f, flip } = G.Pix.pick(s, anim, t, this.dir, this.face);
     // Un solo fotograma para andar: rebote.
     const hop = anim === 'walk' && G.Pix.bounces(s) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
-    const flip = G.Pix.flipped(s, this.dir, this.face);
     const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2 - hop;

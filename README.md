@@ -88,17 +88,20 @@ Mientras se diseña el estilo, sólo están activos **Luffy**, el **marine** y
 **Morgan** (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
 en los datos y se activa añadiéndolo ahí.
 
-## Personajes articulados (4 direcciones)
+## 4 direcciones a partir de Treasure Cruise
 
-Los personajes de `js/data/dolls.js` se pintan por piezas (piernas, pantalón,
-torso, brazos, cabeza, pelo, sombrero) con `js/core/doll.js`, y las
-animaciones salen de mover las piezas: **4 direcciones** (abajo, arriba,
-derecha; izquierda = derecha en espejo) con **quieto, andar (4 pasos),
-puñetazo y daño**. Si un personaje está en `G.DOLLS`, se usa en lugar de su
-hoja de sprites. Ahora mismo: Luffy.
+Treasure Cruise sólo trae vistas de lado / tres cuartos y una pose de correr.
+El generador crea lo que falta editando los píxeles de las convertidas
+(`tools/animate.js`), así el personaje sigue siendo el original:
 
-Objetos del mapa y personajes comparten las herramientas de pintar
-(`js/core/paint.js`): luz, tramado, contorno y líneas interiores.
+- **Derecha / izquierda (andar):** zancada, piernas juntas en el aire, zancada
+  con las piernas en espejo, piernas juntas.
+- **Abajo (andar):** la pose de espera levantando un pie y luego el otro, con balanceo.
+- **Arriba:** vista de espaldas sacada de la de espera (cara -> pelo, pecho -> ropa).
+- **Ataque y daño:** de lado, mirando al enemigo.
+
+Se configura en `tools/sprites.config.js` con `frames` (con nombre) y `dirs`
+(`{ run }`, `{ step }`, `{ back }`). Ahora mismo: Luffy.
 
 ## Sprites (hojas)
 

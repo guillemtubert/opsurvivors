@@ -1,6 +1,6 @@
 /* ============ main.js — arranque ============ */
 (() => {
-  const NEED = ['U', 'Save', 'Pix', 'Paint', 'Doll', 'Camera', 'Input', 'Audio', 'SPRITES', 'Moves', 'Crew', 'Enemies', 'Upgrades',
+  const NEED = ['U', 'Save', 'Pix', 'Paint', 'Camera', 'Input', 'Audio', 'SPRITES', 'Moves', 'Crew', 'Enemies', 'Upgrades',
                 'Props', 'World', 'FX', 'Projectiles', 'Enemy', 'EnemyMgr', 'Hazards', 'Pickups', 'Player',
                 'Combat', 'Spawner', 'LevelUp', 'Icons', 'HUD', 'UI', 'Game'];
 

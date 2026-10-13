@@ -18,15 +18,26 @@
 const LUFFY = 'assets/ref/#0002 - Monkey D. Luffy - Gum-Gum Pistol/Left (Normal - Playable)/';
 
 module.exports = {
+  // Con direcciones: fotogramas con nombre y, por dirección, qué forma cada animación.
+  // Lo que falta en Treasure Cruise se crea (ver tools/animate.js): { run } zancada,
+  // { step } pasos de frente, { back } vista de espaldas. Ataque y daño sólo de lado.
   luffy: {
-    height: 44, colors: 20, dir: LUFFY,
-    fps: { idle: 5, walk: 8, attack: 10, hurt: 1 },
-    anims: {
-      idle: ['Assembled Sprites/motion_0002_wait/0000.png', 'Assembled Sprites/motion_0002_wait/0011.png',
-             'Assembled Sprites/motion_0002_wait/0017.png', 'Assembled Sprites/motion_0002_wait/0037.png'],
-      walk: ['Assembled Sprites/motion_0002_go/0000.png'],
-      attack: [{ f: 'Assembled Sprites/motion_0002_attack/0013.png', solo: true }, { f: 'Assembled Sprites/motion_0002_attack/0020.png', solo: true }],
-      hurt: ['Assembled Sprites/motion_0002_damage/0000.png']
+    height: 44, colors: 20, dir: LUFFY + 'Assembled Sprites/',
+    hip: 0.62,                          // dónde empiezan las piernas en la pose de correr
+    knee: 0.76, lift: 4,                // desde dónde y cuánto se levanta el pie al andar de frente
+    back: { headTo: 0.45, torsoTo: 0.72, hair: ['#0a0810', '#1e1824', '#3a3048'], top: ['#5a0e14', '#9a1c26', '#d0303a', '#f05a5a'], torsoW: 0.16 },
+    fps: { idle: 5, walk: 10, attack: 10, hurt: 1 },
+    frames: {
+      wait0: 'motion_0002_wait/0000.png', wait1: 'motion_0002_wait/0011.png',
+      wait2: 'motion_0002_wait/0017.png', wait3: 'motion_0002_wait/0037.png',
+      go: { f: 'motion_0002_go/0000.png', solo: true },
+      atk0: { f: 'motion_0002_attack/0013.png', solo: true }, atk1: { f: 'motion_0002_attack/0020.png', solo: true },
+      hurt: 'motion_0002_damage/0000.png'
+    },
+    dirs: {
+      down: { idle: ['wait0', 'wait1', 'wait2', 'wait3'], walk: [{ step: 'wait0' }] },
+      right: { idle: ['wait0', 'wait1', 'wait2', 'wait3'], walk: [{ run: 'go' }], attack: ['atk0', 'atk1'], hurt: ['hurt'] },
+      up: { idle: [{ back: 'wait0' }], walk: [{ step: 'wait0', back: true }] }
     }
   },
 

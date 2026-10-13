@@ -1,6 +1,5 @@
 /* ============ paint.js — pintar pixel art con luz, tramado y contorno ============
- * Herramientas comunes para los objetos del mapa (world/props.js) y los
- * personajes articulados (core/doll.js): así todo comparte estilo.
+ * Herramientas para pintar los objetos del mapa (world/props.js).
  *
  * Cada píxel toma un tono de una rampa de colores (de oscuro a claro) según
  * la luz, que viene de arriba a la izquierda, con tramado ordenado en el

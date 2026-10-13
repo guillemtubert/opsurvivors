@@ -168,8 +168,7 @@ G.Player = class Player {
     let anim = this.walking ? 'walk' : 'idle', t = this.walking ? this.animT : now;
     if (now - this.hurtAt < 0.25) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.3) { anim = 'attack'; t = now - this.atkAt; }
-    const f = G.Pix.pose(s, anim, t, this.dir);
-    const flip = G.Pix.flipped(s, this.dir, this.face);
+    const { f, flip } = G.Pix.pick(s, anim, t, this.dir, this.face);
     // Golpe: destello blanco cortito y luego parpadeo transparente mientras eres invulnerable.
     const white = this.flash > 0.08;
     const img = white ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
