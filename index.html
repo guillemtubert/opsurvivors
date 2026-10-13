@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
 <meta name="theme-color" content="#2a1a10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>One Piece Survivors</title>
 <meta name="description" content="Fan game de supervivencia (bullet heaven) con los Sombrero de Paja, en pixel art y para navegador.">
 <link rel="stylesheet" href="css/style.css">
@@ -28,6 +31,7 @@
     <div class="hud-right">
       <span class="pill"><span id="hud-ico-kills"></span><span id="hud-kills">0</span></span>
       <span class="pill"><span id="hud-ico-coins"></span><span id="hud-coins">0</span></span>
+      <button class="pause-btn fs-btn" data-sfx="none" aria-label="Pantalla completa"></button>
       <button id="hud-pause" class="pause-btn" data-sfx="none" aria-label="Pausa"></button>
     </div>
   </div>
@@ -102,6 +106,7 @@
     <label class="set">Efectos <input id="set-sfx" type="range" min="0" max="1" step="0.05"></label>
     <label class="set check"><input id="set-shake" type="checkbox"> Sacudidas de pantalla</label>
     <label class="set check"><input id="set-dmg" type="checkbox"> Números de daño</label>
+    <label id="set-fs-row" class="set check"><input id="set-fs" type="checkbox"> Pantalla completa</label>
     <div class="row" style="margin-top:14px">
       <button id="set-back" class="btn gold grow">Volver</button>
       <button id="set-reset" class="btn small ghost">Borrar partida</button>
@@ -143,6 +148,9 @@
     </div>
   </div>
 </section>
+
+<!-- Pantalla completa en el título y el puerto (en la partida va en el HUD). -->
+<button id="fs-corner" class="pause-btn fs-btn" data-sfx="none" aria-label="Pantalla completa"></button>
 
 <script defer src="js/core/util.js"></script>
 <script defer src="js/core/save.js"></script>
