@@ -12,6 +12,12 @@
  *   size     multiplicador de talla (1 = la de Treasure Cruise, que pone a todos casi igual)
  *   colors   colores de la paleta (común a todos sus fotogramas)
  *   accent   conserva detalles pequeños sobre negro (ojos, filos): { dark, rim, rimMin } (ver pixelize)
+ *   bgDark   hoja con fondo negro (JPG): { thr, r, fringe } (ver pixelize.removeDarkBg)
+ *   height   alto propio en px, para hojas de otra resolución que los atlas (en vez de la escala común)
+ *   dirs8    8 direcciones con sus pasos: { down: [..], 'down-right': [..], right, 'up-right', up,
+ *            'up-left', left, 'down-left' } (andar = pasos 1-2-3-2; quieto = el del medio)
+ *   layout   'rows4x2': hoja de 8 direcciones en 4 filas × 2 bloques (ver build-sprites):
+ *            los recuadros se detectan solos, no hace falta dirs8
  *   flip     true si en el original miran a la izquierda (el juego los quiere a la derecha)
  *   fps      velocidad de cada animación
  *   anims    idle (quieto) · walk (andando: la pose de correr, el juego añade rebote y polvo)
@@ -46,6 +52,16 @@ module.exports = {
         attack: [[335, 817, 135, 190], [656, 619, 223, 164]],
         hurt: [[277, 289, 125, 171]]
       }
+    },
+
+    // Hecho para el juego (assets/ref/Sanji8D.png): 8 direcciones con 3-4 pasos cada una.
+    // La hoja es de otra resolución que los atlas: lleva su alto propio (Luffy = 42).
+    sanji: {
+      sheet: 'assets/ref/Sanji8D.png',
+      bgDark: { thr: 14, r: 3, fringe: 1 },
+      height: 44, colors: 24,
+      fps: { idle: 1, walk: 8 },
+      layout: 'rows4x2'
     },
 
     // Prueba: su atlas guarda la cabeza (capucha) y la túnica por separado.

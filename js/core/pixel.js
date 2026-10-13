@@ -118,12 +118,24 @@ G.Pix = (() => {
     return s;
   }
 
+  const DIRS8 = ['right', 'down-right', 'down', 'down-left', 'left', 'up-left', 'up', 'up-right'];
+  /** Dirección (de 8) de un vector. */
+  function dir8(x, y) { return DIRS8[((Math.round(Math.atan2(y, x) / (Math.PI / 4)) % 8) + 8) % 8]; }
+
   /**
-   * Qué fotograma dibujar y si va volteado. Los personajes son de lado y miran
-   * a la derecha: face < 0 (mirando a la izquierda) los voltea.
+   * Qué fotograma dibujar y si va volteado.
    *   anim  idle · walk · attack · hurt (las que no se repiten se quedan en el último)
+   *   face  1 / -1: de lado, mirando a la derecha / izquierda (voltea)
+   *   dir   una de las 8 direcciones: para las hojas que las tienen (no se voltean)
    */
-  function pick(s, anim, t, face) {
+  function pick(s, anim, t, face, dir) {
+    if (s.dirs) {
+      const set = s.dirs[dir] || s.dirs.down;
+      // Sin poses de ataque o daño: se queda quieto mirando (el destello marca el golpe).
+      const list = set[anim] && set[anim].length ? set[anim] : set.idle;
+      const i = Math.floor(t * (s.fps[anim] || 8));
+      return { f: list[i % list.length], flip: false };
+    }
     const list = s.anims[anim] && s.anims[anim].length ? s.anims[anim] : s.anims.idle;
     const i = Math.floor(t * (s.fps[anim] || 6));
     const once = anim === 'attack' || anim === 'hurt';
@@ -131,7 +143,7 @@ G.Pix = (() => {
   }
 
   /** ¿Anda con un solo fotograma (la pose de correr)? Entonces el juego le pone rebote. */
-  function bounces(s) { return (s.anims.walk || []).length === 1; }
+  function bounces(s) { return !s.dirs && (s.anims.walk || []).length === 1; }
 
   /**
    * Hojas propias (js/data/sprites-built.js, generado por tools/build-sprites.js,
@@ -157,6 +169,7 @@ G.Pix = (() => {
         const s = build(frames, anims, cfg.fps, cfg.body);
         s.scale = cfg.scale || 1;
         s.file = cfg.file; s.n = n;
+        if (cfg.dirs) s.dirs = cfg.dirs;
         cache.set(id, s);
         done();
       };
@@ -197,5 +210,5 @@ G.Pix = (() => {
     return '<img class="px" src="' + url(s.frames[0]) + '" width="' + Math.round(size * s.w / s.h) + '" height="' + size + '" alt="">';
   }
 
-  return { paint, sprite, pick, bounces, white, flip, big, url, portrait, clean, preloadCustom };
+  return { paint, sprite, pick, bounces, dir8, white, flip, big, url, portrait, clean, preloadCustom };
 })();

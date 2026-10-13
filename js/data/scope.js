@@ -3,7 +3,7 @@
  * El resto sigue en los datos (crew.js, enemies.js) y se activa añadiéndolo aquí.
  */
 G.SCOPE = {
-  crew: ['luffy'],
+  crew: ['luffy', 'sanji'],
   enemies: ['marine'],
   bosses: ['morgan', 'imu']
 };

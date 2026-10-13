@@ -18,7 +18,7 @@ G.Crew = (() => {
       hp: 90, spd: 110, atk: 0.95, cost: 900, start: 'kayaku',
       desc: 'Francotirador. Disparos explosivos y trampas Pop Green.' },
     { id: 'sanji', name: 'Sanji', title: 'Pierna Negra', bounty: '1.032.000.000',
-      hp: 115, spd: 122, atk: 1.05, cost: 1400, start: 'collier',
+      hp: 115, spd: 122, atk: 1.05, cost: 0, start: 'collier',          // gratis mientras se prueba (antes 1400)
       desc: 'Cocinero que sólo pelea con las piernas. Rápido y en llamas.' },
     { id: 'chopper', name: 'Tony Tony Chopper', title: 'Amante del Algodón de Azúcar', bounty: '1.000',
       hp: 135, spd: 100, atk: 0.95, cost: 1600, start: 'kokutei',

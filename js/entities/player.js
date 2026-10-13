@@ -40,6 +40,7 @@ G.Player = class Player {
     this.invuln = 0; this.flash = 0;
     this.aim = Math.PI / 2;
     this.face = 1;
+    this.dir = 'down';           // de las 8 direcciones (para las hojas que las tienen)
     this.stepN = 0;              // pasos dados (para el polvo al andar)
     this.walking = false;
     this.animT = 0;
@@ -111,6 +112,7 @@ G.Player = class Player {
     if (['aura', 'buff', 'mine', 'orbit'].includes(m.kind)) return;
     this.atkAt = now;
     this.face = Math.cos(this.aim) >= 0 ? 1 : -1;
+    this.dir = G.Pix.dir8(Math.cos(this.aim), Math.sin(this.aim));
   }
 
   // ---------------- buffs ----------------
@@ -134,6 +136,7 @@ G.Player = class Player {
       const s = this.spd;
       this.x += ax * s * dt; this.y += ay * s * dt;
       if (Math.abs(ax) > 0.1 && now - this.atkAt > 0.3) this.face = ax > 0 ? 1 : -1;
+      if (now - this.atkAt > 0.3) this.dir = G.Pix.dir8(ax, ay);
       // Polvo en cada paso (cuando el rebote toca el suelo).
       const n = Math.floor(this.animT * 12 / Math.PI);
       if (n !== this.stepN) {
@@ -162,6 +165,7 @@ G.Player = class Player {
     // Mira hacia donde ataca si está parado.
     if (!this.walking && this.target && now - this.atkAt > 0.35) {
       this.face = this.target.x > this.x ? 1 : -1;
+      this.dir = G.Pix.dir8(this.target.x - this.x, this.target.y - this.y);
     }
   }
 
@@ -171,7 +175,7 @@ G.Player = class Player {
     let anim = this.walking ? 'walk' : 'idle', t = this.walking ? this.animT : now;
     if (now - this.hurtAt < 0.25) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.3) { anim = 'attack'; t = now - this.atkAt; }
-    const { f, flip } = G.Pix.pick(s, anim, t, this.face);
+    const { f, flip } = G.Pix.pick(s, anim, t, this.face, this.dir);
     // Golpe: destello blanco cortito y luego parpadeo transparente mientras eres invulnerable.
     const white = this.flash > 0.08;
     const img = white ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);

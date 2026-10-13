@@ -111,6 +111,27 @@ node tools/build-sprites.js luffy    # sólo uno
   editar a mano).
 - Lo que no tiene hoja usa el dibujo en código de `js/data/sprites.js`.
 
+### Hojas de 8 direcciones (hechas para el juego)
+
+Formato (como `assets/ref/Sanji8D.png`):
+
+- **4 filas** de la misma altura; en cada fila, **un bloque a la izquierda y
+  otro a la derecha** de la mitad de la imagen, con 3-4 pasos de andar cada uno.
+- Orden, en el sentido de las agujas del reloj desde abajo:
+
+  | fila | izquierda | derecha |
+  |---|---|---|
+  | 1 | abajo | abajo-derecha |
+  | 2 | derecha | arriba-derecha |
+  | 3 | arriba | arriba-izquierda |
+  | 4 | izquierda | abajo-izquierda |
+
+- Fondo transparente (PNG) mejor; un fondo negro liso también vale
+  (`bgDark`), pero un JPG pierde calidad en los bordes.
+- En el config basta con `layout: 'rows4x2'` y su `height` (alto en el
+  juego; Luffy = 42): los recuadros se detectan solos. Andar = pasos 1-2-3-2,
+  quieto = el paso del medio. Sin poses de ataque/daño se queda quieto mirando.
+
 ### El taller (`tools/sprites.html`)
 
 Para probar una imagen suelta a mano (doble clic): arrastra o pega una hoja o un

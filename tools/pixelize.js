@@ -22,6 +22,62 @@
     return out;
   }
 
+  /**
+   * Quita un fondo negro (JPG sin transparencia) sin comerse lo negro del
+   * personaje: sólo se borran las zonas oscuras ANCHAS conectadas al borde
+   * (los contornos son líneas finas y se quedan) y luego `fringe` píxeles
+   * oscuros más alrededor, para limpiar el borde suavizado.
+   *   thr    brillo máximo (0-255) que cuenta como fondo
+   *   r      media anchura mínima de una zona de fondo
+   */
+  function removeDarkBg(img, thr = 14, r = 3, fringe = 1) {
+    const { w, h, data } = img, N = w * h;
+    const dark = new Uint8Array(N);
+    for (let i = 0; i < N; i++) dark[i] = Math.max(data[i * 4], data[i * 4 + 1], data[i * 4 + 2]) <= thr ? 1 : 0;
+    // Erosión separable: oscuro con todo su entorno (2r+1)² también oscuro.
+    const tmp = new Uint8Array(N), thick = new Uint8Array(N);
+    for (let y = 0; y < h; y++) {
+      let run = 0;
+      const row = y * w;
+      for (let x = 0; x < w; x++) { run = dark[row + x] ? run + 1 : 0; tmp[row + x] = run; }
+    }
+    // tmp = longitud de racha oscura que acaba en x; una ventana [x-r, x+r] es toda oscura si tmp[x+r] >= 2r+1.
+    const hor = new Uint8Array(N);
+    for (let y = 0; y < h; y++) for (let x = r; x < w - r; x++) hor[y * w + x] = tmp[y * w + x + r] >= 2 * r + 1 ? 1 : 0;
+    for (let x = 0; x < w; x++) {
+      let run = 0;
+      for (let y = 0; y < h; y++) { run = hor[y * w + x] ? run + 1 : 0; tmp[y * w + x] = run; }
+    }
+    for (let x = 0; x < w; x++) for (let y = r; y < h - r; y++) thick[y * w + x] = tmp[(y + r) * w + x] >= 2 * r + 1 ? 1 : 0;
+    // Relleno desde el borde por las zonas anchas.
+    const bg = new Uint8Array(N), stack = [];
+    for (let x = 0; x < w; x++) { stack.push(x + r * w, (h - 1 - r) * w + x); }
+    for (let y = 0; y < h; y++) { stack.push(y * w + r, y * w + w - 1 - r); }
+    while (stack.length) {
+      const p = stack.pop();
+      if (p < 0 || p >= N || bg[p] || !thick[p]) continue;
+      bg[p] = 1;
+      const x = p % w;
+      stack.push(p + w, p - w);
+      if (x > 0) stack.push(p - 1);
+      if (x < w - 1) stack.push(p + 1);
+    }
+    // El fondo ocupa también el margen de la erosión (r) y `fringe` más, sólo sobre oscuro.
+    let cur = bg;
+    for (let k = 0; k < r + fringe; k++) {
+      const nxt = Uint8Array.from(cur);
+      for (let p = 0; p < N; p++) {
+        if (cur[p] || !dark[p]) continue;
+        const x = p % w;
+        if ((p >= w && cur[p - w]) || (p < N - w && cur[p + w]) || (x > 0 && cur[p - 1]) || (x < w - 1 && cur[p + 1])) nxt[p] = 1;
+      }
+      cur = nxt;
+    }
+    const out = { w, h, data: Uint8Array.from(data) };
+    for (let p = 0; p < N; p++) if (cur[p]) out.data[p * 4 + 3] = 0;
+    return out;
+  }
+
   function crop(img, x, y, w, h) {
     const out = blank(w, h);
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
@@ -276,5 +332,5 @@
     return out;
   }
 
-  return { blank, rgbOf, removeBg, crop, trim, components, largestOnly, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
+  return { blank, rgbOf, removeBg, removeDarkBg, crop, trim, components, largestOnly, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
 });
