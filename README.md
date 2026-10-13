@@ -88,21 +88,6 @@ Mientras se diseña el estilo, sólo están activos **Luffy**, el **marine** y
 **Morgan** (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
 en los datos y se activa añadiéndolo ahí.
 
-## 4 direcciones a partir de Treasure Cruise
-
-Treasure Cruise sólo trae vistas de lado / tres cuartos y una pose de correr.
-El generador crea lo que falta editando los píxeles de las convertidas
-(`tools/animate.js`), así el personaje sigue siendo el original:
-
-- **Derecha / izquierda (andar):** zancada, piernas juntas en el aire, zancada
-  con las piernas en espejo, piernas juntas.
-- **Abajo (andar):** la pose de espera levantando un pie y luego el otro, con balanceo.
-- **Arriba:** vista de espaldas sacada de la de espera (cara -> pelo, pecho -> ropa).
-- **Ataque y daño:** de lado, mirando al enemigo.
-
-Se configura en `tools/sprites.config.js` con `frames` (con nombre) y `dirs`
-(`{ run }`, `{ step }`, `{ back }`). Ahora mismo: Luffy.
-
 ## Sprites (hojas)
 
 Los personajes salen de las ilustraciones de *One Piece Treasure Cruise*
@@ -113,15 +98,18 @@ node tools/build-sprites.js          # todos
 node tools/build-sprites.js luffy    # sólo uno
 ```
 
-- `tools/sprites.config.js` dice, por personaje, qué fotogramas forman cada
-  animación (`idle`, `walk`, `attack`, `hurt`), el alto final, los colores y
-  si hay que quitar un fondo.
-- Todos los fotogramas de un personaje usan la **misma escala y la misma
-  paleta**, y se alinean por los pies.
+- `tools/sprites.config.js` dice, por personaje, qué recuadros de su atlas
+  forman cada animación (`idle`, `walk`, `attack`, `hurt`), los colores y
+  si hay que quitar un fondo. Sólo poses originales: no se inventan fotogramas.
+- **Escala común:** todos los personajes se reducen con el mismo factor
+  (`scale` en el config: Luffy de pie = 42 px), así conservan las proporciones
+  de Treasure Cruise entre ellos y ninguno cambia de tamaño al cambiar de pose.
+  `size` permite agrandar a uno a propósito (p. ej. un jefe).
+- Personajes de lado, mirando a izquierda o derecha. Al andar se usa la pose de
+  correr con rebote y polvo en cada paso.
 - Escribe `assets/chars/<id>.png` y `js/data/sprites-built.js` (generado: no
   editar a mano).
 - Lo que no tiene hoja usa el dibujo en código de `js/data/sprites.js`.
-- Si `walk` tiene un solo fotograma, el juego lo anima con un rebote.
 
 ### El taller (`tools/sprites.html`)
 

@@ -40,7 +40,7 @@ G.Player = class Player {
     this.invuln = 0; this.flash = 0;
     this.aim = Math.PI / 2;
     this.face = 1;
-    this.dir = 'down';           // hacia dónde mira (4 direcciones)
+    this.stepN = 0;              // pasos dados (para el polvo al andar)
     this.walking = false;
     this.animT = 0;
     this.target = null;
@@ -111,7 +111,6 @@ G.Player = class Player {
     if (['aura', 'buff', 'mine', 'orbit'].includes(m.kind)) return;
     this.atkAt = now;
     this.face = Math.cos(this.aim) >= 0 ? 1 : -1;
-    this.dir = G.Pix.dirOf(Math.cos(this.aim), Math.sin(this.aim));
   }
 
   // ---------------- buffs ----------------
@@ -134,8 +133,13 @@ G.Player = class Player {
     if (this.walking) {
       const s = this.spd;
       this.x += ax * s * dt; this.y += ay * s * dt;
-      if (Math.abs(ax) > 0.1) this.face = ax > 0 ? 1 : -1;
-      if (now - this.atkAt > 0.3) this.dir = G.Pix.dirOf(ax, ay);
+      if (Math.abs(ax) > 0.1 && now - this.atkAt > 0.3) this.face = ax > 0 ? 1 : -1;
+      // Polvo en cada paso (cuando el rebote toca el suelo).
+      const n = Math.floor(this.animT * 12 / Math.PI);
+      if (n !== this.stepN) {
+        this.stepN = n;
+        if (!G.World.waterAt(this.x, this.y)) G.FX.dust(this.x - this.face * 6, this.y, this.face);
+      }
       [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.8);
       if (G.World.waterAt(this.x, this.y) && Math.random() < 0.25) G.FX.puff(this.x, this.y, '#d8f2ff', 1);
     }
@@ -158,7 +162,6 @@ G.Player = class Player {
     // Mira hacia donde ataca si está parado.
     if (!this.walking && this.target && now - this.atkAt > 0.35) {
       this.face = this.target.x > this.x ? 1 : -1;
-      this.dir = G.Pix.dirOf(this.target.x - this.x, this.target.y - this.y);
     }
   }
 
@@ -168,7 +171,7 @@ G.Player = class Player {
     let anim = this.walking ? 'walk' : 'idle', t = this.walking ? this.animT : now;
     if (now - this.hurtAt < 0.25) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.3) { anim = 'attack'; t = now - this.atkAt; }
-    const { f, flip } = G.Pix.pick(s, anim, t, this.dir, this.face);
+    const { f, flip } = G.Pix.pick(s, anim, t, this.face);
     // Golpe: destello blanco cortito y luego parpadeo transparente mientras eres invulnerable.
     const white = this.flash > 0.08;
     const img = white ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);

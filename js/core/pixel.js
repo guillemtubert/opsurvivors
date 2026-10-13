@@ -106,9 +106,6 @@ G.Pix = (() => {
     };
   }
 
-  /** Dirección (de 4) de un vector: 'right' · 'left' · 'down' · 'up'. */
-  function dirOf(x, y) { return Math.abs(x) >= Math.abs(y) ? (x >= 0 ? 'right' : 'left') : (y >= 0 ? 'down' : 'up'); }
-
   function sprite(id) {
     let s = cache.get(id);
     if (s) return s;
@@ -122,29 +119,19 @@ G.Pix = (() => {
   }
 
   /**
-   * Qué fotograma dibujar y si va volteado.
+   * Qué fotograma dibujar y si va volteado. Los personajes son de lado y miran
+   * a la derecha: face < 0 (mirando a la izquierda) los voltea.
    *   anim  idle · walk · attack · hurt (las que no se repiten se quedan en el último)
-   *   dir   right · left · down · up    face  1 / -1 (mira a la derecha / izquierda)
-   * Hojas con direcciones: izquierda = derecha en espejo; de frente y de
-   * espaldas se voltea según hacia qué lado mira (son de tres cuartos); lo que
-   * no hay en esa dirección (ataque, daño) sale de la vista lateral.
-   * Hojas sin direcciones: siempre de lado.
    */
-  function pick(s, anim, t, dir, face) {
-    let set, flip;
-    if (s.dirs) {
-      const d = dir === 'left' ? 'right' : dir;
-      set = s.dirs[d]; flip = d === 'right' ? dir === 'left' : face < 0;
-      if (!set || !set[anim] || !set[anim].length) { set = s.dirs.right || set; flip = face < 0; }
-    } else { set = s.anims; flip = face < 0; }
-    const list = set[anim] && set[anim].length ? set[anim] : set.idle;
+  function pick(s, anim, t, face) {
+    const list = s.anims[anim] && s.anims[anim].length ? s.anims[anim] : s.anims.idle;
     const i = Math.floor(t * (s.fps[anim] || 6));
     const once = anim === 'attack' || anim === 'hurt';
-    return { f: list[once ? Math.min(i, list.length - 1) : i % list.length], flip };
+    return { f: list[once ? Math.min(i, list.length - 1) : i % list.length], flip: face < 0 };
   }
 
-  /** ¿Anda con un solo fotograma? Entonces se anima con un rebote. */
-  function bounces(s) { return !s.dirs && (s.anims.walk || []).length === 1; }
+  /** ¿Anda con un solo fotograma (la pose de correr)? Entonces el juego le pone rebote. */
+  function bounces(s) { return (s.anims.walk || []).length === 1; }
 
   /**
    * Hojas propias (js/data/sprites-built.js, generado por tools/build-sprites.js,
@@ -170,7 +157,6 @@ G.Pix = (() => {
         const s = build(frames, anims, cfg.fps, cfg.body);
         s.scale = cfg.scale || 1;
         s.file = cfg.file; s.n = n;
-        if (cfg.dirs) s.dirs = cfg.dirs;
         cache.set(id, s);
         done();
       };
@@ -211,5 +197,5 @@ G.Pix = (() => {
     return '<img class="px" src="' + url(s.frames[0]) + '" width="' + Math.round(size * s.w / s.h) + '" height="' + size + '" alt="">';
   }
 
-  return { paint, sprite, pick, bounces, dirOf, white, flip, big, url, portrait, clean, preloadCustom };
+  return { paint, sprite, pick, bounces, white, flip, big, url, portrait, clean, preloadCustom };
 })();

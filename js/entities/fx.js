@@ -40,6 +40,14 @@ G.FX = (() => {
     }
   }
 
+  /** Polvo de un paso: dos o tres motas que salen hacia atrás y se posan. */
+  function dust(x, y, face) {
+    for (let i = 0; i < 3; i++) {
+      parts.push({ x: x + G.U.rand(-3, 3), y: y + G.U.rand(-1, 1) + G.LIFT, vx: -face * G.U.rand(15, 45), vy: G.U.rand(-25, -8),
+                   life: 0.35, max: 0.35, col: G.U.rand(0, 1) < 0.5 ? '#e8dcc0' : '#c9b896', s: 2, g: 60 });
+    }
+  }
+
   /** Humo/polvo que sube despacio. */
   function puff(x, y, col, n = 5) {
     for (let i = 0; i < n; i++) {
@@ -197,5 +205,5 @@ G.FX = (() => {
     ctx.globalAlpha = 1;
   }
 
-  return { clear, burst, spark, puff, ring, slash, beam, bolt, mark, text, update, drawUnder, drawOver, drawTexts, mini };
+  return { clear, burst, spark, dust, puff, ring, slash, beam, bolt, mark, text, update, drawUnder, drawOver, drawTexts, mini };
 })();
