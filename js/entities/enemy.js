@@ -1,0 +1,340 @@
+/* ============ enemy.js — enemigos, jefes y su gestor ============
+ * (x, y) son los PIES. Los comportamientos están descritos en data/enemies.js.
+ * El gestor mantiene una rejilla espacial (celdas de 64) que se rehace cada
+ * frame: los proyectiles y los ataques sólo miran a los de alrededor.
+ */
+G.Enemy = class Enemy {
+  constructor(def, o = {}) {
+    this.def = def;
+    this.name = def.name;
+    this.title = def.title || '';
+    this.sprite = def.sprite;
+    const s = G.Pix.sprite(def.sprite);
+    this.scale = s.scale || 1;
+    this.r = 9 * this.scale;
+    this.x = o.x || 0; this.y = o.y || 0;
+    this.boss = !!o.boss;
+    this.elite = !!o.elite;
+    this.maxHp = def.hp * (o.hpK || 1) * (this.elite ? 3 : 1);
+    this.hp = this.maxHp;
+    this.spd = def.spd * G.U.rand(0.92, 1.08);
+    this.dmg = def.dmg * (o.dmgK || 1) * (this.elite ? 1.4 : 1);
+    this.xp = def.xp * (o.xpK || 1) * (this.elite ? 3 : 1);
+    this.behavior = def.behavior;
+    this.dead = false;
+    this.flash = 0;
+    this.kx = 0; this.ky = 0;               // empuje recibido
+    this.burnT = 0; this.burnDps = 0; this.burnTick = 0;
+    this.face = 1;
+    this.moving = false;
+    this.animT = Math.random();
+    this.t1 = G.U.rand(1, 3);               // temporizador de su ataque especial
+    this.state = 'walk'; this.stateT = 0;
+    this.dashX = 0; this.dashY = 0;
+    this.hitT = 0;                          // último golpe al jugador
+  }
+
+  update(dt, pl, now) {
+    this.animT += dt;
+    if (this.flash > 0) this.flash -= dt;
+
+    // Quemadura: daño cada medio segundo.
+    if (this.burnT > 0) {
+      this.burnT -= dt; this.burnTick -= dt;
+      if (this.burnTick <= 0) {
+        this.burnTick = 0.5;
+        this.damage(this.burnDps * 0.5, now, null, '#ff8a2a');
+        if (Math.random() < 0.5) G.FX.puff(this.x, this.y - 6, '#ff8a2a', 1);
+        if (this.dead) return;
+      }
+    }
+
+    const dx = pl.x - this.x, dy = pl.y - this.y;
+    const d = Math.hypot(dx, dy) || 1;
+    const nx = dx / d, ny = dy / d;
+    let mx = 0, my = 0;
+    const slow = this.boss ? 1 : [1, 0.6, 0.45][G.World.waterAt(this.x, this.y)];
+    let spd = this.spd * slow;
+
+    switch (this.behavior) {
+      case 'ranged': {
+        if (d > 230) { mx = nx; my = ny; }
+        else if (d < 150) { mx = -nx; my = -ny; }
+        else { mx = -ny * 0.6; my = nx * 0.6; }
+        this.t1 -= dt;
+        if (this.t1 <= 0 && d < 340) {
+          this.t1 = G.U.rand(2.0, 2.8);
+          this.shoot(nx, ny, 170, this.def.shot || this.dmg);
+        }
+        break;
+      }
+      case 'beamer': {
+        if (this.state === 'aim') {
+          this.stateT -= dt;
+          if (this.stateT <= 0) {
+            // Dispara el láser en la dirección marcada.
+            this.state = 'walk';
+            const ex = this.x + Math.cos(this.aim) * 320, ey = this.y + Math.sin(this.aim) * 320;
+            G.FX.beam(this.x, this.y - 10, ex, ey - 10, 8, '#ffe14d', 0.25);
+            G.Audio.sfx('thunder');
+            if (segDist(pl.x, pl.y, this.x, this.y, ex, ey) < 14 + pl.r) pl.hurt(this.dmg * 1.6, now);
+          }
+        } else {
+          mx = nx; my = ny;
+          this.t1 -= dt;
+          if (this.t1 <= 0 && d < 300) {
+            this.t1 = G.U.rand(4.5, 6);
+            this.state = 'aim'; this.stateT = 0.9;
+            this.aim = Math.atan2(dy, dx);
+            G.FX.mark(this.x, this.y, 0, '#ff3a3a', 0.9, 'line', { a: this.aim, len: 320, w: 24 });
+          }
+        }
+        break;
+      }
+      case 'charger': {
+        if (this.state === 'aim') {
+          this.stateT -= dt;
+          if (this.stateT <= 0) { this.state = 'dash'; this.stateT = 0.55; }
+        } else if (this.state === 'dash') {
+          this.stateT -= dt;
+          mx = this.dashX; my = this.dashY; spd = this.spd * 4;
+          if (Math.random() < 0.5) G.FX.puff(this.x, this.y, '#c9b28a', 1);
+          if (this.stateT <= 0) this.state = 'walk';
+        } else {
+          mx = nx; my = ny;
+          this.t1 -= dt;
+          if (this.t1 <= 0 && d < 340) {
+            this.t1 = G.U.rand(3.2, 4.4);
+            this.state = 'aim'; this.stateT = 0.7;
+            this.dashX = nx; this.dashY = ny;
+            G.FX.mark(this.x, this.y, 0, '#ff3a3a', 0.7, 'line', { a: Math.atan2(ny, nx), len: this.spd * 4 * 0.55, w: this.r * 2 });
+          }
+        }
+        break;
+      }
+      case 'fan': {
+        mx = nx * 0.8; my = ny * 0.8;
+        this.t1 -= dt;
+        if (this.t1 <= 0 && d < 380) {
+          this.t1 = G.U.rand(2.0, 2.6);
+          const a0 = Math.atan2(dy, dx);
+          const ring = Math.random() < 0.3;
+          const n = ring ? 14 : 5;
+          for (let i = 0; i < n; i++) {
+            const a = ring ? i / n * 6.283 : a0 + (i - (n - 1) / 2) * 0.22;
+            this.shoot(Math.cos(a), Math.sin(a), ring ? 140 : 200, this.dmg * 0.6, 'knife');
+          }
+          G.Audio.sfx('slash');
+        }
+        break;
+      }
+      case 'zoner': {
+        mx = nx * 0.7; my = ny * 0.7;
+        this.t1 -= dt;
+        if (this.t1 <= 0 && d < 420) {
+          this.t1 = G.U.rand(2.6, 3.4);
+          for (let i = 0; i < 3; i++) {
+            const zx = pl.x + (i ? G.U.rand(-70, 70) : 0), zy = pl.y + (i ? G.U.rand(-50, 50) : 0);
+            const m = G.FX.mark(zx, zy, 34, '#e0c070', 1.0);
+            m.onEnd = () => {
+              G.FX.burst(zx, zy, '#e0c070', 14, 160);
+              G.FX.ring(zx, zy, 8, 40, '#e0c070', 0.3, 4);
+              if (G.U.dist(pl.x, pl.y, zx, zy) < 34 + pl.r) pl.hurt(this.dmg * 0.8, now);
+            };
+            G.Hazards.add(m);
+          }
+        }
+        break;
+      }
+      default:
+        mx = nx; my = ny;
+    }
+
+    // Empuje: se va frenando.
+    this.x += (mx * spd + this.kx) * dt;
+    this.y += (my * spd + this.ky) * dt;
+    const k = Math.exp(-8 * dt);
+    this.kx *= k; this.ky *= k;
+    this.moving = Math.abs(mx) + Math.abs(my) > 0.1;
+    if (Math.abs(mx) > 0.1) this.face = mx > 0 ? 1 : -1;
+
+    // Chocan con árboles y rocas (los jefes no: no deben quedarse atascados).
+    if (!this.boss) [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.7);
+
+    // Golpe al tocarte.
+    if (!pl.dead && d < this.r + pl.r && now - this.hitT > 0.7) {
+      this.hitT = now;
+      pl.hurt(this.dmg, now);
+    }
+  }
+
+  shoot(nx, ny, speed, dmg, vis = 'ebullet') {
+    G.Projectiles.spawn({
+      foe: true, x: this.x + nx * this.r, y: this.y + ny * this.r, vx: nx * speed, vy: ny * speed,
+      dmg, r: 5, life: 3, color: '#ff5f5f', vis
+    });
+  }
+
+  /** @param src  proyectil o técnica (para empuje, quemadura...) */
+  damage(amount, now, src = null, col = null) {
+    if (this.dead) return;
+    let crit = false;
+    if (src && src.owner && Math.random() < src.owner.crit) { amount *= 2; crit = true; }
+    this.hp -= amount;
+    this.flash = 0.1;
+    if (src) {
+      if (src.knock) {
+        const [nx, ny] = src.vx !== undefined ? G.U.norm(src.vx, src.vy) : G.U.norm(this.x - src.ox, this.y - src.oy);
+        const res = this.boss ? 0.12 : this.elite ? 0.5 : 1;
+        this.kx += nx * src.knock * res; this.ky += ny * src.knock * res;
+      }
+      if (src.burn) { this.burnT = 3; this.burnDps = Math.max(this.burnDps, src.burn * (src.owner ? src.owner.atk : 1)); }
+    }
+    G.Game.stats.dealt += amount;
+    G.FX.text(this.x, this.y - this.r * 2, Math.round(amount), col || (crit ? '#ffe14d' : '#ffffff'), crit);
+    G.Audio.sfx('hit');
+    if (this.hp <= 0) this.die(now);
+  }
+
+  die(now) {
+    this.dead = true;
+    G.FX.burst(this.x, this.y - 10, '#ffffff', 8, 130);
+    G.FX.puff(this.x, this.y, '#d8d0c0', 3);
+    G.Pickups.dropEnemy(this);
+    G.Game.onKill(this);
+  }
+
+  draw(ctx, now) {
+    const s = G.Pix.sprite(this.sprite);
+    const sc = this.scale * G.PX;
+    let f = 0;
+    if (this.moving) f = [1, 0, 2, 0][Math.floor(this.animT * 7) % 4];
+    const flip = this.face < 0;
+    const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
+    const w = s.w * sc, h = s.h * sc;
+    const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2;
+    // Sombra.
+    ctx.fillStyle = 'rgba(0,0,0,.28)';
+    ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.45, 0, 0, 6.283); ctx.fill();
+    if (this.elite) {
+      // Élite: halo dorado detrás.
+      ctx.globalAlpha = 0.55 + Math.sin(now * 8) * 0.2;
+      const g = flip ? s.whiteFlip[f] : s.white[f];
+      for (const [ox, oy] of [[-2, 0], [2, 0], [0, -2], [0, 2]]) ctx.drawImage(g, x + ox, y + oy, w, h);
+      ctx.globalAlpha = 1;
+    }
+    ctx.drawImage(img, x, y, w, h);
+    if (this.burnT > 0 && Math.random() < 0.3) G.FX.puff(this.x + G.U.rand(-6, 6), this.y - h * 0.5, '#ff8a2a', 1);
+    // Barra de vida de los élite y de los heridos grandes.
+    if ((this.elite || this.def.hp > 100) && !this.boss && this.hp < this.maxHp) {
+      const bw = 28;
+      ctx.fillStyle = '#1a1220'; ctx.fillRect(this.x - bw / 2 - 2, y - 8, bw + 4, 6);
+      ctx.fillStyle = this.elite ? '#ffd23f' : '#ff5f5f';
+      ctx.fillRect(this.x - bw / 2, y - 6, bw * Math.max(0, this.hp / this.maxHp), 2);
+    }
+  }
+};
+
+/** Distancia de un punto a un segmento. */
+function segDist(px, py, x1, y1, x2, y2) {
+  const vx = x2 - x1, vy = y2 - y1;
+  const t = G.U.clamp(((px - x1) * vx + (py - y1) * vy) / (vx * vx + vy * vy || 1), 0, 1);
+  return Math.hypot(px - (x1 + vx * t), py - (y1 + vy * t));
+}
+G.segDist = segDist;
+
+G.EnemyMgr = (() => {
+  let list = [];
+  const CELL = 64;
+  let grid = new Map();
+
+  function clear() { list = []; grid = new Map(); }
+  function add(e) { list.push(e); return e; }
+
+  function key(cx, cy) { return (cx & 0xffff) << 16 | (cy & 0xffff); }
+
+  function rebuild() {
+    grid = new Map();
+    for (const e of list) {
+      if (e.dead) continue;
+      const k = key(Math.floor(e.x / CELL), Math.floor(e.y / CELL));
+      let c = grid.get(k);
+      if (!c) grid.set(k, c = []);
+      c.push(e);
+    }
+  }
+
+  /** Enemigos cuyas celdas tocan el círculo (filtrar por distancia fuera). */
+  function query(x, y, r) {
+    const out = [];
+    const x0 = Math.floor((x - r) / CELL), x1 = Math.floor((x + r) / CELL);
+    const y0 = Math.floor((y - r) / CELL), y1 = Math.floor((y + r) / CELL);
+    for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) {
+      const c = grid.get(key(cx, cy));
+      if (c) for (const e of c) out.push(e);
+    }
+    return out;
+  }
+
+  function nearest(x, y, maxR, exclude = null) {
+    let best = null, bd = maxR * maxR;
+    for (const e of query(x, y, maxR)) {
+      if (e.dead || (exclude && exclude.has(e))) continue;
+      const d = G.U.dist2(x, y, e.x, e.y);
+      if (d < bd) { bd = d; best = e; }
+    }
+    return best;
+  }
+
+  function update(dt, pl, now) {
+    rebuild();
+    for (const e of list) if (!e.dead) e.update(dt, pl, now);
+    // Separación: que no se amontonen en un solo píxel.
+    for (const e of list) {
+      if (e.dead) continue;
+      for (const o of query(e.x, e.y, e.r * 2)) {
+        if (o === e || o.dead) continue;
+        const dx = e.x - o.x, dy = e.y - o.y, min = (e.r + o.r) * 0.8;
+        const d2 = dx * dx + dy * dy;
+        if (d2 > 0 && d2 < min * min) {
+          const d = Math.sqrt(d2), push = (min - d) * 0.5;
+          const wE = e.boss ? 0.1 : 1;
+          e.x += dx / d * push * wE; e.y += dy / d * push * wE;
+        }
+      }
+    }
+    list = list.filter(e => !e.dead);
+    // Los que se quedan muy lejos vuelven a aparecer cerca (no se pierden).
+    const far = G.Camera.outerRadius() * 2.2;
+    for (const e of list) {
+      if (!e.boss && G.U.dist2(e.x, e.y, pl.x, pl.y) > far * far) {
+        const a = Math.atan2(pl.y - e.y, pl.x - e.x) + Math.PI + G.U.rand(-0.5, 0.5);
+        const r = G.Camera.outerRadius() + 30;
+        e.x = pl.x - Math.cos(a) * r; e.y = pl.y - Math.sin(a) * r;
+      }
+    }
+  }
+
+  function collect(out, now) {
+    for (const e of list) if (G.Camera.sees(e.x, e.y, 80)) out.push({ y: e.y, draw: ctx => e.draw(ctx, now) });
+  }
+
+  return {
+    clear, add, update, query, nearest, collect,
+    get list() { return list; }, get count() { return list.length; },
+    boss() { return list.find(e => e.boss && !e.dead) || null; }
+  };
+})();
+
+/* Peligros con aviso en el suelo: al acabar el aviso, se ejecuta onEnd. */
+G.Hazards = (() => {
+  let list = [];
+  return {
+    clear() { list = []; },
+    add(m) { list.push(m); },
+    update() {
+      for (const m of list) if (m.life <= 0 && m.onEnd) { m.onEnd(); m.onEnd = null; }
+      list = list.filter(m => m.onEnd);
+    }
+  };
+})();

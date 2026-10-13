@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#2a1a10">
+<title>One Piece Survivors</title>
+<meta name="description" content="Fan game de supervivencia (bullet heaven) con los Sombrero de Paja, en pixel art y para navegador.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+
+<div id="boot" class="boot">Cargando…</div>
+
+<!-- ====== HUD ====== -->
+<div id="hud" class="hidden">
+  <div class="xpbar"><i id="hud-xp"></i></div>
+  <div class="hud-top">
+    <div class="hud-me">
+      <div id="hud-face" class="face"></div>
+      <div>
+        <div class="hpbar"><i id="hud-hp"></i><span id="hud-hp-txt"></span></div>
+        <div id="hud-lvl" class="lvl">Nv. 1</div>
+      </div>
+    </div>
+    <div id="hud-time" class="time">0:00</div>
+    <div class="hud-right">
+      <span class="pill"><span id="hud-ico-kills"></span><span id="hud-kills">0</span></span>
+      <span class="pill"><span id="hud-ico-coins"></span><span id="hud-coins">0</span></span>
+      <button id="hud-pause" class="pause-btn" data-sfx="none" aria-label="Pausa"></button>
+    </div>
+  </div>
+  <div id="hud-boss" class="bossbar hidden">
+    <div id="hud-boss-name"></div>
+    <div class="bar"><i id="hud-boss-hp"></i></div>
+  </div>
+  <div class="hud-bottom">
+    <div id="hud-move-name" class="move-name"></div>
+    <div id="hud-moves" class="slots"></div>
+  </div>
+</div>
+<div id="banner" class="banner hidden"></div>
+
+<!-- ====== Título ====== -->
+<section id="scr-title" class="scr hidden">
+  <div class="title">
+    <div id="title-flag"></div>
+    <h1>ONE PIECE<br><span>SURVIVORS</span></h1>
+    <p>Sobrevive a la Marina con los Sombrero de Paja</p>
+    <p class="blink">Pulsa para zarpar</p>
+  </div>
+</section>
+
+<!-- ====== Puerto (menú) ====== -->
+<section id="scr-menu" class="scr hidden">
+  <div class="box menu-box">
+    <div class="menu-left">
+      <div id="menu-captain"></div>
+      <p id="menu-best" class="sub center"></p>
+    </div>
+    <div class="menu-right">
+      <h2>One Piece Survivors</h2>
+      <p id="menu-berries" class="berries"></p>
+      <div class="menu-list">
+        <button id="btn-play" class="menu-item play">¡Zarpar!<small>Empieza una partida</small></button>
+        <button id="btn-crew" class="menu-item">Tripulación<small>Elige o recluta a tu capitán</small></button>
+        <button id="btn-upg" class="menu-item">Mejoras<small>Entrena con tus berries</small></button>
+        <button id="btn-settings" class="menu-item">Ajustes<small>Sonido y pantalla</small></button>
+      </div>
+      <p class="note">WASD / flechas: moverte · 1-4, Q/E: técnica · Esc: pausa</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Tripulación ====== -->
+<section id="scr-crew" class="scr dim hidden">
+  <div class="box wide">
+    <div class="row between"><h2>Tripulación</h2><button class="btn small ghost" data-back>Volver</button></div>
+    <div class="split">
+      <div id="crew-grid" class="crew-grid"></div>
+      <div id="crew-detail" class="panel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Mejoras ====== -->
+<section id="scr-upg" class="scr dim hidden">
+  <div class="box wide">
+    <div class="row between"><h2>Mejoras</h2>
+      <div class="row"><span id="upg-berries" class="berries"></span><button class="btn small ghost" data-back>Volver</button></div></div>
+    <p class="sub">Valen para toda la tripulación.</p>
+    <div id="upg-list" class="upg-list"></div>
+  </div>
+</section>
+
+<!-- ====== Ajustes ====== -->
+<section id="scr-settings" class="scr dim hidden">
+  <div class="box" style="width:min(440px,100%)">
+    <h2>Ajustes</h2>
+    <label class="set">Música <input id="set-music" type="range" min="0" max="1" step="0.05"></label>
+    <label class="set">Efectos <input id="set-sfx" type="range" min="0" max="1" step="0.05"></label>
+    <label class="set check"><input id="set-shake" type="checkbox"> Sacudidas de pantalla</label>
+    <label class="set check"><input id="set-dmg" type="checkbox"> Números de daño</label>
+    <div class="row" style="margin-top:14px">
+      <button id="set-back" class="btn gold grow">Volver</button>
+      <button id="set-reset" class="btn small ghost">Borrar partida</button>
+    </div>
+  </div>
+</section>
+
+<!-- ====== Durante la partida ====== -->
+<section id="scr-levelup" class="scr dim hidden">
+  <div class="box center">
+    <h2 id="lvl-title">¡Nivel 2!</h2>
+    <p class="sub">Elige una recompensa · <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></p>
+    <div id="cards" class="cards"></div>
+    <button id="lvl-reroll" class="btn small ghost hidden" data-sfx="none" style="margin-top:12px">Otras cartas (<span id="lvl-rr-n">1</span>) · <kbd>R</kbd></button>
+  </div>
+</section>
+
+<section id="scr-pause" class="scr dim hidden">
+  <div class="box center" style="width:min(460px,100%)">
+    <h2>Pausa</h2>
+    <p class="sub"><kbd>WASD</kbd> moverse · <kbd>1</kbd>–<kbd>4</kbd> técnica · <kbd>Q</kbd>/<kbd>E</kbd> cambiar · <kbd>Esc</kbd> pausa</p>
+    <p class="sub">Sólo se usa la técnica activa: cámbiala según la situación.</p>
+    <div class="row" style="justify-content:center">
+      <button id="btn-resume" class="btn gold">Continuar</button>
+      <button id="btn-pause-settings" class="btn">Ajustes</button>
+      <button id="btn-quit" class="btn">Volver a puerto</button>
+    </div>
+  </div>
+</section>
+
+<section id="scr-over" class="scr dim hidden">
+  <div class="box center" style="width:min(460px,100%)">
+    <h2 id="over-title">¡Has caído!</h2>
+    <div id="over-face"></div>
+    <div id="over-stats" class="over-stats"></div>
+    <div class="row" style="justify-content:center">
+      <button id="btn-retry" class="btn gold">Otra vez</button>
+      <button id="btn-again" class="btn">Volver a puerto</button>
+    </div>
+  </div>
+</section>
+
+<script defer src="js/core/util.js"></script>
+<script defer src="js/core/save.js"></script>
+<script defer src="js/core/pixel.js"></script>
+<script defer src="js/core/camera.js"></script>
+<script defer src="js/core/input.js"></script>
+<script defer src="js/core/audio.js"></script>
+
+<script defer src="js/data/sprites.js"></script>
+<script defer src="js/data/moves.js"></script>
+<script defer src="js/data/crew.js"></script>
+<script defer src="js/data/enemies.js"></script>
+<script defer src="js/data/upgrades.js"></script>
+
+<script defer src="js/world/world.js"></script>
+
+<script defer src="js/entities/fx.js"></script>
+<script defer src="js/entities/projectile.js"></script>
+<script defer src="js/entities/enemy.js"></script>
+<script defer src="js/entities/pickup.js"></script>
+<script defer src="js/entities/player.js"></script>
+
+<script defer src="js/systems/combat.js"></script>
+<script defer src="js/systems/spawner.js"></script>
+<script defer src="js/systems/levelup.js"></script>
+
+<script defer src="js/ui/icons.js"></script>
+<script defer src="js/ui/hud.js"></script>
+<script defer src="js/ui/ui.js"></script>
+
+<script defer src="js/game.js"></script>
+<script defer src="js/main.js"></script>
+</body>
+</html>
