@@ -227,7 +227,7 @@ G.Enemy = class Enemy {
     // Un solo fotograma para andar: rebote.
     // Flotando: vaivén suave. Andando con una sola pose: rebote de los pasos.
     const hop = this.def.hover ? Math.round((Math.sin(this.animT * 2.5) + 1) * 1.5) * 2
-      : anim === 'walk' && G.Pix.bounces(s) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
+      : anim === 'walk' && G.Pix.bounces(s, this.dir) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
     const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2 - hop;

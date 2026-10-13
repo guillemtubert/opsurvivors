@@ -1,0 +1,21 @@
+#!/bin/sh
+# Antes de cada commit: que no se cuelen los originales (atlas de Treasure Cruise,
+# hojas sin convertir). El juego y GitHub Pages sólo necesitan assets/chars/.
+# Se activa con:  git config core.hooksPath tools/hooks
+# (Para saltártelo a propósito: git commit --no-verify)
+
+bad=$(git diff --cached --name-only --diff-filter=AM | while IFS= read -r f; do
+  case "$f" in
+    assets/ref/*) echo "  $f  (original: assets/ref/ no se sube)"; continue ;;
+    *.jfif|*.JFIF|*.jpg|*.JPG|*.jpeg|*.JPEG) echo "  $f  (JPG: el juego no usa ninguno, es un original)"; continue ;;
+  esac
+  size=$(git cat-file -s ":$f" 2>/dev/null || echo 0)
+  if [ "$size" -gt 2097152 ]; then echo "  $f  ($((size / 1048576)) MB: demasiado grande para el juego)"; fi
+done)
+
+if [ -n "$bad" ]; then
+  echo "Commit cancelado: estos archivos parecen originales y no deben subirse a GitHub:"
+  echo "$bad"
+  echo "Quítalos con:  git restore --staged <archivo>"
+  exit 1
+fi

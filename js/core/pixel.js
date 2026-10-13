@@ -147,8 +147,11 @@ G.Pix = (() => {
     return { f: list[once ? Math.min(i, list.length - 1) : i % list.length], flip: face < 0 };
   }
 
-  /** ¿Anda con un solo fotograma (la pose de correr)? Entonces el juego le pone rebote. */
-  function bounces(s) { return !s.dirs && (s.anims.walk || []).length === 1; }
+  /** ¿Anda con un solo fotograma (la pose de correr) en esa dirección? Entonces el juego le pone rebote. */
+  function bounces(s, dir) {
+    const w = s.dirs ? (s.dirs[dir] || s.dirs.down).walk : s.anims.walk;
+    return (w || []).length === 1;
+  }
 
   /**
    * Hojas propias (js/data/sprites-built.js, generado por tools/build-sprites.js,

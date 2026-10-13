@@ -85,15 +85,34 @@ js/
 ## Alcance actual
 
 Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y
-**Sanji**, el **marine**, y **Morgan** e **Imu** como jefes (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
+**Sanji**, el **marine**, y **Morgan** e **Imu** como jefes (`js/data/scope.js`).
+Luffy, Sanji, el marine y Morgan andan en 8 direcciones. El resto de tripulantes, enemigos y jefes sigue
 en los datos y se activa añadiéndolo ahí.
 
 ## Sprites (hojas)
 
-> Los originales (`assets/ref/`) no se suben al repositorio (`.gitignore`): son
-> ripeos de Treasure Cruise y hojas sin convertir. El juego sólo necesita las
-> hojas ya convertidas de `assets/chars/`, que sí están. Para regenerarlas hace
-> falta tener `assets/ref/` en local.
+### Originales y GitHub
+
+Los originales (`assets/ref/`: ripeos de Treasure Cruise, hojas sin convertir)
+**no se suben** al repositorio. El juego y GitHub Pages sólo necesitan las hojas
+ya convertidas de `assets/chars/` (y `js/data/sprites-built.js`), que sí están.
+Para regenerarlas hace falta tener `assets/ref/` en local.
+
+- `.gitignore` deja fuera `assets/ref/`.
+- `tools/hooks/pre-commit` cancela cualquier commit que lleve algo de
+  `assets/ref/`, un JPG o un archivo de más de 2 MB (aunque se fuerce con
+  `git add -f`). Al clonar el repositorio en otro ordenador, actívalo con:
+
+  ```
+  git config core.hooksPath tools/hooks
+  ```
+- Las hojas en JPG (`.jfif`) se pasan a PNG, junto al original, antes de
+  generar: el generador sólo lee PNG.
+
+Flujo para un personaje nuevo: dejar lo que haya en
+`assets/ref/characters/<id>/` → configurarlo en `tools/sprites.config.js` →
+`node tools/build-sprites.js <id>` → commit de `assets/chars/<id>.png` y
+`js/data/sprites-built.js` → `git push` (GitHub Pages se actualiza solo).
 
 Cada personaje tiene su carpeta `assets/ref/characters/<id>/` con todo lo que
 haya de él (atlas de *One Piece Treasure Cruise*, hojas de 8 direcciones hechas

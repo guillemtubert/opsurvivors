@@ -64,15 +64,25 @@ module.exports = {
       }
     },
 
+    // Marine: andar en 8 direcciones (Marine8D.png, convertida del .jfif; fondo blanco).
+    // Sin 'pockets': la camisa y la gorra son blancas como el fondo.
     marine: {
-      sheet: REF + 'marine/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0180 - Saber Apprentice - Navy.png',
-      size: 1, colors: 22,
-      fps: { idle: 4, walk: 1, attack: 6, hurt: 1 },
+      sheet: REF + 'marine/Marine8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 8, attack: 6 },
+      dirs8: {
+        down: [[473, 65, 222, 322], [107, 67, 193, 321], [822, 68, 257, 323]],
+        'down-right': [[67, 1507, 215, 277], [374, 1509, 182, 276], [656, 1509, 220, 270], [949, 1509, 224, 275]],
+        right: [[75, 573, 271, 304]],
+        'up-right': [[1276, 536, 294, 321], [1719, 530, 186, 317], [2087, 530, 193, 323]],
+        up: [[105, 931, 181, 335], [490, 931, 182, 333], [860, 931, 203, 335]],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
       anims: {
-        idle: [[45, 37, 132, 170], [237, 38, 128, 169], [429, 39, 126, 168]],
-        walk: [[43, 309, 143, 159]],
-        attack: [[335, 817, 135, 190], [656, 619, 223, 164]],
-        hurt: [[277, 289, 125, 171]]
+        attack: [[1830, 1499, 202, 284], [2103, 1536, 297, 244]]       // espada en alto y estocada
       }
     },
 
@@ -102,16 +112,26 @@ module.exports = {
       }
     },
 
+    // Morgan: andar en 8 direcciones (Morgan8D.png, convertida del .jfif; fondo blanco).
+    // Jefe: más grande que los demás a propósito.
     morgan: {
-      sheet: REF + 'morgan/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0035 - Axe-Hand Morgan.png',
-      bg: '#e69900',
-      size: 1, colors: 20,
-      fps: { idle: 4, walk: 1, attack: 5, hurt: 1 },
+      sheet: REF + 'morgan/Morgan8D.png',
+      bgFlat: { color: '#ffffff', thr: 40, r: 2, fringe: 2, pockets: true },
+      height: 62, colors: 24,
+      fps: { idle: 1, walk: 8, attack: 5 },
+      dirs8: {
+        down: [[15, 35, 274, 404], [314, 35, 274, 404], [612, 34, 274, 405], [915, 35, 268, 405], [1211, 35, 275, 404], [1512, 35, 270, 404]],
+        'down-right': [[21, 489, 261, 395], [309, 489, 272, 394], [610, 488, 266, 399], [934, 489, 261, 396]],
+        right: [[1227, 483, 232, 400], [1522, 483, 259, 390], [1821, 483, 256, 395], [2123, 483, 249, 401]],
+        'up-left': [[13, 941, 268, 398], [314, 941, 261, 397], [621, 941, 242, 400]],
+        up: [[930, 938, 251, 391], [1210, 941, 259, 394], [1522, 941, 263, 401], [1819, 941, 262, 400], [2123, 941, 245, 400]],
+        'up-right': { mirror: 'up-left' },
+        left: { mirror: 'right' },
+        'down-left': [[312, 1394, 267, 391], [603, 1394, 272, 391], [940, 1394, 224, 391], [1205, 1394, 281, 391]]
+      },
       anims: {
-        idle: [[32, 65, 128, 190], [223, 60, 129, 195], [410, 57, 135, 198]],
-        walk: [[74, 889, 165, 164]],
-        attack: [[288, 889, 170, 164], [537, 889, 186, 164]],
-        hurt: [[811, 882, 123, 172]]
+        // El último fotograma es el que se ve al embestir (estado 'dash' del jefe).
+        attack: [[2111, 1402, 268, 369], [1507, 1414, 268, 372]]       // hachazo en alto, embestida
       }
     }
   }

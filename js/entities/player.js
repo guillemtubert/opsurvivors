@@ -183,7 +183,7 @@ G.Player = class Player {
     // Dibujo en código: respira 1 px quieto. Hoja con una sola pose de correr: rebota al andar.
     let bob = 0;
     if (anim === 'idle' && s.anims.idle.length === 1) bob = Math.floor(now * 2) % 2 ? 2 : 0;
-    if (anim === 'walk' && G.Pix.bounces(s)) bob = -Math.round(Math.abs(Math.sin(this.animT * 12)) * 2) * 2;
+    if (anim === 'walk' && G.Pix.bounces(s, this.dir)) bob = -Math.round(Math.abs(Math.sin(this.animT * 12)) * 2) * 2;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2 + bob) / 2) * 2;
     ctx.fillStyle = 'rgba(0,0,0,.3)';
     ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.4, 0, 0, 6.283); ctx.fill();
