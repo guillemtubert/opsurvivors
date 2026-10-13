@@ -66,7 +66,7 @@ tools/serve.js        servidor local mínimo
 tools/sprites.html    taller de sprites (recortar hojas / convertir dibujos)
 tools/build-sprites.js  generador: assets/ref/ -> assets/chars/ (config en sprites.config.js)
 tools/png.js, pixelize.js  PNG sin dependencias y conversión a pixel art
-assets/ref/           originales de One Piece Treasure Cruise
+assets/ref/characters/<id>/  todo lo que hay de cada personaje (atlas, hojas de 8 direcciones...)
 js/
   core/     util, save (localStorage), pixel (mapas de píxeles -> canvas),
             camera, input (teclado + joystick táctil), audio (sintetizador chiptune)
@@ -84,14 +84,15 @@ js/
 
 ## Alcance actual
 
-Mientras se diseña el estilo, sólo están activos **Luffy**, el **marine** y
-**Morgan** (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
+Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y
+**Sanji**, el **marine**, y **Morgan** e **Imu** como jefes (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
 en los datos y se activa añadiéndolo ahí.
 
 ## Sprites (hojas)
 
-Los personajes salen de las ilustraciones de *One Piece Treasure Cruise*
-(`assets/ref/`), convertidas a pixel art por un generador:
+Cada personaje tiene su carpeta `assets/ref/characters/<id>/` con todo lo que
+haya de él (atlas de *One Piece Treasure Cruise*, hojas de 8 direcciones hechas
+para el juego...). Un generador lo convierte a pixel art:
 
 ```
 node tools/build-sprites.js          # todos
@@ -101,10 +102,10 @@ node tools/build-sprites.js luffy    # sólo uno
 - `tools/sprites.config.js` dice, por personaje, qué recuadros de su atlas
   forman cada animación (`idle`, `walk`, `attack`, `hurt`), los colores y
   si hay que quitar un fondo. Sólo poses originales: no se inventan fotogramas.
-- **Escala común:** todos los personajes se reducen con el mismo factor
-  (`scale` en el config: Luffy de pie = 42 px), así conservan las proporciones
-  de Treasure Cruise entre ellos y ninguno cambia de tamaño al cambiar de pose.
-  `size` permite agrandar a uno a propósito (p. ej. un jefe).
+- **Escala común** de los atlas de Treasure Cruise (`scale.factor`: 1 px del
+  juego = 4,42 px del atlas): conservan las proporciones entre ellos y ninguno
+  cambia de tamaño al cambiar de pose. `size` agranda a uno a propósito (p. ej.
+  un jefe). Las hojas de otra resolución llevan su alto (`height`).
 - Personajes de lado, mirando a izquierda o derecha. Al andar se usa la pose de
   correr con rebote y polvo en cada paso.
 - Escribe `assets/chars/<id>.png` y `js/data/sprites-built.js` (generado: no
@@ -129,8 +130,13 @@ Formato (como `assets/ref/Sanji8D.png`):
 - Fondo transparente (PNG) mejor; un fondo negro liso también vale
   (`bgDark`), pero un JPG pierde calidad en los bordes.
 - En el config basta con `layout: 'rows4x2'` y su `height` (alto en el
-  juego; Luffy = 42): los recuadros se detectan solos. Andar = pasos 1-2-3-2,
-  quieto = el paso del medio. Sin poses de ataque/daño se queda quieto mirando.
+  juego): los recuadros se detectan solos. 3 pasos se andan 1-2-3-2; 4, en
+  bucle. Sin poses de ataque/daño se queda quieto mirando.
+- Si la hoja no va por filas limpias (como la de Luffy de Elbaph), se indican
+  los recuadros a mano en `dirs8`, y las direcciones de la izquierda pueden salir
+  en espejo de las de la derecha (`{ mirror: 'right' }`).
+- Ataque y daño pueden venir del atlas de Treasure Cruise del mismo personaje
+  (poses de lado): `walkSheet` para la hoja de andar, `sheet` para el atlas.
 
 ### El taller (`tools/sprites.html`)
 

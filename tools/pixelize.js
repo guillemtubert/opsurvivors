@@ -23,17 +23,19 @@
   }
 
   /**
-   * Quita un fondo negro (JPG sin transparencia) sin comerse lo negro del
-   * personaje: sólo se borran las zonas oscuras ANCHAS conectadas al borde
-   * (los contornos son líneas finas y se quedan) y luego `fringe` píxeles
-   * oscuros más alrededor, para limpiar el borde suavizado.
-   *   thr    brillo máximo (0-255) que cuenta como fondo
+   * Quita un fondo liso (JPG sin transparencia: negro, blanco...) sin comerse
+   * lo del mismo color que haya en el personaje: sólo se borran las zonas de
+   * ese color ANCHAS conectadas al borde (contornos y detalles son finos y se
+   * quedan) y luego `fringe` píxeles más alrededor, para limpiar el borde.
+   *   color  color del fondo        thr  diferencia máxima por canal (0-255)
    *   r      media anchura mínima de una zona de fondo
+   *   pockets  también las bolsas de fondo encerradas por el dibujo (entre brazo y cuerpo)
    */
-  function removeDarkBg(img, thr = 14, r = 3, fringe = 1) {
+  function removeFlatBg(img, color = '#000000', thr = 14, r = 3, fringe = 1, pockets = false) {
     const { w, h, data } = img, N = w * h;
-    const dark = new Uint8Array(N);
-    for (let i = 0; i < N; i++) dark[i] = Math.max(data[i * 4], data[i * 4 + 1], data[i * 4 + 2]) <= thr ? 1 : 0;
+    const [R, Gc, B] = rgbOf(color);
+    const dark = new Uint8Array(N);                     // "parecido al fondo"
+    for (let i = 0; i < N; i++) dark[i] = Math.max(Math.abs(data[i * 4] - R), Math.abs(data[i * 4 + 1] - Gc), Math.abs(data[i * 4 + 2] - B)) <= thr ? 1 : 0;
     // Erosión separable: oscuro con todo su entorno (2r+1)² también oscuro.
     const tmp = new Uint8Array(N), thick = new Uint8Array(N);
     for (let y = 0; y < h; y++) {
@@ -53,6 +55,7 @@
     const bg = new Uint8Array(N), stack = [];
     for (let x = 0; x < w; x++) { stack.push(x + r * w, (h - 1 - r) * w + x); }
     for (let y = 0; y < h; y++) { stack.push(y * w + r, y * w + w - 1 - r); }
+    if (pockets) for (let p = 0; p < N; p++) if (thick[p]) stack.push(p);
     while (stack.length) {
       const p = stack.pop();
       if (p < 0 || p >= N || bg[p] || !thick[p]) continue;
@@ -332,5 +335,5 @@
     return out;
   }
 
-  return { blank, rgbOf, removeBg, removeDarkBg, crop, trim, components, largestOnly, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
+  return { blank, rgbOf, removeBg, removeFlatBg, crop, trim, components, largestOnly, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
 });

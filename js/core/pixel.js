@@ -130,6 +130,11 @@ G.Pix = (() => {
    */
   function pick(s, anim, t, face, dir) {
     if (s.dirs) {
+      // Ataque y daño: poses de lado si las tiene (voltea según hacia dónde mira).
+      if ((anim === 'attack' || anim === 'hurt') && s.anims[anim] && s.anims[anim].length) {
+        const l = s.anims[anim], i = Math.floor(t * (s.fps[anim] || 8));
+        return { f: l[Math.min(i, l.length - 1)], flip: face < 0 };
+      }
       const set = s.dirs[dir] || s.dirs.down;
       // Sin poses de ataque o daño: se queda quieto mirando (el destello marca el golpe).
       const list = set[anim] && set[anim].length ? set[anim] : set.idle;

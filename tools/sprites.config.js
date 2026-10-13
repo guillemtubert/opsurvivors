@@ -1,23 +1,28 @@
 /* ============ sprites.config.js — de assets/ref/ a assets/chars/ ============
  * Lo lee tools/build-sprites.js.
  *
- * ESCALA COMÚN: todos los personajes se reducen con el mismo factor, sacado de
- * `scale` (el personaje y alto de referencia). Así conservan las proporciones
- * entre ellos y ninguno cambia de tamaño al cambiar de pose. Las fuentes deben
- * ser del mismo tipo: el atlas de cada personaje en Treasure Cruise (las
- * "Assembled/Split Sprites" están a otra escala).
+ * Cada personaje tiene su carpeta en assets/ref/characters/<id>/ con todo lo
+ * que haya de él (atlas de Treasure Cruise, hojas hechas para el juego...).
+ *
+ * ESCALA COMÚN de los atlas de Treasure Cruise: 1 px del juego = `scale.factor`
+ * px del atlas. Así conservan las proporciones entre ellos y ninguno cambia de
+ * tamaño al cambiar de pose. (Con ella, el Luffy original de pie medía 42 px.)
+ * Las hojas de otra resolución llevan su alto propio (`height`).
  *
  * Por personaje:
  *   sheet    imagen de origen (atlas)          bg   color de fondo a quitar, si lo hay
  *   size     multiplicador de talla (1 = la de Treasure Cruise, que pone a todos casi igual)
  *   colors   colores de la paleta (común a todos sus fotogramas)
  *   accent   conserva detalles pequeños sobre negro (ojos, filos): { dark, rim, rimMin } (ver pixelize)
- *   bgDark   hoja con fondo negro (JPG): { thr, r, fringe } (ver pixelize.removeDarkBg)
+ *   bgFlat   hoja con fondo liso (JPG negro, blanco...): { color, thr, r, fringe, pockets } (ver pixelize.removeFlatBg)
  *   height   alto propio en px, para hojas de otra resolución que los atlas (en vez de la escala común)
  *   dirs8    8 direcciones con sus pasos: { down: [..], 'down-right': [..], right, 'up-right', up,
- *            'up-left', left, 'down-left' } (andar = pasos 1-2-3-2; quieto = el del medio)
+ *            'up-left', left, 'down-left' }. { mirror: 'right' } = los de otra dirección en espejo.
+ *            3 pasos se andan 1-2-3-2; 4 o más, en bucle. idleStep: qué paso es el de quieto.
  *   layout   'rows4x2': hoja de 8 direcciones en 4 filas × 2 bloques (ver build-sprites):
  *            los recuadros se detectan solos, no hace falta dirs8
+ *            Con 8 direcciones, anims.attack/hurt (de lado) pueden venir de otra hoja:
+ *            walkSheet/walkBg para la de andar, sheet/bg para la de poses, sideHeight su alto.
  *   flip     true si en el original miran a la izquierda (el juego los quiere a la derecha)
  *   fps      velocidad de cada animación
  *   anims    idle (quieto) · walk (andando: la pose de correr, el juego añade rebote y polvo)
@@ -26,24 +31,41 @@
  *            P.components: node -e "..." ver README) o { f: [..], dx, solo }.
  *            Atlas por piezas (cabeza y cuerpo sueltos): { body: [..], head: [..], overlap }.
  */
+const REF = 'assets/ref/characters/';
+
 module.exports = {
-  scale: { ref: 'luffy', height: 42 },      // Luffy de pie mide 42 px (con el contorno)
+  scale: { factor: 4.425 },
 
   chars: {
+    // Luffy de Elbaph: andar en 8 direcciones (hoja hecha para el juego, fondo blanco)
+    // y poses de ataque/daño del atlas #4583 de Treasure Cruise.
     luffy: {
-      sheet: 'assets/ref/#0002 - Monkey D. Luffy - Gum-Gum Pistol/Left (Normal - Playable)/motion_0002_luffy_0001.png',
-      size: 1, colors: 20,
-      fps: { idle: 5, walk: 1, attack: 8, hurt: 1 },
+      walkSheet: REF + 'luffy/LuffyElbaph.png',
+      walkBg: { color: '#ffffff', thr: 40, r: 2, fringe: 2, pockets: true },
+      sheet: REF + 'luffy/Mobile - One Piece_ Treasure Cruise - Playable Characters - #4583 - Monkey D. Luffy - Adventure in the Land of Mystery.png',
+      bg: '#e69900',                          // el marco naranja del atlas
+      height: 46, sideHeight: 48, colors: 24,
+      fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
+      // La hoja de andar no va por filas limpias: se cogen las direcciones con
+      // 4 pasos completos y las que miran a la izquierda salen en espejo.
+      dirs8: {
+        down: [[10, 14, 130, 188], [159, 18, 130, 184], [312, 12, 124, 184], [459, 18, 130, 187]],
+        'down-right': [[17, 700, 101, 196], [162, 697, 109, 190], [306, 700, 114, 187], [459, 697, 111, 187]],
+        right: [[11, 253, 118, 184], [155, 247, 114, 192], [302, 249, 127, 181], [450, 249, 123, 184]],
+        'up-right': [[606, 247, 129, 189], [758, 242, 121, 194], [903, 237, 132, 191], [1056, 242, 121, 194]],
+        up: [[12, 468, 124, 190], [161, 465, 125, 198], [312, 468, 124, 190], [459, 468, 127, 197]],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
       anims: {
-        idle: [[48, 32, 101, 177], [241, 33, 101, 176], [434, 34, 101, 175]],
-        walk: [[40, 294, 163, 163]],
-        attack: [[233, 839, 137, 166], [521, 841, 171, 164]],
-        hurt: [[479, 548, 117, 167]]
+        attack: [{ f: [240, 1450, 145, 195], solo: true }, { f: [535, 268, 175, 124], solo: true }],   // sin el humo de debajo
+        hurt: [{ f: [130, 548, 175, 125], solo: true }]
       }
     },
 
     marine: {
-      sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0180 - Saber Apprentice - Navy.png',
+      sheet: REF + 'marine/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0180 - Saber Apprentice - Navy.png',
       size: 1, colors: 22,
       fps: { idle: 4, walk: 1, attack: 6, hurt: 1 },
       anims: {
@@ -54,20 +76,19 @@ module.exports = {
       }
     },
 
-    // Hecho para el juego (assets/ref/Sanji8D.png): 8 direcciones con 3-4 pasos cada una.
-    // La hoja es de otra resolución que los atlas: lleva su alto propio (Luffy = 42).
+    // Hecho para el juego: 8 direcciones con 3-4 pasos cada una, fondo negro.
     sanji: {
-      sheet: 'assets/ref/Sanji8D.png',
-      bgDark: { thr: 14, r: 3, fringe: 1 },
+      sheet: REF + 'sanji/Sanji8D.png',
+      bgFlat: { color: '#000000', thr: 14, r: 3, fringe: 1 },
       height: 44, colors: 24,
       fps: { idle: 1, walk: 8 },
       layout: 'rows4x2'
     },
 
-    // Prueba: su atlas guarda la cabeza (capucha) y la túnica por separado.
+    // Su atlas guarda la cabeza (capucha) y la túnica por separado.
     imu: {
-      sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #4571 - Imu - Occupant of the Empty Throne.png',
-      bg: '#e69900',                          // el marco naranja de la hoja
+      sheet: REF + 'imu/Mobile - One Piece_ Treasure Cruise - Playable Characters - #4571 - Imu - Occupant of the Empty Throne.png',
+      bg: '#e69900',
       size: 1, colors: 12,
       accent: { dark: 0.22, rim: '#4a4458', rimMin: 0.1 },    // ojos rojos y filos de la túnica
       fps: { idle: 3, walk: 1, attack: 5, hurt: 1 },
@@ -82,8 +103,8 @@ module.exports = {
     },
 
     morgan: {
-      sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0035 - Axe-Hand Morgan.png',
-      bg: '#e69900',                          // el marco naranja de la hoja
+      sheet: REF + 'morgan/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0035 - Axe-Hand Morgan.png',
+      bg: '#e69900',
       size: 1, colors: 20,
       fps: { idle: 4, walk: 1, attack: 5, hurt: 1 },
       anims: {

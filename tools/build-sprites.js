@@ -32,13 +32,13 @@ function load(file) {
   return img;
 }
 
-/** Hoja con fondo negro (JPG): se limpia una vez entera y se guarda. */
+/** Hoja con fondo liso (JPG negro, blanco...): se limpia una vez entera y se guarda. */
 function sheetOf(cfg) {
-  if (!cfg.bgDark) return load(cfg.sheet);
-  const key = cfg.sheet + '#oscuro';
+  if (!cfg.bgFlat) return load(cfg.sheet);
+  const key = cfg.sheet + '#sinfondo';
   if (!cache.has(key)) {
-    const o = cfg.bgDark;
-    cache.set(key, P.removeDarkBg(load(cfg.sheet), o.thr || 14, o.r || 3, o.fringe === undefined ? 1 : o.fringe));
+    const o = cfg.bgFlat;
+    cache.set(key, P.removeFlatBg(load(cfg.sheet), o.color || '#000000', o.thr || 14, o.r || 3, o.fringe === undefined ? 1 : o.fringe, !!o.pockets));
   }
   return cache.get(key);
 }
@@ -79,12 +79,8 @@ function source(cfg, f) {
   return cfg.flip ? P.flipX(t) : t;
 }
 
-/** Factor de reducción común: el primer fotograma de idle del de referencia mide `height`. */
-function commonK() {
-  const { ref, height } = CONFIG.scale;
-  const cfg = CONFIG.chars[ref];
-  return source(cfg, cfg.anims.idle[0]).h / (height - 2);
-}
+/** Factor de reducción común de los atlas de Treasure Cruise (ver el config). */
+function commonK() { return CONFIG.scale.factor; }
 
 const DIRS8 = ['down', 'down-right', 'right', 'up-right', 'up', 'up-left', 'left', 'down-left'];
 
@@ -112,19 +108,32 @@ function build(id, cfg, K) {
   const order = [];                          // [{ anim, src, dx, dir }]
   if (cfg.layout === 'rows4x2') cfg = Object.assign({}, cfg, { dirs8: layoutRows4x2(cfg) });
   if (cfg.dirs8) {
-    // 8 direcciones: los pasos de cada una, en orden.
+    // 8 direcciones: los pasos de cada una, en orden. { mirror: 'right' } = los de otra, en espejo.
+    const srcs = {};
     for (const d of DIRS8) {
-      if (!cfg.dirs8[d]) throw new Error(id + ': falta la dirección ' + d);
-      for (const f of cfg.dirs8[d]) order.push({ anim: 'walk', dir: d, src: source(cfg, f), dx: (f && f.dx) || 0 });
+      const spec = cfg.dirs8[d];
+      if (!spec) throw new Error(id + ': falta la dirección ' + d);
+      if (spec.mirror) continue;
+      srcs[d] = spec.map(f => ({ src: source(Object.assign({}, cfg, { sheet: cfg.walkSheet || cfg.sheet, bgFlat: cfg.walkBg || cfg.bgFlat, bg: cfg.walkSheet ? null : cfg.bg }), f), dx: (f && f.dx) || 0 }));
     }
+    for (const d of DIRS8) {
+      const m = cfg.dirs8[d].mirror;
+      const list = m ? srcs[m].map(o => ({ src: P.flipX(o.src), dx: -o.dx })) : srcs[d];
+      if (!list) throw new Error(id + ': ' + d + ' copia a ' + m + ', que no tiene pasos propios');
+      for (const o of list) order.push({ anim: 'walk', dir: d, src: o.src, dx: o.dx });
+    }
+    // Poses de lado (mirando a la derecha) para atacar y recibir daño, opcionales.
+    for (const a of ['attack', 'hurt']) for (const f of (cfg.anims && cfg.anims[a]) || []) order.push({ anim: a, src: source(cfg, f), dx: (f && f.dx) || 0, side: true });
   } else {
     for (const a of ANIMS) for (const f of cfg.anims[a] || []) order.push({ anim: a, src: source(cfg, f), dx: (f && f.dx) || 0 });
     if (!order.length || order[0].anim !== 'idle') throw new Error(id + ': hace falta al menos un fotograma de idle');
   }
 
   // Escala: la común (con su talla) o, si la hoja es de otra resolución, su alto propio.
+  // (Con 8 direcciones y poses de otra hoja, cada hoja lleva su escala: sideHeight.)
   const k = cfg.height ? order[0].src.h / (cfg.height - 2) : K / (cfg.size || 1);
-  const small = order.map(o => P.downscale(o.src, k, 0.5, cfg.accent || null));
+  const kSide = cfg.sideHeight && order.find(o => o.side) ? order.find(o => o.side).src.h / (cfg.sideHeight - 2) : k;
+  const small = order.map(o => P.downscale(o.src, o.side ? kSide : k, 0.5, cfg.accent || null));
   const pal = P.medianCut(P.colorsOf(small), cfg.colors || 16);
   // Detalles reservados (accent): los colores intensos, aunque sean pocos píxeles,
   // tienen sitio fijo en la paleta (si no, la mediana los descarta: ojos de Imu).
@@ -148,13 +157,15 @@ function build(id, cfg, K) {
   let anims = {}, dirs = null;
   if (cfg.dirs8) {
     // Por dirección: andar 1-2-3-2 (ida y vuelta) y quieto = el paso del medio.
+    // 3 pasos: ida y vuelta (1-2-3-2). 4 o más: ciclo completo en bucle (1-2-3-4).
     dirs = {};
-    order.forEach((o, i) => { (dirs[o.dir] = dirs[o.dir] || { walk: [] }).walk.push(i); });
+    order.forEach((o, i) => { if (o.dir) (dirs[o.dir] = dirs[o.dir] || { walk: [] }).walk.push(i); });
     for (const d of DIRS8) {
       const w = dirs[d].walk, mid = w[w.length >> 1];
-      dirs[d] = { idle: [mid], walk: w.concat(w.slice(1, -1).reverse()) };
+      dirs[d] = { idle: [cfg.idleStep !== undefined ? w[cfg.idleStep] : mid], walk: w.length <= 3 ? w.concat(w.slice(1, -1).reverse()) : w };
     }
     anims = { idle: dirs.down.idle, walk: dirs.right.walk };
+    order.forEach((o, i) => { if (o.side) (anims[o.anim] = anims[o.anim] || []).push(i); });
   } else {
     order.forEach((o, i) => (anims[o.anim] = anims[o.anim] || []).push(i));
   }
@@ -181,7 +192,7 @@ const prev = (() => {
   } catch (e) { return {}; }
 })();
 const K = commonK();
-console.log('escala común 1/' + K.toFixed(2) + ' (' + CONFIG.scale.ref + ' de pie = ' + CONFIG.scale.height + ' px)');
+console.log('escala común de los atlas 1/' + K.toFixed(2));
 const out = only ? Object.assign({}, prev) : {};
 for (const [id, cfg] of Object.entries(CONFIG.chars)) {
   if (only && id !== only) continue;
