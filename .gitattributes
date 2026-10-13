@@ -1,0 +1,2 @@
+# Los scripts de git deben tener saltos de línea Unix (si no, no se ejecutan).
+tools/hooks/* text eol=lf
