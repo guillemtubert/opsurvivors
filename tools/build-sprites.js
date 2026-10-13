@@ -32,8 +32,33 @@ function load(file) {
   return img;
 }
 
+/**
+ * Fotograma montado a partir de piezas (atlas como el de Imu, que guarda la
+ * cabeza y el cuerpo por separado): la cabeza se centra sobre el cuello (la
+ * fila más alta del cuerpo) y baja `overlap` píxeles para encajar.
+ */
+function compose(cfg, spec) {
+  const piece = box => {
+    let img = P.crop(load(cfg.sheet), ...box);
+    if (cfg.bg) img = P.removeBg(img, cfg.bg, 6);
+    return P.trim(img);
+  };
+  const body = piece(spec.body), head = piece(spec.head);
+  let neck = 0, n = 0;
+  for (let x = 0; x < body.w; x++) if (body.data[x * 4 + 3] > 128) { neck += x; n++; }
+  const cx = Math.round(neck / Math.max(1, n)) + (spec.dx || 0);
+  const left = Math.min(0, cx - (head.w >> 1));
+  const w = Math.max(body.w, cx + head.w - (head.w >> 1)) - left;
+  const h = body.h + head.h - (spec.overlap || 0);
+  const out = P.blank(w, h);
+  P.blit(out, body, -left, h - body.h);
+  P.blit(out, head, cx - (head.w >> 1) - left, 0);
+  return out;
+}
+
 /** Un fotograma del config -> imagen recortada y sin fondo, a resolución original. */
 function source(cfg, f) {
+  if (f && f.body) return cfg.flip ? P.flipX(compose(cfg, f)) : compose(cfg, f);
   const spec = f && f.f !== undefined ? f.f : f;
   let img = Array.isArray(spec) ? P.crop(load(cfg.sheet), ...spec) : load(path.join(cfg.dir || '', spec));
   if (cfg.bg) img = P.removeBg(img, cfg.bg, 6);
@@ -56,8 +81,14 @@ function build(id, cfg, K) {
   if (!order.length || order[0].anim !== 'idle') throw new Error(id + ': hace falta al menos un fotograma de idle');
 
   const k = K / (cfg.size || 1);
-  const small = order.map(o => P.downscale(o.src, k));
+  const small = order.map(o => P.downscale(o.src, k, 0.5, cfg.accent || null));
   const pal = P.medianCut(P.colorsOf(small), cfg.colors || 16);
+  // Detalles reservados (accent): los colores intensos, aunque sean pocos píxeles,
+  // tienen sitio fijo en la paleta (si no, la mediana los descarta: ojos de Imu).
+  if (cfg.accent) {
+    const vivid = P.colorsOf(small).filter(([r, g, b]) => { const mx = Math.max(r, g, b); return mx > 120 && (mx - Math.min(r, g, b)) / mx > 0.5; });
+    if (vivid.length) pal.push(...P.medianCut(vivid, 2));
+  }
   const done = small.map(s => P.outline(P.quantize(s, pal), cfg.outline || '#1a1220'));
 
   // Celda común: pies abajo y centrados en el punto de apoyo de cada fotograma.

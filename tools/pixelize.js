@@ -128,20 +128,40 @@
    * de su zona, pesada por la opacidad (los bordes no se ensucian de fondo).
    * Devuelve colores sin cuantizar y alfa 0/255 (umbral `cut`).
    */
-  function downscale(img, k, cut = 0.5) {
+  /**
+   * `accent` (opcional) conserva detalles pequeños sobre zonas oscuras, que la
+   * media borraría (los ojos de Imu, los filos claros de su túnica):
+   *   { dark: 0.22, rim: '#4a4458', rimMin: 0.1 }
+   * Si al menos un 4% del bloque es de un color intenso, se queda ese color.
+   * Si no, en un bloque más oscuro que `dark` con al menos `rimMin` de
+   * píxeles claros, sale `rim`.
+   */
+  function downscale(img, k, cut = 0.5, accent = null) {
     const w = Math.max(1, Math.round(img.w / k)), h = Math.max(1, Math.round(img.h / k));
     const out = blank(w, h), sd = img.data;
+    const rim = accent && accent.rim ? rgbOf(accent.rim) : null;
     for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
       const sx0 = Math.floor(x * k), sx1 = Math.max(sx0 + 1, Math.floor((x + 1) * k));
       const sy0 = Math.floor(y * k), sy1 = Math.max(sy0 + 1, Math.floor((y + 1) * k));
       let r = 0, g = 0, b = 0, a = 0, n = 0;
+      let vr = 0, vg = 0, vb = 0, vn = 0, light = 0;          // color intenso y píxeles claros
       for (let yy = sy0; yy < sy1 && yy < img.h; yy++) for (let xx = sx0; xx < sx1 && xx < img.w; xx++) {
         const i = (yy * img.w + xx) * 4, al = sd[i + 3] / 255;
         r += sd[i] * al; g += sd[i + 1] * al; b += sd[i + 2] * al; a += al; n++;
+        if (accent && al > 0.5) {
+          const mx = Math.max(sd[i], sd[i + 1], sd[i + 2]), mn = Math.min(sd[i], sd[i + 1], sd[i + 2]);
+          if (mx > 120 && (mx - mn) / mx > 0.5) { vr += sd[i]; vg += sd[i + 1]; vb += sd[i + 2]; vn++; }
+          else if (mx > 150) light++;
+        }
       }
       const j = (y * w + x) * 4;
       if (n && a / n >= cut) {
-        out.data[j] = Math.round(r / a); out.data[j + 1] = Math.round(g / a); out.data[j + 2] = Math.round(b / a); out.data[j + 3] = 255;
+        let cr = r / a, cg = g / a, cb = b / a;
+        if (accent) {
+          if (vn / n >= 0.04) { cr = vr / vn; cg = vg / vn; cb = vb / vn; }
+          else if (rim && Math.max(cr, cg, cb) / 255 < (accent.dark || 0.22) && light / n >= (accent.rimMin || 0.1)) [cr, cg, cb] = rim;
+        }
+        out.data[j] = Math.round(cr); out.data[j + 1] = Math.round(cg); out.data[j + 2] = Math.round(cb); out.data[j + 3] = 255;
       }
     }
     return out;

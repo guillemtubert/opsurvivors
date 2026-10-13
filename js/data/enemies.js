@@ -7,7 +7,8 @@
  *   beamer   láser con aviso en el suelo (Pacifista)
  *   charger  se para, apunta y embiste (jefes)
  *   fan      lanza cuchillos en abanico (Buggy)
- *   zoner    zonas de arena bajo tus pies que estallan (Crocodile)
+ *   zoner    zonas de arena bajo tus pies que estallan (Crocodile, Imu)
+ * hover: true  flota (vaivén suave en vez de pasos)
  *
  * `from` = segundo de la run en que empieza a salir; `w` = peso en la bolsa.
  * La vida y el daño crecen con el tiempo (ver Spawner).
@@ -23,6 +24,7 @@ G.Enemies = (() => {
 
   const BOSSES = [
     { id: 'morgan',    name: 'Capitán Morgan',  title: 'Mano de Hacha',  sprite: 'morgan',    at: 150, hp: 1100, spd: 62, dmg: 22, xp: 160, behavior: 'charger' },
+    { id: 'imu',       name: 'Imu',             title: 'Ocupante del Trono Vacío', sprite: 'imu', at: 330, hp: 2600, spd: 50, dmg: 28, xp: 320, behavior: 'zoner', hover: true },
     { id: 'buggy',     name: 'Buggy',           title: 'El Payaso',      sprite: 'buggy',     at: 330, hp: 2200, spd: 58, dmg: 26, xp: 300, behavior: 'fan' },
     { id: 'arlong',    name: 'Arlong',          title: 'Diente de Sierra', sprite: 'arlong',  at: 510, hp: 3600, spd: 70, dmg: 32, xp: 480, behavior: 'charger' },
     { id: 'crocodile', name: 'Crocodile',       title: 'Señor 0',        sprite: 'crocodile', at: 690, hp: 5400, spd: 60, dmg: 36, xp: 700, behavior: 'zoner' }
