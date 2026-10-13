@@ -35,6 +35,7 @@ function source(cfg, f) {
   const spec = f && f.f !== undefined ? f.f : f;
   let img = Array.isArray(spec) ? P.crop(load(cfg.sheet), ...spec) : load(path.join(cfg.dir || '', spec));
   if (cfg.bg) img = P.removeBg(img, cfg.bg, 6);
+  if (f && f.solo) img = P.largestOnly(img);
   const t = P.trim(img);
   if (!t) throw new Error('Fotograma vacío: ' + JSON.stringify(spec));
   return cfg.flip ? P.flipX(t) : t;

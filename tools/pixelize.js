@@ -83,6 +83,47 @@
   }
 
   /**
+   * Deja sólo la figura principal: el grupo de píxeles (8 vecinos, alfa >= 128)
+   * más grande y su borde suavizado. Quita humo, chispas o restos sueltos.
+   */
+  function largestOnly(img) {
+    const { w, h, data } = img;
+    const label = new Int32Array(w * h).fill(-1), stack = [];
+    let best = -1, bestN = 0, id = 0;
+    for (let s = 0; s < w * h; s++) {
+      if (label[s] >= 0 || data[s * 4 + 3] < 128) continue;
+      let n = 0;
+      stack.push(s); label[s] = id;
+      while (stack.length) {
+        const p = stack.pop(), x = p % w, y = (p / w) | 0;
+        n++;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx, ny = y + dy;
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+          const q = ny * w + nx;
+          if (label[q] < 0 && data[q * 4 + 3] >= 128) { label[q] = id; stack.push(q); }
+        }
+      }
+      if (n > bestN) { bestN = n; best = id; }
+      id++;
+    }
+    const out = blank(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = y * w + x;
+      let keep = label[i] === best;
+      // Píxeles semitransparentes del borde de la figura.
+      if (!keep && data[i * 4 + 3] && data[i * 4 + 3] < 128) {
+        for (let dy = -1; dy <= 1 && !keep; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx, ny = y + dy;
+          if (nx >= 0 && ny >= 0 && nx < w && ny < h && label[ny * w + nx] === best) { keep = true; break; }
+        }
+      }
+      if (keep) out.data.set(data.subarray(i * 4, i * 4 + 4), i * 4);
+    }
+    return out;
+  }
+
+  /**
    * Reduce dividiendo el tamaño entre k (k > 1). Cada píxel nuevo es la media
    * de su zona, pesada por la opacidad (los bordes no se ensucian de fondo).
    * Devuelve colores sin cuantizar y alfa 0/255 (umbral `cut`).
@@ -215,5 +256,5 @@
     return out;
   }
 
-  return { blank, rgbOf, removeBg, crop, trim, components, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
+  return { blank, rgbOf, removeBg, crop, trim, components, largestOnly, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
 });

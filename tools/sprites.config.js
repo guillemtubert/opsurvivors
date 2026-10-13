@@ -10,6 +10,9 @@
  *   anims    idle (quieto) · walk (andando) · attack (al lanzar una técnica) · hurt (golpe recibido)
  *            Cada fotograma es un fichero (relativo a `dir`) o un recuadro [x, y, w, h] de `sheet`.
  *            { f: ..., dx: 2 } mueve ese fotograma 2 px a la derecha si queda descentrado.
+ *            { f: ..., solo: true } se queda sólo con la figura principal (quita humo y efectos).
+ *            Ojo: no mezclar fuentes de distinto tamaño (en Treasure Cruise, las "Split Sprites"
+ *            son más grandes que las "Assembled Sprites": el personaje crecería al cambiar de pose).
  *            Con un solo fotograma en walk, el juego lo anima con un rebote.
  */
 const LUFFY = 'assets/ref/#0002 - Monkey D. Luffy - Gum-Gum Pistol/Left (Normal - Playable)/';
@@ -22,8 +25,8 @@ module.exports = {
       idle: ['Assembled Sprites/motion_0002_wait/0000.png', 'Assembled Sprites/motion_0002_wait/0011.png',
              'Assembled Sprites/motion_0002_wait/0017.png', 'Assembled Sprites/motion_0002_wait/0037.png'],
       walk: ['Assembled Sprites/motion_0002_go/0000.png'],
-      attack: ['Split Sprites/attack_02__finish__ready.png', 'Split Sprites/attack_03.png'],
-      hurt: ['Split Sprites/damage.png']
+      attack: [{ f: 'Assembled Sprites/motion_0002_attack/0013.png', solo: true }, { f: 'Assembled Sprites/motion_0002_attack/0020.png', solo: true }],
+      hurt: ['Assembled Sprites/motion_0002_damage/0000.png']
     }
   },
 

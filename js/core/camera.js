@@ -5,8 +5,8 @@
  */
 G.Camera = {
   x: 0, y: 0,
-  VIEW_W: 960,              // los sprites de One Piece Treasure Cruise son grandes: se ve más mapa
-  MIN_VIEW_H: 525,
+  VIEW_W: 1280,             // ancho de mundo visible: los personajes ocupan ~1/8 del alto de pantalla
+  MIN_VIEW_H: 720,
   scale: 1,                 // píxeles CSS por unidad de mundo
   w: 768, h: 432,           // tamaño de la vista en unidades de mundo
   shake: 0, _sx: 0, _sy: 0,
