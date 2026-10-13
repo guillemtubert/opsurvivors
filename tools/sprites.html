@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taller de sprites · One Piece Survivors</title>
+<!--
+  Taller de sprites: convierte una hoja de sprites (o cualquier imagen) en la
+  tira que usa el juego (assets/chars/<id>.png) y te da la línea para
+  js/data/custom-sprites.js. Funciona abierto con doble clic.
+
+  Dos modos:
+    Pixel art     hojas de sprites de juegos: se recortan tal cual (o se
+                  reducen ×2, ×3... si la hoja viene ampliada).
+    Convertir     dibujos, capturas, fan art: se reduce a la altura que digas,
+                  se limita la paleta y se le pone contorno.
+-->
+<style>
+@font-face { font-family: 'Pixelify'; src: url('../assets/fonts/PixelifyPS-400.ttf') format('truetype'); font-weight: 400 550; }
+@font-face { font-family: 'Pixelify'; src: url('../assets/fonts/PixelifyPS-700.ttf') format('truetype'); font-weight: 551 900; }
+:root {
+  --ink: #fff8e8; --muted: #e8cfa0; --wood1: #7a4a26; --wood2: #4e2c14; --edge: #f6e3b4; --edge-out: #1a0e06;
+  --gold: #ffd23f; --panel: rgba(0,0,0,.25);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body { background: #2a1a10; color: var(--ink); font: 15px/1.35 'Pixelify', system-ui, sans-serif; }
+h1 { margin: 0; font-size: 24px; color: var(--gold); }
+h2 { margin: 0 0 8px; font-size: 17px; color: var(--gold); }
+header { display: flex; gap: 16px; align-items: baseline; padding: 12px 16px; background: linear-gradient(180deg, var(--wood1), var(--wood2)); border-bottom: 3px solid var(--edge); }
+header p { margin: 0; color: var(--muted); }
+main { display: grid; grid-template-columns: 300px 1fr 300px; gap: 12px; padding: 12px; }
+main > div { min-width: 0; }
+@media (max-width: 1100px) { main { grid-template-columns: 1fr; } }
+section { background: var(--panel); border: 3px solid rgba(246,227,180,.3); padding: 10px 12px; margin-bottom: 12px; }
+label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 6px 0; }
+label.check { justify-content: flex-start; }
+input[type=range] { width: 140px; accent-color: var(--gold); }
+input[type=number], select, input[type=text] { width: 90px; background: #1a0e06; color: var(--ink); border: 2px solid var(--edge); font: inherit; padding: 2px 4px; }
+input[type=color] { width: 44px; height: 26px; border: 2px solid var(--edge); background: none; padding: 0; }
+button {
+  font: inherit; font-weight: 700; color: var(--ink); cursor: pointer; padding: 6px 12px;
+  background: linear-gradient(180deg, #a0602e, #6a3a18); border: 3px solid var(--edge); box-shadow: 0 0 0 2px var(--edge-out);
+}
+button.gold { background: linear-gradient(180deg, #ffe37a, #f0a31e); color: #3a2300; }
+button.small { padding: 2px 8px; font-size: 13px; }
+button:disabled { filter: grayscale(.8) brightness(.7); cursor: not-allowed; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.hint { color: var(--muted); font-size: 13px; margin: 6px 0 0; }
+.tabs { display: flex; gap: 4px; margin-bottom: 8px; }
+.tabs button { flex: 1; }
+.tabs button.on { background: linear-gradient(180deg, #ffe37a, #f0a31e); color: #3a2300; }
+canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+.checker {
+  background-color: #8a8a96;
+  background-image: linear-gradient(45deg, #6e6e7a 25%, transparent 25%, transparent 75%, #6e6e7a 75%),
+                    linear-gradient(45deg, #6e6e7a 25%, transparent 25%, transparent 75%, #6e6e7a 75%);
+  background-size: 16px 16px; background-position: 0 0, 8px 8px;
+}
+#drop {
+  position: relative; min-height: 420px; max-height: calc(100vh - 120px); overflow: auto;
+  border: 3px dashed rgba(246,227,180,.5); display: flex; align-items: flex-start; justify-content: flex-start;
+}
+#drop.empty { align-items: center; justify-content: center; text-align: center; color: var(--muted); }
+#drop.over { border-color: var(--gold); }
+#view { display: block; cursor: crosshair; }
+#frames { display: flex; gap: 8px; flex-wrap: wrap; }
+.frame { display: flex; flex-direction: column; align-items: center; gap: 4px; background: rgba(0,0,0,.3); padding: 6px; border: 2px solid rgba(246,227,180,.3); }
+.frame b { font-size: 12px; color: var(--gold); }
+.frame .btns { display: flex; gap: 2px; }
+.frame canvas { background: #8a8a96; }
+#preview, #ingame { display: block; margin: 0 auto; }
+pre { white-space: pre-wrap; word-break: break-all; background: #1a0e06; border: 2px solid var(--edge); padding: 8px; font-size: 12px; margin: 6px 0; user-select: all; }
+.err { color: #ff8a8a; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Taller de sprites</h1>
+  <p>Arrastra una imagen, pégala (Ctrl+V) o elígela · recorta los fotogramas · exporta la tira para el juego</p>
+</header>
+
+<main>
+  <!-- ================= izquierda: entrada y ajustes ================= -->
+  <div>
+    <section>
+      <h2>1 · Imagen</h2>
+      <div class="row"><input id="file" type="file" accept="image/*"></div>
+      <p class="hint">También puedes arrastrarla al recuadro del centro o pegarla con Ctrl+V.</p>
+      <label>Zoom <input id="zoom" type="range" min="1" max="10" step="1" value="3"></label>
+    </section>
+
+    <section>
+      <h2>2 · Fondo</h2>
+      <label class="check"><input id="bg-on" type="checkbox" checked> Quitar color de fondo</label>
+      <label>Color <input id="bg-col" type="color" value="#ff00ff"></label>
+      <label>Tolerancia <input id="bg-tol" type="range" min="0" max="120" value="12"></label>
+      <div class="row"><button id="bg-auto" class="small">Detectar (esquinas)</button><button id="bg-pick" class="small">Elegir con clic</button></div>
+      <p class="hint">Si la imagen ya tiene transparencia, desmárcalo.</p>
+    </section>
+
+    <section>
+      <h2>3 · Modo</h2>
+      <div class="tabs"><button id="m-pixel" class="on">Pixel art</button><button id="m-conv">Convertir</button></div>
+      <div id="opt-pixel">
+        <label>Reducir ×
+          <select id="px-factor"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+        <div class="row"><button id="px-guess" class="small">Adivinar ×</button></div>
+        <p class="hint">Para hojas de juegos (GBA, DS...). Si la hoja viene ampliada (cada píxel es un bloque de 2×2, 3×3...), redúcela.</p>
+      </div>
+      <div id="opt-conv" hidden>
+        <label>Altura (px) <input id="cv-h" type="number" min="12" max="96" value="36"></label>
+        <label>Colores <input id="cv-n" type="number" min="2" max="32" value="12"></label>
+        <label class="check"><input id="cv-outline" type="checkbox" checked> Contorno</label>
+        <label>Color contorno <input id="cv-ocol" type="color" value="#1a1220"></label>
+        <p class="hint">Para dibujos o capturas: se reduce, se limita la paleta y se perfila. Suele hacer falta retocar a mano.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Cómo recortar</h2>
+      <p class="hint"><b>Clic</b> en un recuadro numerado: lo añade como fotograma.<br>
+        <b>Arrastrar</b>: recorta una zona a mano (para sprites pegados o imágenes sueltas).<br>
+        Orden: <b>1 quieto · 2 paso A · 3 paso B</b> (más fotogramas se guardan para el futuro).</p>
+      <label>Separación mínima <input id="gap" type="range" min="0" max="12" value="2"></label>
+      <p class="hint">Si un sprite sale partido en varios recuadros, sube la separación.</p>
+    </section>
+  </div>
+
+  <!-- ================= centro: la imagen ================= -->
+  <div>
+    <div id="drop" class="empty checker">Suelta aquí una hoja de sprites<br>o un dibujo</div>
+    <p id="status" class="hint"></p>
+  </div>
+
+  <!-- ================= derecha: fotogramas, vista previa, exportar ================= -->
+  <div>
+    <section>
+      <h2>4 · Fotogramas</h2>
+      <div id="frames"></div>
+      <p class="hint" id="frames-hint">Aún no hay ninguno.</p>
+      <label class="check"><input id="flip-all" type="checkbox"> Voltear todos (el juego los quiere mirando a la derecha)</label>
+      <div class="row"><button id="clear" class="small">Quitar todos</button></div>
+    </section>
+
+    <section>
+      <h2>5 · Vista previa</h2>
+      <canvas id="preview" width="160" height="160" class="checker"></canvas>
+      <label class="check"><input id="walk" type="checkbox" checked> Andando</label>
+      <p class="hint">En el juego, al lado de un marine y de una palmera:</p>
+      <canvas id="ingame" width="270" height="150"></canvas>
+      <label>Tamaño en el juego
+        <select id="scale"><option value="1" selected>×1 (recomendado)</option><option value="2">×2</option><option value="0.5">×0,5</option></select></label>
+    </section>
+
+    <section>
+      <h2>6 · Exportar</h2>
+      <label>Personaje <select id="who" style="width:140px"></select></label>
+      <div class="row"><button id="export" class="gold" disabled>Descargar PNG</button></div>
+      <p class="hint">Guarda el PNG en <b>OnePieceSurvivors/assets/chars/</b> y pega esta línea dentro de
+        <b>G.CUSTOM_SPRITES</b> en <b>js/data/custom-sprites.js</b>:</p>
+      <pre id="line">—</pre>
+      <div class="row"><button id="copy" class="small" disabled>Copiar línea</button></div>
+    </section>
+  </div>
+</main>
+
+<!-- Los dibujos del juego, para comparar tamaños en la vista previa. -->
+<script src="../js/core/util.js"></script>
+<script src="../js/core/pixel.js"></script>
+<script src="../js/data/sprites.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+
+  // ---------------- estado ----------------
+  let src = null;          // { w, h, data: Uint8ClampedArray }   imagen original
+  let clean = null;        // ImageData con el fondo quitado
+  let boxes = [];          // recuadros detectados [{x,y,w,h}]
+  let frames = [];         // [{ canvas, flip }]
+  let mode = 'pixel';
+  let picking = false;
+  let drag = null;         // { x0, y0, x1, y1 } en píxeles de la imagen
+
+  const view = document.createElement('canvas');
+  view.id = 'view';
+  const vctx = view.getContext('2d');
+
+  // Personajes del juego.
+  for (const id of Object.keys(G.SPRITES)) {
+    const o = document.createElement('option');
+    o.value = o.textContent = id;
+    $('who').appendChild(o);
+  }
+
+  // ---------------- cargar imagen ----------------
+
+  function loadBlob(blob) {
+    if (!blob || !blob.type.startsWith('image/')) { status('Eso no es una imagen.', true); return; }
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.width; c.height = img.height;
+      const x = c.getContext('2d');
+      x.drawImage(img, 0, 0);
+      src = { w: img.width, h: img.height, data: x.getImageData(0, 0, img.width, img.height).data };
+      URL.revokeObjectURL(url);
+      const drop = $('drop');
+      drop.classList.remove('empty');
+      drop.textContent = '';
+      drop.appendChild(view);
+      $('zoom').value = img.width > 800 ? 1 : img.width > 400 ? 2 : 3;
+      autoBg();
+      guessFactor();
+      // El pixel art usa pocos colores; un dibujo o una captura, miles.
+      const many = countColors() > 300;
+      setMode(many ? 'conv' : 'pixel');
+      reprocess();
+      if (many) status(statusText() + ' · parece un dibujo: modo Convertir');
+    };
+    img.onerror = () => status('No se pudo leer la imagen.', true);
+    img.src = url;
+  }
+
+  $('file').addEventListener('change', e => loadBlob(e.target.files[0]));
+  const drop = $('drop');
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); loadBlob(e.dataTransfer.files[0]); });
+  addEventListener('paste', e => {
+    const item = [...(e.clipboardData || {}).items || []].find(i => i.type.startsWith('image/'));
+    if (item) loadBlob(item.getAsFile());
+  });
+
+  /** Colores distintos (hasta 1000, con muestreo en imágenes grandes). */
+  function countColors() {
+    const set = new Set(), d = src.data, step = Math.max(1, Math.floor(src.w * src.h / 200000)) * 4;
+    for (let i = 0; i < d.length && set.size < 1000; i += step) if (d[i + 3] >= 128) set.add((d[i] << 16) | (d[i + 1] << 8) | d[i + 2]);
+    return set.size;
+  }
+
+  function status(t, err = false) { $('status').textContent = t; $('status').className = 'hint' + (err ? ' err' : ''); }
+
+  // ---------------- fondo ----------------
+
+  const hex = (r, g, b) => '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+  const rgbOf = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
+
+  /** Color de fondo: el más repetido en las cuatro esquinas. */
+  function autoBg() {
+    if (!src) return;
+    const { w, h, data } = src;
+    const count = {};
+    for (const [x, y] of [[0, 0], [w - 1, 0], [0, h - 1], [w - 1, h - 1], [w >> 1, 0], [0, h >> 1]]) {
+      const i = (y * w + x) * 4;
+      if (data[i + 3] < 128) { count.transparent = (count.transparent || 0) + 1; continue; }
+      const k = hex(data[i], data[i + 1], data[i + 2]);
+      count[k] = (count[k] || 0) + 1;
+    }
+    const best = Object.entries(count).sort((a, b) => b[1] - a[1])[0][0];
+    if (best === 'transparent') { $('bg-on').checked = false; }
+    else { $('bg-on').checked = true; $('bg-col').value = best; }
+  }
+
+  function removeBg() {
+    const { w, h, data } = src;
+    const out = new ImageData(new Uint8ClampedArray(data), w, h);
+    if ($('bg-on').checked) {
+      const [br, bg, bb] = rgbOf($('bg-col').value), tol = +$('bg-tol').value;
+      const d = out.data;
+      for (let i = 0; i < d.length; i += 4) {
+        if (Math.abs(d[i] - br) + Math.abs(d[i + 1] - bg) + Math.abs(d[i + 2] - bb) <= tol * 3) d[i + 3] = 0;
+      }
+    }
+    return out;
+  }
+
+  // ---------------- detectar sprites ----------------
+
+  /** Grupos de píxeles visibles, unidos si están a menos de `gap` píxeles. */
+  function detect() {
+    const { width: w, height: h, data } = clean;
+    const seen = new Uint8Array(w * h);
+    const out = [];
+    const stack = [];
+    for (let s = 0; s < w * h; s++) {
+      if (seen[s] || data[s * 4 + 3] < 128) continue;
+      let x0 = w, y0 = h, x1 = 0, y1 = 0, n = 0;
+      stack.push(s); seen[s] = 1;
+      while (stack.length) {
+        const p = stack.pop(), x = p % w, y = (p / w) | 0;
+        n++;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx, ny = y + dy;
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+          const q = ny * w + nx;
+          if (!seen[q] && data[q * 4 + 3] >= 128) { seen[q] = 1; stack.push(q); }
+        }
+      }
+      if (n >= 4) out.push({ x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 });
+      if (out.length > 4000) break;
+    }
+    // Une recuadros cercanos (un sprite con piezas sueltas: espada, sombrero...).
+    const gap = +$('gap').value;
+    let merged = true;
+    while (merged) {
+      merged = false;
+      for (let i = 0; i < out.length && !merged; i++) for (let j = i + 1; j < out.length; j++) {
+        const a = out[i], b = out[j];
+        if (a.x - gap <= b.x + b.w && b.x - gap <= a.x + a.w && a.y - gap <= b.y + b.h && b.y - gap <= a.y + a.h) {
+          const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
+          out[i] = { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
+          out.splice(j, 1);
+          merged = true;
+          break;
+        }
+      }
+    }
+    // Orden de lectura: por filas y de izquierda a derecha.
+    out.sort((a, b) => Math.abs(a.y - b.y) > Math.min(a.h, b.h) / 2 ? a.y - b.y : a.x - b.x);
+    return out;
+  }
+
+  /** ¿Viene ampliada? Busca el mayor tamaño de bloque que encaja con todos los cambios de color. */
+  function guessFactor() {
+    if (!src) return;
+    const { w, h, data } = src;
+    const same = (i, j) => data[i] === data[j] && data[i + 1] === data[j + 1] && data[i + 2] === data[j + 2] && data[i + 3] === data[j + 3];
+    let g = 0;
+    const gcd = (a, b) => b ? gcd(b, a % b) : a;
+    for (let y = 0; y < h && g !== 1; y += Math.max(1, (h / 60) | 0)) {
+      let run = 1;
+      for (let x = 1; x < w; x++) {
+        if (same((y * w + x) * 4, (y * w + x - 1) * 4)) run++;
+        else { g = gcd(g, run); run = 1; if (g === 1) break; }
+      }
+    }
+    const f = Math.min(6, Math.max(1, g || 1));
+    $('px-factor').value = String(f);
+    return f;
+  }
+
+  // ---------------- dibujar la imagen ----------------
+
+  function reprocess() {
+    if (!src) return;
+    clean = removeBg();
+    boxes = detect();
+    status(statusText());
+    redraw();
+  }
+
+  function statusText() {
+    return src.w + '×' + src.h + ' px · ' + boxes.length + ' recuadros detectados' + (boxes.length > 300 ? ' (muchos: ¿falta quitar el fondo?)' : '');
+  }
+
+  function redraw() {
+    if (!src) return;
+    const z = +$('zoom').value;
+    view.width = src.w * z; view.height = src.h * z;
+    const c = document.createElement('canvas');
+    c.width = src.w; c.height = src.h;
+    c.getContext('2d').putImageData(clean, 0, 0);
+    vctx.imageSmoothingEnabled = false;
+    vctx.clearRect(0, 0, view.width, view.height);
+    vctx.drawImage(c, 0, 0, view.width, view.height);
+    vctx.lineWidth = 1;
+    vctx.font = '700 ' + Math.max(10, 4 * z) + 'px Pixelify, monospace';
+    if (boxes.length <= 400) boxes.forEach((b, i) => {
+      vctx.strokeStyle = 'rgba(255,210,63,.9)';
+      vctx.strokeRect(b.x * z + 0.5, b.y * z + 0.5, b.w * z - 1, b.h * z - 1);
+      vctx.fillStyle = '#1a0e06';
+      vctx.fillRect(b.x * z, b.y * z - Math.max(10, 4 * z), String(i + 1).length * Math.max(7, 3 * z) + 4, Math.max(10, 4 * z));
+      vctx.fillStyle = '#ffd23f';
+      vctx.fillText(i + 1, b.x * z + 2, b.y * z - 2);
+    });
+    if (drag) {
+      const r = rect(drag);
+      vctx.strokeStyle = '#ffffff';
+      vctx.setLineDash([4, 3]);
+      vctx.strokeRect(r.x * z + 0.5, r.y * z + 0.5, r.w * z, r.h * z);
+      vctx.setLineDash([]);
+    }
+  }
+
+  function rect(d) {
+    const x = Math.min(d.x0, d.x1), y = Math.min(d.y0, d.y1);
+    return { x, y, w: Math.abs(d.x1 - d.x0) + 1, h: Math.abs(d.y1 - d.y0) + 1 };
+  }
+
+  function imgPos(e) {
+    const r = view.getBoundingClientRect(), z = +$('zoom').value;
+    return [Math.floor((e.clientX - r.left) / z), Math.floor((e.clientY - r.top) / z)];
+  }
+
+  view.addEventListener('mousedown', e => {
+    const [x, y] = imgPos(e);
+    if (picking) {
+      const i = (y * src.w + x) * 4;
+      $('bg-col').value = hex(src.data[i], src.data[i + 1], src.data[i + 2]);
+      $('bg-on').checked = true;
+      picking = false; view.style.cursor = 'crosshair';
+      reprocess();
+      return;
+    }
+    drag = { x0: x, y0: y, x1: x, y1: y, moved: false };
+  });
+  addEventListener('mousemove', e => {
+    if (!drag) return;
+    const [x, y] = imgPos(e);
+    drag.x1 = G.U.clamp(x, 0, src.w - 1); drag.y1 = G.U.clamp(y, 0, src.h - 1);
+    if (Math.abs(drag.x1 - drag.x0) + Math.abs(drag.y1 - drag.y0) > 2) drag.moved = true;
+    redraw();
+  });
+  addEventListener('mouseup', () => {
+    if (!drag) return;
+    const d = drag;
+    drag = null;
+    if (d.moved) addFrame(rect(d));
+    else {
+      const b = boxes.find(b => d.x0 >= b.x && d.x0 < b.x + b.w && d.y0 >= b.y && d.y0 < b.y + b.h);
+      if (b) addFrame(b);
+    }
+    redraw();
+  });
+
+  // ---------------- convertir una zona en fotograma ----------------
+
+  function crop(r) {
+    const c = document.createElement('canvas');
+    c.width = r.w; c.height = r.h;
+    const x = c.getContext('2d');
+    const tmp = document.createElement('canvas');
+    tmp.width = src.w; tmp.height = src.h;
+    tmp.getContext('2d').putImageData(clean, 0, 0);
+    x.drawImage(tmp, r.x, r.y, r.w, r.h, 0, 0, r.w, r.h);
+    return trim(c);
+  }
+
+  /** Quita los bordes transparentes. */
+  function trim(c) {
+    const x = c.getContext('2d');
+    const d = x.getImageData(0, 0, c.width, c.height).data;
+    let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+    for (let y = 0; y < c.height; y++) for (let i = 0; i < c.width; i++) {
+      if (d[(y * c.width + i) * 4 + 3] >= 128) { if (i < x0) x0 = i; if (i > x1) x1 = i; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    }
+    if (x1 < 0) return null;
+    const o = document.createElement('canvas');
+    o.width = x1 - x0 + 1; o.height = y1 - y0 + 1;
+    o.getContext('2d').drawImage(c, x0, y0, o.width, o.height, 0, 0, o.width, o.height);
+    return o;
+  }
+
+  /** Reducción por bloques: toma el píxel central de cada bloque (pixel art ampliado). */
+  function shrink(c, f) {
+    if (f <= 1) return c;
+    const w = Math.max(1, Math.round(c.width / f)), h = Math.max(1, Math.round(c.height / f));
+    const sd = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    const o = document.createElement('canvas');
+    o.width = w; o.height = h;
+    const ox = o.getContext('2d'), od = ox.createImageData(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const sx = Math.min(c.width - 1, Math.floor(x * f + f / 2)), sy = Math.min(c.height - 1, Math.floor(y * f + f / 2));
+      const i = (sy * c.width + sx) * 4, j = (y * w + x) * 4;
+      od.data[j] = sd[i]; od.data[j + 1] = sd[i + 1]; od.data[j + 2] = sd[i + 2]; od.data[j + 3] = sd[i + 3] >= 128 ? 255 : 0;
+    }
+    ox.putImageData(od, 0, 0);
+    return o;
+  }
+
+  /** Imagen normal -> pixel art: reduce (media por zonas), limita la paleta y perfila. */
+  function convert(c) {
+    const H = G.U.clamp(+$('cv-h').value || 36, 8, 128);
+    const outline = $('cv-outline').checked;
+    const inner = outline ? H - 2 : H;
+    const k = c.height / inner;
+    const w = Math.max(1, Math.round(c.width / k)), h = inner;
+    const sd = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    const px = new Float32Array(w * h * 4);
+    // Media de cada zona, pesada por la opacidad (los bordes no se ensucian de fondo).
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const sx0 = Math.floor(x * k), sx1 = Math.max(sx0 + 1, Math.floor((x + 1) * k));
+      const sy0 = Math.floor(y * k), sy1 = Math.max(sy0 + 1, Math.floor((y + 1) * k));
+      let r = 0, g = 0, b = 0, a = 0, n = 0;
+      for (let yy = sy0; yy < sy1 && yy < c.height; yy++) for (let xx = sx0; xx < sx1 && xx < c.width; xx++) {
+        const i = (yy * c.width + xx) * 4, al = sd[i + 3] / 255;
+        r += sd[i] * al; g += sd[i + 1] * al; b += sd[i + 2] * al; a += al; n++;
+      }
+      const j = (y * w + x) * 4;
+      if (a > 0) { px[j] = r / a; px[j + 1] = g / a; px[j + 2] = b / a; }
+      px[j + 3] = n ? a / n : 0;
+    }
+    // Paleta por corte de la mediana.
+    const opaque = [];
+    for (let i = 0; i < w * h; i++) if (px[i * 4 + 3] >= 0.5) opaque.push([px[i * 4], px[i * 4 + 1], px[i * 4 + 2]]);
+    const pal = medianCut(opaque, G.U.clamp(+$('cv-n').value || 12, 2, 64));
+    const ow = outline ? w + 2 : w, oh = outline ? h + 2 : h, off = outline ? 1 : 0;
+    const o = document.createElement('canvas');
+    o.width = ow; o.height = oh;
+    const ox = o.getContext('2d'), od = ox.createImageData(ow, oh);
+    const solid = new Uint8Array(ow * oh);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const i = (y * w + x) * 4;
+      if (px[i + 3] < 0.5) continue;
+      const c2 = nearest(pal, px[i], px[i + 1], px[i + 2]);
+      const j = ((y + off) * ow + x + off);
+      solid[j] = 1;
+      od.data[j * 4] = c2[0]; od.data[j * 4 + 1] = c2[1]; od.data[j * 4 + 2] = c2[2]; od.data[j * 4 + 3] = 255;
+    }
+    if (outline) {
+      const [lr, lg, lb] = rgbOf($('cv-ocol').value);
+      for (let y = 0; y < oh; y++) for (let x = 0; x < ow; x++) {
+        const j = y * ow + x;
+        if (solid[j]) continue;
+        const near = (x > 0 && solid[j - 1]) || (x < ow - 1 && solid[j + 1]) || (y > 0 && solid[j - ow]) || (y < oh - 1 && solid[j + ow]);
+        if (near) { od.data[j * 4] = lr; od.data[j * 4 + 1] = lg; od.data[j * 4 + 2] = lb; od.data[j * 4 + 3] = 255; }
+      }
+    }
+    ox.putImageData(od, 0, 0);
+    return o;
+  }
+
+  function medianCut(colors, n) {
+    if (!colors.length) return [[0, 0, 0]];
+    let boxes = [colors];
+    while (boxes.length < n) {
+      // Parte la caja con más variación por su canal más ancho.
+      let bi = -1, best = -1, ch = 0;
+      boxes.forEach((b, i) => {
+        if (b.length < 2) return;
+        for (let c = 0; c < 3; c++) {
+          let lo = 255, hi = 0;
+          for (const p of b) { if (p[c] < lo) lo = p[c]; if (p[c] > hi) hi = p[c]; }
+          if (hi - lo > best) { best = hi - lo; bi = i; ch = c; }
+        }
+      });
+      if (bi < 0 || best < 4) break;
+      const b = boxes[bi].sort((p, q) => p[ch] - q[ch]);
+      boxes.splice(bi, 1, b.slice(0, b.length >> 1), b.slice(b.length >> 1));
+    }
+    return boxes.map(b => {
+      const s = [0, 0, 0];
+      for (const p of b) { s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; }
+      return s.map(v => Math.round(v / b.length));
+    });
+  }
+
+  function nearest(pal, r, g, b) {
+    let best = pal[0], bd = Infinity;
+    for (const p of pal) {
+      const d = (p[0] - r) ** 2 * 0.3 + (p[1] - g) ** 2 * 0.59 + (p[2] - b) ** 2 * 0.11;
+      if (d < bd) { bd = d; best = p; }
+    }
+    return best;
+  }
+
+  function addFrame(r) {
+    if (!src) return;
+    let c = crop(r);
+    if (!c) { status('Esa zona está vacía (¿es todo fondo?).', true); return; }
+    c = mode === 'pixel' ? shrink(c, +$('px-factor').value) : convert(c);
+    frames.push({ canvas: c, flip: false });
+    renderFrames();
+    if (c.height > 96) status('Fotograma de ' + c.width + '×' + c.height + ': demasiado grande para el juego. ¿Es un dibujo? Usa Convertir, o Reducir ×.', true);
+  }
+
+  // ---------------- fotogramas ----------------
+
+  const NAMES = ['Quieto', 'Paso A', 'Paso B'];
+
+  function renderFrames() {
+    const box = $('frames');
+    box.innerHTML = '';
+    frames.forEach((f, i) => {
+      const el = document.createElement('div');
+      el.className = 'frame';
+      const z = Math.max(1, Math.floor(64 / Math.max(f.canvas.width, f.canvas.height)));
+      const cv = document.createElement('canvas');
+      cv.width = f.canvas.width * z; cv.height = f.canvas.height * z;
+      const x = cv.getContext('2d');
+      x.imageSmoothingEnabled = false;
+      drawFrame(x, f, 0, 0, z);
+      el.innerHTML = '<b>' + (i + 1) + ' · ' + (NAMES[i] || 'extra') + '</b>';
+      el.appendChild(cv);
+      const s = document.createElement('small');
+      s.textContent = f.canvas.width + '×' + f.canvas.height;
+      el.appendChild(s);
+      const btns = document.createElement('div');
+      btns.className = 'btns';
+      const add = (t, title, fn) => { const b = document.createElement('button'); b.className = 'small'; b.textContent = t; b.title = title; b.onclick = fn; btns.appendChild(b); };
+      add('◀', 'Mover antes', () => { if (i > 0) { [frames[i - 1], frames[i]] = [frames[i], frames[i - 1]]; renderFrames(); } });
+      add('↔', 'Voltear', () => { f.flip = !f.flip; renderFrames(); });
+      add('▶', 'Mover después', () => { if (i < frames.length - 1) { [frames[i + 1], frames[i]] = [frames[i], frames[i + 1]]; renderFrames(); } });
+      add('✕', 'Quitar', () => { frames.splice(i, 1); renderFrames(); });
+      el.appendChild(btns);
+      box.appendChild(el);
+    });
+    const n = frames.length;
+    $('frames-hint').textContent = !n ? 'Aún no hay ninguno.' :
+      n < 3 ? 'Con ' + n + ' basta, pero con 3 (quieto, paso A, paso B) anda mejor.' : 'Listo para exportar.';
+    $('export').disabled = $('copy').disabled = !n;
+    updateLine();
+  }
+
+  function drawFrame(x, f, dx, dy, z) {
+    const flip = f.flip !== $('flip-all').checked;
+    x.save();
+    if (flip) { x.translate(dx + f.canvas.width * z, dy); x.scale(-1, 1); x.drawImage(f.canvas, 0, 0, f.canvas.width * z, f.canvas.height * z); }
+    else x.drawImage(f.canvas, dx, dy, f.canvas.width * z, f.canvas.height * z);
+    x.restore();
+  }
+
+  /** Tamaño común: todos con el mismo ancho y alto, centrados y apoyados abajo (los pies). */
+  function cell() {
+    return { fw: Math.max(...frames.map(f => f.canvas.width)), fh: Math.max(...frames.map(f => f.canvas.height)) };
+  }
+
+  /** La tira final: siempre al menos 3 fotogramas. */
+  function strip() {
+    const list = frames.slice();
+    while (list.length < 3) list.push(list[list.length === 2 ? 0 : list.length - 1]);
+    const { fw, fh } = cell();
+    const c = document.createElement('canvas');
+    c.width = fw * list.length; c.height = fh;
+    const x = c.getContext('2d');
+    list.forEach((f, i) => drawFrame(x, f, i * fw + Math.floor((fw - f.canvas.width) / 2), fh - f.canvas.height, 1));
+    return { canvas: c, fw, fh, n: list.length };
+  }
+
+  function updateLine() {
+    if (!frames.length) { $('line').textContent = '—'; return; }
+    const { fw, fh } = cell(), id = $('who').value;
+    $('line').textContent = id + ": { file: 'assets/chars/" + id + ".png', fw: " + fw + ', fh: ' + fh + ', scale: ' + $('scale').value + ' },';
+  }
+
+  $('export').onclick = () => {
+    const s = strip();
+    s.canvas.toBlob(b => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = $('who').value + '.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    }, 'image/png');
+  };
+  $('copy').onclick = () => {
+    navigator.clipboard.writeText($('line').textContent).then(() => status('Línea copiada.'), () => status('No se pudo copiar: selecciónala a mano.', true));
+  };
+
+  // ---------------- vista previa ----------------
+
+  const pctx = $('preview').getContext('2d'), gctx = $('ingame').getContext('2d');
+  const grass = (() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 16;
+    const x = c.getContext('2d');
+    for (let y = 0; y < 16; y++) for (let i = 0; i < 16; i++) {
+      const h = G.U.hash(i, y, 3);
+      x.fillStyle = h > 0.97 ? '#3c7a35' : h < 0.02 ? '#7cc45a' : ['#4f9a45', '#56a24b', '#47903f'][(h * 3) | 0];
+      x.fillRect(i, y, 1, 1);
+    }
+    return c;
+  })();
+  const palm = G.Pix.paint([
+    '.....kk....kk.......', '...kk22k..k22kk.....', '..k2333kkk3332k.....', '.k23k..k22k..k32k...', 'k2k...k2332k...k2k..',
+    'kk...k23k.k32k..kk..', '.....k2k...k2k......', '......kkTk..kk......', '.......kTk..........', '.......kTtk.........',
+    '........kTk.........', '........kTtk........', '........kTtk........', '.......kTtk.........', '.......kTtk.........',
+    '.......kTtk.........', '......kTTttk........', '.....kkkkkkkk.......'], { 2: '#45943f', 3: '#64b252', T: '#5b3b22', t: '#7a5130' });
+
+  let t0 = performance.now();
+  function anim(now) {
+    requestAnimationFrame(anim);
+    const t = (now - t0) / 1000;
+    const walk = $('walk').checked;
+    const seq = [1, 0, 2, 0];
+    const pick = () => {
+      if (!frames.length) return null;
+      const s = frames.length >= 3 ? frames : frames.concat(frames).concat(frames);
+      return walk ? s[seq[Math.floor(t * 8) % 4]] : s[0];
+    };
+    const f = pick();
+
+    // Grande, sobre cuadros.
+    pctx.clearRect(0, 0, 160, 160);
+    pctx.imageSmoothingEnabled = false;
+    if (f) {
+      const { fw, fh } = cell();
+      const z = Math.max(1, Math.floor(150 / Math.max(fw, fh)));
+      drawFrame(pctx, f, Math.floor((160 - f.canvas.width * z) / 2), 155 - f.canvas.height * z, z);
+    }
+
+    // En el juego: misma escala que el resto (×3 para verlo).
+    const Z = 3, sc = +$('scale').value;
+    gctx.imageSmoothingEnabled = false;
+    for (let y = 0; y < 150; y += 16 * Z) for (let x = 0; x < 270; x += 16 * Z) gctx.drawImage(grass, x, y, 16 * Z, 16 * Z);
+    const ground = 132;
+    const shadow = (x, w) => { gctx.fillStyle = 'rgba(0,0,0,.3)'; gctx.beginPath(); gctx.ellipse(x, ground, w, w * 0.35, 0, 0, 6.283); gctx.fill(); };
+    gctx.drawImage(palm, 4, ground - 17 * Z, palm.width * Z, palm.height * Z);
+    const marine = G.Pix.sprite('marine').frames[Math.floor(t * 7) % 2 ? 1 : 2];
+    shadow(110, 11 * Z / 2);
+    gctx.drawImage(marine, 110 - 8 * Z, ground - 20 * Z + Z, 16 * Z, 20 * Z);
+    if (f) {
+      const w = f.canvas.width * Z * sc, h = f.canvas.height * Z * sc;
+      shadow(200, Math.max(10, w / 3));
+      const tmp = { canvas: f.canvas, flip: f.flip };
+      gctx.save();
+      gctx.translate(200 - w / 2, ground - h + Z);
+      drawFrame(gctx, tmp, 0, 0, Z * sc);
+      gctx.restore();
+    }
+  }
+  requestAnimationFrame(anim);
+
+  // ---------------- controles ----------------
+
+  function setMode(m) {
+    mode = m;
+    $('m-pixel').classList.toggle('on', m === 'pixel');
+    $('m-conv').classList.toggle('on', m === 'conv');
+    $('opt-pixel').hidden = m !== 'pixel';
+    $('opt-conv').hidden = m !== 'conv';
+  }
+  $('m-pixel').onclick = () => setMode('pixel');
+  $('m-conv').onclick = () => setMode('conv');
+  $('zoom').oninput = redraw;
+  for (const id of ['bg-on', 'bg-col', 'bg-tol', 'gap']) $(id).addEventListener('input', reprocess);
+  $('bg-auto').onclick = () => { autoBg(); reprocess(); };
+  $('bg-pick').onclick = () => { if (!src) return; picking = true; view.style.cursor = 'copy'; status('Haz clic en el color de fondo.'); };
+  $('px-guess').onclick = () => { const f = guessFactor(); status(f > 1 ? 'Parece ampliada ×' + f + '.' : 'Parece a tamaño real (×1).'); };
+  $('flip-all').onchange = renderFrames;
+  $('clear').onclick = () => { frames = []; renderFrames(); };
+  $('who').onchange = updateLine;
+  $('scale').onchange = updateLine;
+})();
+</script>
+</body>
+</html>

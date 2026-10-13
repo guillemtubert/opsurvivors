@@ -103,36 +103,40 @@ G.Pix = (() => {
     s = build([paint(rows, def.pal), paint(stepRows(rows, 0), def.pal), paint(stepRows(rows, 1), def.pal)]);
     s.scale = def.scale || 1;
     cache.set(id, s);
-    loadCustom(id);
     return s;
   }
 
   /**
-   * Hoja propia (opcional): una tira horizontal de fotogramas mirando a la
-   * derecha. Si carga, sustituye al dibujo en código sin tocar nada más.
+   * Hojas propias (js/data/custom-sprites.js, hechas con tools/sprites.html):
+   * una tira horizontal de fotogramas mirando a la derecha. Se cargan al
+   * arrancar y sustituyen al dibujo en código sin tocar nada más.
+   * Resuelve siempre (si una falla, se queda el dibujo en código).
    */
-  function loadCustom(id) {
-    const cfg = G.CUSTOM_SPRITES && G.CUSTOM_SPRITES[id];
-    if (!cfg) return;
-    const img = new Image();
-    img.onload = () => {
-      const fw = cfg.fw || img.height, fh = cfg.fh || img.height;
-      const n = Math.max(1, Math.floor(img.width / fw));
-      const frames = [];
-      for (let i = 0; i < n; i++) {
-        const c = document.createElement('canvas');
-        c.width = fw; c.height = fh;
-        c.getContext('2d').drawImage(img, i * fw, 0, fw, fh, 0, 0, fw, fh);
-        frames.push(c);
-      }
-      // Siempre 3: quieto, paso A, paso B.
-      while (frames.length < 3) frames.push(frames[frames.length - 1]);
-      const s = build(frames.slice(0, 3));
-      s.scale = cfg.scale || 1;
-      cache.set(id, s);
-    };
-    img.onerror = () => console.warn('[Pix] no se pudo cargar', cfg.file);
-    img.src = cfg.file;
+  function preloadCustom() {
+    const all = Object.entries(G.CUSTOM_SPRITES || {}).map(([id, cfg]) => new Promise(done => {
+      const img = new Image();
+      img.onload = () => {
+        const fw = cfg.fw || img.height, fh = cfg.fh || img.height;
+        const n = Math.max(1, Math.floor(img.width / fw));
+        const frames = [];
+        for (let i = 0; i < n; i++) {
+          const c = document.createElement('canvas');
+          c.width = fw; c.height = fh;
+          c.getContext('2d').drawImage(img, i * fw, 0, fw, fh, 0, 0, fw, fh);
+          frames.push(c);
+        }
+        // Siempre 3: quieto, paso A, paso B.
+        while (frames.length < 3) frames.push(frames[frames.length - 1]);
+        const s = build(frames.slice(0, 3));
+        s.scale = cfg.scale || 1;
+        s.file = cfg.file; s.n = n;
+        cache.set(id, s);
+        done();
+      };
+      img.onerror = () => { console.warn('[Pix] no se pudo cargar', cfg.file); done(); };
+      img.src = cfg.file;
+    }));
+    return Promise.all(all);
   }
 
   /** Canvas a tamaño ×k (para retratos del DOM). */
@@ -155,8 +159,15 @@ G.Pix = (() => {
   /** <img> pixelado de un sprite, para el DOM. */
   function portrait(id, size) {
     const s = sprite(id);
+    const w = Math.round(size * s.w / s.h);
+    // Hoja propia: abierto con doble clic (file://) el navegador no deja sacar
+    // un data URL de una imagen del disco, así que se recorta con CSS.
+    if (s.file) {
+      return '<span class="px" style="display:inline-block;width:' + w + 'px;height:' + size + 'px;background:url(' + s.file +
+        ') 0 0 / ' + (w * s.n) + 'px ' + size + 'px no-repeat;image-rendering:pixelated"></span>';
+    }
     return '<img class="px" src="' + url(s.frames[0]) + '" width="' + Math.round(size * s.w / s.h) + '" height="' + size + '" alt="">';
   }
 
-  return { paint, sprite, white, flip, big, url, portrait, clean };
+  return { paint, sprite, white, flip, big, url, portrait, clean, preloadCustom };
 })();

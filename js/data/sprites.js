@@ -377,8 +377,4 @@ G.SPRITES = {
       '...k|kkk.|.kkk|k...'] }
 };
 
-/* Hojas propias (opcional). Ejemplo:
- *   G.CUSTOM_SPRITES = { luffy: { file: 'assets/chars/luffy.png', fw: 32, fh: 40, scale: 0.5 } };
- * Tira horizontal: quieto, paso A, paso B, mirando a la derecha.
- */
-G.CUSTOM_SPRITES = G.CUSTOM_SPRITES || {};
+/* Las hojas de sprites propias, que sustituyen a estos dibujos, van en js/data/custom-sprites.js. */

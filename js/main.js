@@ -13,8 +13,9 @@
       return;
     }
     // Espera a la fuente pixel para que la interfaz no salte al cargarla.
-    const ready = document.fonts && document.fonts.load ? document.fonts.load('16px Pixelify') : Promise.resolve();
-    ready.catch(() => {}).then(() => {
+    const font = document.fonts && document.fonts.load ? document.fonts.load('16px Pixelify').catch(() => {}) : Promise.resolve();
+    // También las hojas de sprites propias, para que los retratos ya salgan bien.
+    Promise.all([font, G.Pix.preloadCustom()]).then(() => {
       G.HUD.init();
       G.UI.init();
       G.Game.init();
