@@ -73,7 +73,8 @@ js/
   data/     scope (qué está activo), sprites (pixel art en código),
             sprites-built (generado), custom-sprites (hojas a mano),
             moves, crew, enemies, upgrades
-  world/    world (islas por ruido, horneado por chunks, objetos, colisiones)
+  world/    world (islas por ruido continuo, horneado por chunks, colisiones),
+            props (árboles, palmeras, rocas, barriles pintados a escala de los personajes)
   entities/ fx, projectile, enemy (+ gestor y rejilla espacial), pickup, player
   systems/  combat (las técnicas), spawner (oleadas y jefes), levelup (cartas)
   ui/       icons, hud, ui (pantallas)

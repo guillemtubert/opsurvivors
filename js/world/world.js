@@ -40,46 +40,9 @@ G.World = (() => {
       rock: ['#4a4656', '#625e70', '#7c788a'], flowers: ['#9a8ad0', '#5fe0c0', '#c9cfdc'], tuft: ['#3a3446', '#5a5470'] }
   ];
 
-  // ---------------- dibujos de los objetos (por bioma) ----------------
+  // ---------------- detalles pequeños (por bioma) ----------------
+  // Los objetos grandes (árboles, rocas, barriles...) están en world/props.js.
   const PROPS = {
-    tree: { solid: 11, rows: [
-      '......kkkk..........', '....kk3333kk........', '...k32223333kk......', '..k3222222333k......', '.k322112222333k.....',
-      '.k22111122223333k...', 'k2211111122222333k..', 'k21111111122222333k.', 'k2111111111222223k..', '.k111111111122223k..',
-      '.k1111111111122k....', '..k1111111111kk.....', '...kk11111kk........', '.....kkttkk.........', '......kTtk..........',
-      '......kTtk..........', '......kTtk..........', '.....kTTttk.........', '....kkkkkkkk........'],
-      pal: b => ({ 1: b.leaf[0], 2: b.leaf[1], 3: b.leaf[2], T: b.trunk[0], t: b.trunk[1] }), ox: 7, oy: 18 },
-    palm: { solid: 9, rows: [
-      '.....kk....kk.......', '...kk22k..k22kk.....', '..k2333kkk3332k.....', '.k23k..k22k..k32k...', 'k2k...k2332k...k2k..',
-      'kk...k23k.k32k..kk..', '.....k2k...k2k......', '......kkTk..kk......', '.......kTk..........', '.......kTtk.........',
-      '........kTk.........', '........kTtk........', '........kTtk........', '.......kTtk.........', '.......kTtk.........',
-      '.......kTtk.........', '......kTTttk........', '.....kkkkkkkk.......'],
-      pal: b => ({ 2: b.leaf[1], 3: b.leaf[2], T: b.trunk[0], t: b.trunk[1] }), ox: 8, oy: 17 },
-    cactus: { solid: 8, rows: [
-      '....kkk.....', '...k232k....', '...k232k.kk.', '.kkk232kk23k', 'k23k232k232k', 'k232232232k.',
-      'k232232kkk..', '.kkk232k....', '...k232k....', '...k232k....', '...k232k....', '..kkkkkkk...'],
-      pal: b => ({ 2: b.leaf[1], 3: b.leaf[2] }), ox: 5, oy: 11 },
-    cloudtree: { solid: 10, rows: [
-      '.....kkkkkk.........', '...kkwwwwwwkk.......', '..kwwwwwwwwwwk......', '.kwwwwwwwwwwwwk.....', 'kwwwwwwwwwwwwwwk....',
-      'kwWwwwwwwwwwwWWk....', '.kWWwwwwwwwWWWk.....', '..kkWWWWWWWWkk......', '....kkkTtkkk........', '......kTtk..........',
-      '......kTtk..........', '......kTtk..........', '.....kTTttk.........', '....kkkkkkkk........'],
-      pal: b => ({ T: b.trunk[0], t: b.trunk[1], w: '#ffffff', W: '#d8e4f4' }), ox: 7, oy: 13 },
-    dead: { solid: 9, rows: [
-      '.k.......k......', 'kTk..k..kTk.....', '.kTk.kk.kTk..k..', '..kTkTk.kTk.kTk.', '...kTTkkTTkkTk..',
-      '....kTTTTTTTk...', '.....kTTTtk.....', '......kTtk......', '......kTtk......', '......kTtk......',
-      '.....kTTttk.....', '....kkkkkkkk....'],
-      pal: b => ({ T: b.trunk[0], t: b.trunk[1] }), ox: 7, oy: 11 },
-    rock: { solid: 9, rows: [
-      '....kkkkk.....', '..kk33322kk...', '.k3332222221k.', 'k333222222211k', 'k322222222111k', 'k222222221111k',
-      '.k2222211111k.', '..kkkkkkkkkk..'],
-      pal: b => ({ 1: b.rock[0], 2: b.rock[1], 3: b.rock[2] }), ox: 7, oy: 7 },
-    barrel: { solid: 7, hp: 18, rows: [
-      '..kkkkkk..', '.kbBBBBbk.', 'kbbbbbbbbk', 'kXXXXXXXXk', 'kbBbbbbBbk', 'kbBbbbbBbk',
-      'kbBbbbbBbk', 'kXXXXXXXXk', 'kbbbbbbbbk', '.kbbbbbbk.', '..kkkkkk..'],
-      pal: () => ({ b: '#9a6434', B: '#b87a42' }), ox: 5, oy: 10 },
-    crate: { solid: 7, hp: 26, rows: [
-      'kkkkkkkkkkkk', 'kbbbbbbbbbBk', 'kbkkkkkkkkBk', 'kbkbBbbbkkBk', 'kbkbbBbkbkBk', 'kbkbbbkbbkBk',
-      'kbkbbkbBbkBk', 'kbkbkbbbBkBk', 'kbkkkkkkkkBk', 'kbbbbbbbbbBk', 'kkkkkkkkkkkk'],
-      pal: () => ({ b: '#b88a4a', B: '#8a6434' }), ox: 6, oy: 10 },
     tuft: { rows: ['.1..1.1.', '.11.111.', '1121121.', '.222222.'],
       pal: b => ({ 1: b.tuft[1], 2: b.tuft[0] }), ox: 4, oy: 3 },
     flower: { rows: ['.a.', 'aya', '.a.', '.g.'],
@@ -109,32 +72,43 @@ G.World = (() => {
   }
 
   // ---------------- terreno ----------------
+  /*
+   * Un campo de ruido continuo decide el terreno en cada punto (no por tile):
+   * así las orillas y los caminos tienen formas orgánicas a nivel de píxel.
+   *   n < W0 mar profundo · < W1 agua · < S1 arena · resto suelo
+   * Las franjas justo por debajo de cada umbral son la espuma, el agua clara
+   * y el borde de hierba.
+   */
+  const W0 = 0.26, W1 = 0.33, S1 = 0.39;
+
+  /** Valor del campo en coordenadas de tile (con decimales). */
+  function field(fx, fy) {
+    let n = G.U.fbm(fx * 0.05, fy * 0.05, seed);
+    // Lo cerca del origen siempre es tierra: se empieza en una isla.
+    const d = Math.hypot(fx, fy);
+    if (d < 9) n += (9 - d) * 0.04;
+    return n;
+  }
+  const classify = n => n < W0 ? 0 : n < W1 ? 1 : n < S1 ? 2 : 3;
+
+  /** Veta de camino de tierra (0 = en el centro del camino). */
+  const pathField = (fx, fy) => Math.abs(G.U.noise(fx * 0.07, fy * 0.07, seed + 99) - 0.5);
+  const PATH_W = 0.018;
 
   const terrCache = new Map();
-  function terrain(tx, ty) {
-    // Lo cerca del origen siempre es tierra: se empieza en una isla.
-    const d = Math.hypot(tx, ty);
-    let n = G.U.fbm(tx * 0.05, ty * 0.05, seed);
-    if (d < 9) n += (9 - d) * 0.04;
-    if (n < 0.26) return 0;
-    if (n < 0.33) return 1;
-    if (n < 0.39) return 2;
-    return 3;
-  }
-
+  /** Terreno en el centro de un tile (para colocar objetos). */
   function terrAt(tx, ty) {
     const k = ((tx & 0xffff) << 16) | (ty & 0xffff);
     let v = terrCache.get(k);
     if (v === undefined) {
-      v = terrain(tx, ty);
+      v = classify(field(tx + 0.5, ty + 0.5));
       if (terrCache.size > 200000) terrCache.clear();
       terrCache.set(k, v);
     }
     return v;
   }
 
-  /** Camino de tierra dentro del suelo (vetas de ruido). */
-  function isPath(tx, ty) { return Math.abs(G.U.noise(tx * 0.09, ty * 0.09, seed + 99) - 0.5) < 0.024; }
+  function isPath(tx, ty) { return pathField(tx + 0.5, ty + 0.5) < PATH_W * 1.6; }
 
   /** Objeto de un tile (o null). Mismo resultado siempre para la misma semilla. */
   function propAt(tx, ty) {
@@ -142,29 +116,33 @@ G.World = (() => {
     const t = terrAt(tx, ty);
     const h = G.U.hash(tx, ty, seed + 5);
     const b = B();
+    // Los grandes (árboles, palmeras) sólo en tiles pares: así nunca se pisan.
+    const grid = !(tx & 1) && !(ty & 1);
     let p = null;
     if (t === 3) {
       if (isPath(tx, ty)) p = h < 0.04 ? 'flower' : null;
-      else if (h < 0.045) p = b.tree;
-      else if (h < 0.06) p = 'rock';
-      else if (h < 0.072) p = 'barrel';
-      else if (h < 0.08) p = 'crate';
+      else if (grid && h < 0.085) p = b.tree;
+      else if (!grid && h < 0.012) p = 'rock';
+      else if (!grid && h < 0.022) p = 'barrel';
+      else if (!grid && h < 0.028) p = 'crate';
       else if (h < 0.2) p = 'tuft';
       else if (h < 0.24) p = 'flower';
       else if (h < 0.27) p = 'flower2';
     } else if (t === 2) {
-      if (h < 0.03) p = b.palm;
-      else if (h < 0.04) p = 'crate';
-      else if (h < 0.05) p = 'barrel';
-      else if (h < 0.09) p = 'shell';
-    } else if (t === 1 && h < 0.012) p = 'rock';
+      if (grid && h < 0.07) p = b.palm;
+      else if (!grid && h < 0.008) p = 'crate';
+      else if (!grid && h < 0.016) p = 'barrel';
+      else if (h < 0.07) p = 'shell';
+    } else if (t === 1 && !grid && h < 0.008) p = 'rock';
     if (p && broken.has(tx + ',' + ty)) return null;
     return p;
   }
 
   /** Desplazamiento del objeto dentro de su tile (para que no parezca rejilla). */
   function jitter(tx, ty) {
-    return [Math.floor(G.U.hash(tx, ty, seed + 8) * 7) - 3, Math.floor(G.U.hash(tx, ty, seed + 9) * 5) - 2];
+    // Los grandes se mueven más (hasta media celda de 2×2): que no se vea la rejilla.
+    const big = !(tx & 1) && !(ty & 1), ax = big ? 15 : 7, ay = big ? 11 : 5;
+    return [Math.floor(G.U.hash(tx, ty, seed + 8) * ax) - (ax >> 1), Math.floor(G.U.hash(tx, ty, seed + 9) * ay) - (ay >> 1)];
   }
 
   // ---------------- horneado del suelo ----------------
@@ -174,90 +152,90 @@ G.World = (() => {
     return (255 << 24) | ((n & 255) << 16) | (n & 0xff00) | ((n >> 16) & 255);
   }
 
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + 0.5) / 16);
+  // Tabla de azar de 256×256 para la textura del suelo: calcular un hash por
+  // píxel era lo que más costaba al hornear (se repite cada 256 px: no se nota).
+  const RND = new Float32Array(256 * 256);
+  for (let i = 0; i < RND.length; i++) RND[i] = G.U.hash(i & 255, i >> 8, 3);
+  const rnd = (x, y) => RND[((y & 255) << 8) | (x & 255)];
+
   function bake(cx, cy) {
     const b = B();
+    const S = CH * T;
     const c = document.createElement('canvas');
-    c.width = c.height = CH * T;
+    c.width = c.height = S;
     const x = c.getContext('2d');
-    const img = x.createImageData(CH * T, CH * T);
+    const img = x.createImageData(S, S);
     const buf = new Uint32Array(img.data.buffer);
     const P = {
       g: b.ground.map(rgb32), sp: rgb32(b.speck), li: rgb32(b.light), pa: b.path.map(rgb32),
+      pe: rgb32(G.U.shade(b.path[0], -0.18)),
       sa: b.sand.map(rgb32), sd: rgb32(b.sandDot), wa: rgb32(b.water), de: rgb32(b.deep),
-      fo: rgb32(b.foam), wl: rgb32(G.U.shade(b.water, 0.18)), gd: rgb32(G.U.shade(b.ground[0], -0.18)),
-      sw: rgb32(G.U.shade(b.sand[0], -0.12))
+      fo: rgb32(b.foam), wl: rgb32(G.U.shade(b.water, 0.18)), sw: rgb32(G.U.shade(b.sand[0], -0.1))
     };
-    const tx0 = cx * CH, ty0 = cy * CH;
-
-    for (let j = 0; j < CH; j++) {
-      for (let i = 0; i < CH; i++) {
-        const tx = tx0 + i, ty = ty0 + j;
-        const t = terrAt(tx, ty);
-        // Vecinos más "altos": de ahí salen orillas y bordes.
-        const nb = [];
-        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-          if (!dx && !dy) continue;
-          const r = terrAt(tx + dx, ty + dy);
-          if (r > t) nb.push(dx, dy, r);
-        }
-        const path = t === 3 && isPath(tx, ty);
-        for (let py = 0; py < T; py++) {
-          for (let px = 0; px < T; px++) {
-            const ax = tx * T + px, ay = ty * T + py;
-            const hh = G.U.hash(ax, ay, 3);
-            // Distancia al vecino más alto (0 = pegado al borde).
-            let dmin = 9, rmax = t;
-            for (let n = 0; n < nb.length; n += 3) {
-              const dx = nb[n], dy = nb[n + 1];
-              const ddx = dx < 0 ? px : dx > 0 ? T - 1 - px : 0;
-              const ddy = dy < 0 ? py : dy > 0 ? T - 1 - py : 0;
-              const d = Math.max(ddx, ddy);
-              if (d < dmin) { dmin = d; rmax = nb[n + 2]; }
-            }
-            let col;
-            if (t <= 1) {
-              col = t === 0 ? P.de : P.wa;
-              if (t === 0 && rmax >= 1 && dmin <= 2) col = P.wa;
-              if (rmax >= 2) {
-                if (dmin === 0) col = P.fo;
-                else if (dmin === 1) col = (ax + ay) & 1 ? P.fo : P.wl;
-                else if (dmin === 2) col = P.wl;
-              }
-              // Olas: rayitas claras.
-              if (dmin > 2 && ((ax * 3 + ay * 7) % 41 === 0 || (hh < 0.006))) col = P.wl;
-            } else if (t === 2) {
-              col = P.sa[(hh * 3) | 0];
-              if (hh > 0.97) col = P.sd;
-              if (rmax === 3 && dmin <= 1) col = dmin === 0 || ((ax + ay) & 1) ? P.g[0] : col;
-              else if (rmax === 3 && dmin === 2 && hh < 0.3) col = P.g[1];
-            } else {
-              if (path) {
-                col = P.pa[hh < 0.5 ? 0 : 1];
-              } else {
-                col = P.g[(hh * 3) | 0];
-                if (hh > 0.985) col = P.sp;
-                else if (hh < 0.012) col = P.li;
-                // Briznas: un píxel claro sobre uno oscuro.
-                const bl = G.U.hash(ax >> 2, ay >> 2, 11);
-                if (bl < 0.08 && (ax & 3) === 1) { if ((ay & 3) === 1) col = P.li; else if ((ay & 3) === 2) col = P.sp; }
-              }
-            }
-            buf[(j * T + py) * CH * T + i * T + px] = col;
+    const ax0 = cx * S, ay0 = cy * S;
+    // El ruido se calcula cada STEP píxeles y se interpola: mismas formas, 16 veces menos trabajo.
+    const STEP = 4, GW = S / STEP + 1;
+    const nG = new Float32Array(GW * GW), pG = new Float32Array(GW * GW);
+    for (let j = 0; j < GW; j++) for (let i = 0; i < GW; i++) {
+      const fx = (ax0 + i * STEP) / T, fy = (ay0 + j * STEP) / T;
+      nG[j * GW + i] = field(fx, fy);
+      pG[j * GW + i] = pathField(fx, fy);
+    }
+    const lerp2 = (g, px, py) => {
+      const i = px / STEP | 0, j = py / STEP | 0, u = (px % STEP) / STEP, v = (py % STEP) / STEP, k = j * GW + i;
+      return (g[k] * (1 - u) + g[k + 1] * u) * (1 - v) + (g[k + GW] * (1 - u) + g[k + GW + 1] * u) * v;
+    };
+    for (let py = 0; py < S; py++) {
+      for (let px = 0; px < S; px++) {
+        const ax = ax0 + px, ay = ay0 + py;
+        const n = lerp2(nG, px, py);
+        const hh = rnd(ax, ay), dth = BAYER[(ay & 3) * 4 + (ax & 3)];
+        let col;
+        if (n < W0) {
+          col = n > W0 - 0.02 * dth ? P.wa : P.de;                       // fondo que se aclara
+        } else if (n < W1) {
+          const e = (W1 - n) / 0.012;                                      // 0 en la orilla, 1 = agua abierta
+          col = e < 0.12 + 0.18 * dth ? P.fo : e < 0.45 + 0.35 * dth ? P.wl : P.wa;
+          if (e > 1 && ((ax * 3 + ay * 7) % 53 === 0 || hh < 0.004)) col = P.wl;  // olas
+        } else if (n < S1) {
+          col = P.sa[(hh * 3) | 0];
+          if (hh > 0.975) col = P.sd;
+          const e = (n - W1) / 0.012;                                      // arena mojada junto al agua
+          if (e < dth) col = P.sw;
+          const g = (S1 - n) / 0.012;                                      // hierba que invade la arena
+          if (g < dth * 0.9) col = P.g[0];
+        } else {
+          col = P.g[(hh * 3) | 0];
+          if (hh > 0.985) col = P.sp;
+          else if (hh < 0.012) col = P.li;
+          const bl = rnd((ax >> 2) + 97, (ay >> 2) + 31);
+          if (bl < 0.08 && (ax & 3) === 1) { if ((ay & 3) === 1) col = P.li; else if ((ay & 3) === 2) col = P.sp; }
+          // Camino de tierra con borde tramado.
+          const pf = lerp2(pG, px, py);
+          if (n > S1 + 0.015 && pf < PATH_W + 0.006 * dth) {
+            col = pf > PATH_W - 0.004 ? P.pe : P.pa[hh < 0.5 ? 0 : 1];
+            if (hh > 0.97) col = P.pe;
           }
         }
+        buf[py * S + px] = col;
       }
     }
     x.putImageData(img, 0, 0);
     return c;
   }
 
-  function chunk(cx, cy) {
+  let baked = 0;                       // chunks horneados en este frame
+  /** Chunk horneado, o null si ya se gastó el presupuesto de este frame. */
+  function chunk(cx, cy, must = true) {
     const k = cx + ',' + cy;
     let c = chunks.get(k);
     if (!c) {
+      if (!must && baked >= 1) return null;
+      baked++;
       c = bake(cx, cy);
       chunks.set(k, c);
-      if (chunks.size > 80) {
+      if (chunks.size > 120) {
         // Suelta los más viejos (el Map guarda el orden de inserción).
         const first = chunks.keys().next().value;
         chunks.delete(first);
@@ -266,25 +244,38 @@ G.World = (() => {
     return c;
   }
 
-  /** Pinta el suelo visible. Máximo `budget` chunks nuevos por frame. */
+  /**
+   * Pinta el suelo visible. Además hornea por adelantado (como mucho uno por
+   * frame) los chunks del anillo de alrededor, para que al avanzar ya estén
+   * listos y no haya tirones (cada uno cuesta ~15 ms).
+   */
   function drawGround(ctx) {
     const cam = G.Camera, S = CH * G.TILE;
     const x0 = Math.floor((cam.x - cam.w / 2) / S), x1 = Math.floor((cam.x + cam.w / 2) / S);
     const y0 = Math.floor((cam.y - cam.h / 2) / S), y1 = Math.floor((cam.y + cam.h / 2) / S);
+    baked = 0;
     for (let cy = y0; cy <= y1; cy++) for (let cx = x0; cx <= x1; cx++) {
       ctx.drawImage(chunk(cx, cy), cx * S, cy * S, S, S);
+    }
+    for (let cy = y0 - 1; cy <= y1 + 1; cy++) for (let cx = x0 - 1; cx <= x1 + 1; cx++) {
+      if (cy >= y0 && cy <= y1 && cx >= x0 && cx <= x1) continue;
+      chunk(cx, cy, false);
     }
   }
 
   // ---------------- objetos ----------------
 
+  /** Datos de un objeto: { solid (px de arte), hp, big } (los pequeños no tienen solid). */
+  function propDef(name) { return G.Props.has(name) ? G.Props.META[name] : PROPS[name]; }
+
+  /** Imagen de un objeto en el bioma actual: { img, white, ox, oy }. */
   function propImg(name) {
     const k = biome + '/' + name;
     let p = propCache.get(k);
     if (!p) {
-      const d = PROPS[name];
-      const img = G.Pix.paint(d.rows, d.pal(B()));
-      p = { img, white: G.Pix.white(img) };
+      if (G.Props.has(name)) p = G.Props.make(name, B());
+      else { const d = PROPS[name]; p = { img: G.Pix.paint(d.rows, d.pal(B())), ox: d.ox, oy: d.oy }; }
+      p.white = G.Pix.white(p.img);
       propCache.set(k, p);
     }
     return p;
@@ -293,12 +284,13 @@ G.World = (() => {
   /** Mete en `list` los objetos visibles: { y, draw(ctx) } para ordenar por altura. */
   function collectProps(list, now) {
     const cam = G.Camera, TL = G.TILE;
-    const x0 = Math.floor((cam.x - cam.w / 2) / TL) - 1, x1 = Math.floor((cam.x + cam.w / 2) / TL) + 1;
-    const y0 = Math.floor((cam.y - cam.h / 2) / TL) - 1, y1 = Math.floor((cam.y + cam.h / 2) / TL) + 2;
+    // Margen amplio: un árbol que está debajo de la vista asoma por arriba.
+    const x0 = Math.floor((cam.x - cam.w / 2) / TL) - 2, x1 = Math.floor((cam.x + cam.w / 2) / TL) + 2;
+    const y0 = Math.floor((cam.y - cam.h / 2) / TL) - 1, y1 = Math.floor((cam.y + cam.h / 2) / TL) + 4;
     for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) {
       const name = propAt(tx, ty);
       if (!name) continue;
-      const d = PROPS[name];
+      const d = propDef(name);
       const [jx, jy] = jitter(tx, ty);
       const fx = (tx * T + T / 2 + jx) * G.PX, fy = (ty * T + T / 2 + jy) * G.PX;
       const dmg = damage.get(tx + ',' + ty);
@@ -310,7 +302,17 @@ G.World = (() => {
           let sx = 0;
           if (dmg && now - dmg.at < 0.15) sx = Math.sin(now * 90) * 2;
           const img = dmg && now - dmg.at < 0.08 ? p.white : p.img;
-          ctx.drawImage(img, fx - d.ox * G.PX + sx, fy - d.oy * G.PX, img.width * G.PX, img.height * G.PX);
+          // Si el jugador queda tapado por un objeto grande, éste se transparenta.
+          const pl = G.Game.player;
+          const hide = d.big && pl && pl.y < fy - 4 && Math.abs(pl.x - fx) < img.width * G.PX * 0.45 && pl.y > fy - p.oy * G.PX;
+          if (d.solid) {
+            // Sombra en el suelo.
+            ctx.fillStyle = 'rgba(0,0,0,.25)';
+            ctx.beginPath(); ctx.ellipse(fx, fy, d.solid * G.PX * (d.big ? 2.2 : 1.3), d.solid * G.PX * (d.big ? 0.8 : 0.5), 0, 0, 6.283); ctx.fill();
+          }
+          if (hide) ctx.globalAlpha = 0.5;
+          ctx.drawImage(img, fx - p.ox * G.PX + sx, fy - p.oy * G.PX, img.width * G.PX, img.height * G.PX);
+          ctx.globalAlpha = 1;
         }
       });
     }
@@ -323,9 +325,10 @@ G.World = (() => {
     const ty0 = Math.floor((y - rad) / TL) - 1, ty1 = Math.floor((y + rad) / TL) + 1;
     for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
       const name = propAt(tx, ty);
-      if (!name || !PROPS[name].solid) continue;
+      const d = name && propDef(name);
+      if (!d || !d.solid) continue;
       const [jx, jy] = jitter(tx, ty);
-      out.push({ x: (tx * T + T / 2 + jx) * G.PX, y: (ty * T + T / 2 + jy) * G.PX - 3, r: PROPS[name].solid * G.PX * 0.75, tx, ty, name });
+      out.push({ x: (tx * T + T / 2 + jx) * G.PX, y: (ty * T + T / 2 + jy) * G.PX - 3, r: d.solid * G.PX, tx, ty, name });
     }
     return out;
   }
@@ -349,14 +352,14 @@ G.World = (() => {
 
   /** 0 tierra · 1 agua · 2 mar profundo */
   function waterAt(x, y) {
-    const t = terrAt(Math.floor(x / G.TILE), Math.floor(y / G.TILE));
+    const t = classify(field(x / G.TILE, y / G.TILE));
     return t === 0 ? 2 : t === 1 ? 1 : 0;
   }
 
   /** Daña barriles y cajas dentro del círculo. */
   function hitBreakables(x, y, r, dmg, now) {
     for (const s of solidsNear(x, y, r + 20)) {
-      const d = PROPS[s.name];
+      const d = propDef(s.name);
       if (!d.hp) continue;
       if (G.U.dist2(x, y, s.x, s.y) > (r + s.r) ** 2) continue;
       const k = s.tx + ',' + s.ty;

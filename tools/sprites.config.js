@@ -16,7 +16,7 @@ const LUFFY = 'assets/ref/#0002 - Monkey D. Luffy - Gum-Gum Pistol/Left (Normal 
 
 module.exports = {
   luffy: {
-    height: 40, colors: 20, dir: LUFFY,
+    height: 44, colors: 20, dir: LUFFY,
     fps: { idle: 5, walk: 8, attack: 10, hurt: 1 },
     anims: {
       idle: ['Assembled Sprites/motion_0002_wait/0000.png', 'Assembled Sprites/motion_0002_wait/0011.png',
@@ -28,7 +28,7 @@ module.exports = {
   },
 
   marine: {
-    height: 36, colors: 16,
+    height: 44, colors: 16,
     sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0180 - Saber Apprentice - Navy.png',
     fps: { idle: 4, walk: 8, attack: 6, hurt: 1 },
     anims: {
@@ -40,7 +40,7 @@ module.exports = {
   },
 
   morgan: {
-    height: 58, colors: 20,
+    height: 76, colors: 20,
     sheet: 'assets/ref/Mobile - One Piece_ Treasure Cruise - Playable Characters - #0035 - Axe-Hand Morgan.png',
     bg: '#e69900',                         // el marco naranja de la hoja
     fps: { idle: 4, walk: 8, attack: 5, hurt: 1 },
