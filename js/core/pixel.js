@@ -106,9 +106,21 @@ G.Pix = (() => {
     };
   }
 
+  /** Dirección (de 4) de un vector: 'right' · 'left' · 'down' · 'up'. */
+  function dirOf(x, y) { return Math.abs(x) >= Math.abs(y) ? (x >= 0 ? 'right' : 'left') : (y >= 0 ? 'down' : 'up'); }
+
   function sprite(id) {
     let s = cache.get(id);
     if (s) return s;
+    // Personaje articulado (data/dolls.js): 4 direcciones y animaciones completas.
+    if (G.DOLLS && G.DOLLS[id]) {
+      const r = G.Doll.render(G.DOLLS[id]);
+      s = build(r.frames, r.dirs.down, { idle: 2, walk: 10, attack: 12, hurt: 1 }, r.body);
+      s.dirs = r.dirs;
+      s.scale = 1;
+      cache.set(id, s);
+      return s;
+    }
     const def = G.SPRITES[id];
     if (!def) throw new Error('Sprite desconocido: ' + id);
     const rows = clean(def.rows, 16, true);
@@ -122,15 +134,20 @@ G.Pix = (() => {
    * Fotograma de la animación `anim` tras `t` segundos. Las que no se repiten
    * (attack, hurt) se quedan en el último. Si no la tiene, usa idle.
    */
-  function pose(s, anim, t) {
-    const list = s.anims[anim] && s.anims[anim].length ? s.anims[anim] : s.anims.idle;
+  function pose(s, anim, t, dir = 'right') {
+    // Con direcciones: la izquierda es la derecha en espejo (el que dibuja voltea).
+    const set = s.dirs ? s.dirs[dir === 'left' ? 'right' : dir] || s.dirs.down : s.anims;
+    const list = set[anim] && set[anim].length ? set[anim] : set.idle;
     const i = Math.floor(t * (s.fps[anim] || 6));
     const once = anim === 'attack' || anim === 'hurt';
     return list[once ? Math.min(i, list.length - 1) : i % list.length];
   }
 
   /** ¿Anda con un solo fotograma? Entonces se anima con un rebote. */
-  function bounces(s) { return (s.anims.walk || []).length === 1; }
+  function bounces(s) { return !s.dirs && (s.anims.walk || []).length === 1; }
+
+  /** ¿Hay que voltear el dibujo? (izquierda en los de 4 direcciones; mirando a la izquierda en los demás) */
+  function flipped(s, dir, face) { return s.dirs ? dir === 'left' : face < 0; }
 
   /**
    * Hojas propias (js/data/sprites-built.js, generado por tools/build-sprites.js,
@@ -139,7 +156,8 @@ G.Pix = (() => {
    * Resuelve siempre (si una falla, se queda el dibujo en código).
    */
   function preloadCustom() {
-    const all = Object.entries(G.CUSTOM_SPRITES || {}).map(([id, cfg]) => new Promise(done => {
+    // Los articulados (data/dolls.js) mandan sobre las hojas.
+    const all = Object.entries(G.CUSTOM_SPRITES || {}).filter(([id]) => !(G.DOLLS && G.DOLLS[id])).map(([id, cfg]) => new Promise(done => {
       const img = new Image();
       img.onload = () => {
         const fw = cfg.fw || img.height, fh = cfg.fh || img.height;
@@ -196,5 +214,5 @@ G.Pix = (() => {
     return '<img class="px" src="' + url(s.frames[0]) + '" width="' + Math.round(size * s.w / s.h) + '" height="' + size + '" alt="">';
   }
 
-  return { paint, sprite, pose, bounces, white, flip, big, url, portrait, clean, preloadCustom };
+  return { paint, sprite, pose, bounces, flipped, dirOf, white, flip, big, url, portrait, clean, preloadCustom };
 })();

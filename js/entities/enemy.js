@@ -27,6 +27,7 @@ G.Enemy = class Enemy {
     this.kx = 0; this.ky = 0;               // empuje recibido
     this.burnT = 0; this.burnDps = 0; this.burnTick = 0;
     this.face = 1;
+    this.dir = 'down';
     this.moving = false;
     this.animT = Math.random();
     this.t1 = G.U.rand(1, 3);               // temporizador de su ataque especial
@@ -162,6 +163,8 @@ G.Enemy = class Enemy {
     this.kx *= k; this.ky *= k;
     this.moving = Math.abs(mx) + Math.abs(my) > 0.1;
     if (Math.abs(mx) > 0.1) this.face = mx > 0 ? 1 : -1;
+    if (this.moving) this.dir = G.Pix.dirOf(mx, my);
+    if (now - this.atkAt < 0.35) this.dir = G.Pix.dirOf(dx, dy);
 
     // Chocan con árboles y rocas (los jefes no: no deben quedarse atascados).
     if (!this.boss) [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.7);
@@ -219,10 +222,10 @@ G.Enemy = class Enemy {
     if (this.state === 'aim' || this.state === 'dash') { anim = 'attack'; t = 9; }
     else if (now - this.hurtAt < 0.18) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.35) { anim = 'attack'; t = now - this.atkAt; }
-    const f = G.Pix.pose(s, anim, t);
+    const f = G.Pix.pose(s, anim, t, this.dir);
     // Un solo fotograma para andar: rebote.
     const hop = anim === 'walk' && G.Pix.bounces(s) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
-    const flip = this.face < 0;
+    const flip = G.Pix.flipped(s, this.dir, this.face);
     const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2 - hop;

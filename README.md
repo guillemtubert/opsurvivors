@@ -88,7 +88,19 @@ Mientras se diseña el estilo, sólo están activos **Luffy**, el **marine** y
 **Morgan** (`js/data/scope.js`). El resto de tripulantes, enemigos y jefes sigue
 en los datos y se activa añadiéndolo ahí.
 
-## Sprites
+## Personajes articulados (4 direcciones)
+
+Los personajes de `js/data/dolls.js` se pintan por piezas (piernas, pantalón,
+torso, brazos, cabeza, pelo, sombrero) con `js/core/doll.js`, y las
+animaciones salen de mover las piezas: **4 direcciones** (abajo, arriba,
+derecha; izquierda = derecha en espejo) con **quieto, andar (4 pasos),
+puñetazo y daño**. Si un personaje está en `G.DOLLS`, se usa en lugar de su
+hoja de sprites. Ahora mismo: Luffy.
+
+Objetos del mapa y personajes comparten las herramientas de pintar
+(`js/core/paint.js`): luz, tramado, contorno y líneas interiores.
+
+## Sprites (hojas)
 
 Los personajes salen de las ilustraciones de *One Piece Treasure Cruise*
 (`assets/ref/`), convertidas a pixel art por un generador:
