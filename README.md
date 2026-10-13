@@ -66,7 +66,7 @@ tools/serve.js        servidor local mínimo
 tools/sprites.html    taller de sprites (recortar hojas / convertir dibujos)
 tools/build-sprites.js  generador: assets/ref/ -> assets/chars/ (config en sprites.config.js)
 tools/png.js, pixelize.js  PNG sin dependencias y conversión a pixel art
-assets/ref/characters/<id>/  todo lo que hay de cada personaje (atlas, hojas de 8 direcciones...)
+assets/ref/characters/<id>/  originales de cada personaje (NO están en el repositorio: ver abajo)
 js/
   core/     util, save (localStorage), pixel (mapas de píxeles -> canvas),
             camera, input (teclado + joystick táctil), audio (sintetizador chiptune)
@@ -89,6 +89,11 @@ Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y
 en los datos y se activa añadiéndolo ahí.
 
 ## Sprites (hojas)
+
+> Los originales (`assets/ref/`) no se suben al repositorio (`.gitignore`): son
+> ripeos de Treasure Cruise y hojas sin convertir. El juego sólo necesita las
+> hojas ya convertidas de `assets/chars/`, que sí están. Para regenerarlas hace
+> falta tener `assets/ref/` en local.
 
 Cada personaje tiene su carpeta `assets/ref/characters/<id>/` con todo lo que
 haya de él (atlas de *One Piece Treasure Cruise*, hojas de 8 direcciones hechas
