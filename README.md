@@ -36,11 +36,18 @@ en iPhone, que no lo permite, usa «Añadir a pantalla de inicio».
   sólo una a la vez, hasta 4 aprendidas). Cámbiala según la situación.
 - Al subir de nivel eliges **1 de 3 cartas**: técnica nueva, mejorar una
   (hasta Nv. 5) o una mejora de la partida.
-- **Islas** que cambian cada 3 minutos: East Blue, Alabasta, Skypiea y Thriller Bark.
-  El agua frena; árboles y rocas bloquean; barriles y cajas se rompen y sueltan
-  berries, carne o un Den Den Mushi (atrae toda la experiencia).
-- **Jefes**: Capitán Morgan (2:30), Buggy (5:30), Arlong (8:30) y Crocodile (11:30),
-  luego vuelven más fuertes. Sueltan un cofre del tesoro.
+- Una partida es una **saga**: varias **islas** seguidas, manteniendo nivel y técnicas.
+  Cada isla es un mapa limitado por el mar, con un **minimapa** arriba a la derecha
+  (tócalo para ampliarlo).
+  1. **Explora**: hay cofres repartidos (opcionales; dan berries y una carta).
+  2. Cuando quieras, usa el **Den Den Mushi** de la Marina (`Espacio` o el botón)
+     para llamar al **jefe** de la isla. Si lo llamas antes del Buster Call, te
+     llevas berries extra.
+  3. A los **3 minutos** llega el **Buster Call**: cada vez más enemigos y más fuertes.
+  4. Derrotado el jefe, sube al **Going Merry** en el muelle y zarpa a la siguiente isla.
+- El agua frena y el mar profundo no se cruza; árboles y rocas bloquean; barriles
+  y cajas se rompen y sueltan berries, carne o un Den Den Mushi pequeño (atrae
+  toda la experiencia).
 - Los **berries** se guardan al acabar: con ellos reclutas tripulantes y compras
   mejoras permanentes.
 
@@ -75,12 +82,13 @@ js/
             camera, input (teclado + joystick táctil), audio (sintetizador chiptune)
   data/     scope (qué está activo), sprites (pixel art en código),
             sprites-built (generado), custom-sprites (hojas a mano),
-            moves, crew, enemies, upgrades
-  world/    world (islas por ruido continuo, horneado por chunks, colisiones),
+            moves, crew, enemies, upgrades, islands (sagas, islas y sus jefes)
+  world/    world (la isla: ruido continuo con caída hacia la costa, horneado por chunks, colisiones),
+            island (cofres, Den Den Mushi, muelle y Going Merry, Buster Call),
             props (árboles, palmeras, rocas, barriles pintados a escala de los personajes)
   entities/ fx, projectile, enemy (+ gestor y rejilla espacial), pickup, player
-  systems/  combat (las técnicas), spawner (oleadas y jefes), levelup (cartas)
-  ui/       icons, hud, ui (pantallas)
+  systems/  combat (las técnicas), spawner (oleadas, Buster Call y jefe), levelup (cartas)
+  ui/       icons, minimap, hud, ui (pantallas)
   game.js   flujo y bucle principal
   main.js   arranque
 ```
@@ -88,9 +96,9 @@ js/
 ## Alcance actual
 
 Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y
-**Sanji**, el **marine**, y **Morgan** e **Imu** como jefes (`js/data/scope.js`).
-Luffy, Sanji, el marine y Morgan andan en 8 direcciones. El resto de tripulantes, enemigos y jefes sigue
-en los datos y se activa añadiéndolo ahí.
+**Sanji**, el **marine** y la isla **Shells Town** con **Morgan** de jefe (`js/data/scope.js`).
+Luffy, Sanji, el marine y Morgan andan en 8 direcciones. El resto de tripulantes, enemigos e islas
+sigue en los datos y se activa añadiéndolo ahí (una isla sólo se activa si su jefe ya existe).
 
 ## Sprites (hojas)
 

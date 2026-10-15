@@ -10,8 +10,11 @@ G.HUD = (() => {
       root: $('hud'), hp: $('hud-hp'), hpTxt: $('hud-hp-txt'), xp: $('hud-xp'), lvl: $('hud-lvl'),
       time: $('hud-time'), kills: $('hud-kills'), coins: $('hud-coins'), face: $('hud-face'),
       boss: $('hud-boss'), bossName: $('hud-boss-name'), bossHp: $('hud-boss-hp'),
-      moves: $('hud-moves'), banner: $('banner'), pause: $('hud-pause')
+      moves: $('hud-moves'), banner: $('banner'), pause: $('hud-pause'),
+      goal: $('hud-goal'), action: $('hud-action')
     };
+    G.Minimap.init();
+    el.action.addEventListener('pointerdown', e => { e.stopPropagation(); G.Island.act(); });
     $('hud-ico-kills').innerHTML = G.Icons.html('skull', 18);
     $('hud-ico-coins').innerHTML = G.Icons.html('coin', 18);
     el.pause.innerHTML = G.Icons.html('pause', 22);
@@ -35,6 +38,10 @@ G.HUD = (() => {
     set('xp', Math.floor(pl.xp / pl.xpNext * 200), v => { el.xp.style.width = (v / 2) + '%'; });
     set('lvl', pl.level, v => { el.lvl.textContent = 'Nv. ' + v; });
     set('time', Math.floor(time), v => { el.time.textContent = G.U.mmss(v); });
+    set('goal', G.Island.goal(), v => {
+      el.goal.textContent = v;
+      el.goal.classList.toggle('alert', G.Island.busterT() >= 0 && v.includes('BUSTER'));
+    });
     set('kills', pl.kills, v => { el.kills.textContent = G.U.fmt(v); });
     set('coins', pl.coins, v => { el.coins.textContent = G.U.fmt(v); });
 
@@ -51,6 +58,16 @@ G.HUD = (() => {
       if (!slot) return;
       const cd = i === pl.active && m.kind !== 'orbit' ? Math.max(0, m.t) / Math.max(0.01, m.cd * pl.cdMul) : 0;
       set('cd' + i, Math.round(cd * 20), v => { slot.querySelector('.cd').style.height = (v * 5) + '%'; });
+    });
+  }
+
+  /** Botón de lo que se puede hacer donde estás (o null). */
+  function action(a) {
+    set('action', a ? (a.off ? 'off:' : '') + a.label : '', () => {
+      el.action.classList.toggle('hidden', !a);
+      if (!a) return;
+      el.action.textContent = a.label;
+      el.action.disabled = !!a.off;
     });
   }
 
@@ -85,5 +102,5 @@ G.HUD = (() => {
     bannerT = setTimeout(() => el.banner.classList.add('hidden'), 3200);
   }
 
-  return { init, show, update, moves, banner };
+  return { init, show, update, moves, banner, action };
 })();

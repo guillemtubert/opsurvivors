@@ -224,7 +224,15 @@ ul.moves small, .upg-row small { display: block; color: var(--muted); font-size:
 .hpbar i.low { background: linear-gradient(180deg, #ff8a8a, #c02a3a); }
 .hpbar span { position: absolute; inset: 0; text-align: center; font-size: 12px; line-height: 13px; font-weight: 700; }
 .lvl { font-weight: 700; color: var(--gold); margin-top: 2px; }
-.time { font-size: 30px; font-weight: 700; }
+.hud-mid { text-align: center; }
+.time { font-size: 30px; font-weight: 700; line-height: 1.1; }
+.goal { font-size: 14px; font-weight: 700; color: var(--paper); white-space: nowrap; }
+.goal.alert { color: #ff6b6b; animation: blink 1s steps(2) infinite; }
+.minimap { position: absolute; top: 72px; right: max(12px, env(safe-area-inset-right)); width: 120px; height: 120px; pointer-events: auto; cursor: pointer;
+           background: rgba(10,30,60,.6); border: 3px solid var(--edge); box-shadow: 0 0 0 2px var(--edge-out); transition: width .15s, height .15s; }
+.minimap.big { width: min(300px, 70vmin); height: min(300px, 70vmin); }
+.action { pointer-events: auto; margin-bottom: 6px; animation: pop .2s ease-out; }
+.action:disabled { filter: none; opacity: .85; background: rgba(26,14,6,.85); color: var(--muted); border-color: rgba(246,227,180,.5); font-size: 14px; }
 .hud-right { display: flex; gap: 8px; align-items: center; }
 .pill { display: inline-flex; align-items: center; gap: 4px; background: rgba(0,0,0,.45); border: 2px solid rgba(246,227,180,.4); padding: 2px 8px; font-weight: 700; }
 .pause-btn { pointer-events: auto; cursor: pointer; background: rgba(0,0,0,.45); border: 2px solid rgba(246,227,180,.5); padding: 4px; display: flex; }
@@ -293,6 +301,9 @@ ul.moves small, .upg-row small { display: block; color: var(--muted); font-size:
   .hpbar span { font-size: 10px; line-height: 10px; }
   .lvl { font-size: 13px; margin-top: 0; }
   .time { font-size: 20px; line-height: 1; }
+  .goal { font-size: 11px; }
+  .minimap { top: 50px; width: 84px; height: 84px; border-width: 2px; }
+  .action { padding: 6px 14px; font-size: 15px; }
   .hud-right { gap: 5px; }
   .pill { padding: 1px 5px; font-size: 13px; border-width: 1px; }
   .pill .ico { width: 14px; height: 14px; }
@@ -307,7 +318,7 @@ ul.moves small, .upg-row small { display: block; color: var(--muted); font-size:
   .slot .ico { width: 28px; height: 28px; }
   .slot.on { transform: translateY(-2px); }
   .slot .key { font-size: 10px; }
-  .banner { padding: 6px 40px; }
+  .banner { padding: 6px 40px; top: 16%; }
   .banner b { font-size: 18px; } .banner small { font-size: 12px; }
 }
 /* Horizontal con muy poca altura: el puerto y las cartas caben sin desplazar. */
@@ -328,6 +339,7 @@ ul.moves small, .upg-row small { display: block; color: var(--muted); font-size:
 }
 /* Vertical estrecho: el tiempo baja bajo la barra de arriba para que quepa todo. */
 @media (max-width: 600px) and (min-height: 501px) {
-  .time { position: absolute; top: 44px; left: 50%; transform: translateX(-50%); }
-  .bossbar { top: 76px; width: 86vw; }
+  .hud-mid { position: absolute; top: 44px; left: 50%; transform: translateX(-50%); }
+  .minimap { top: 82px; }
+  .bossbar { top: 82px; left: max(8px, env(safe-area-inset-left)); transform: none; width: calc(100vw - 120px); }
 }

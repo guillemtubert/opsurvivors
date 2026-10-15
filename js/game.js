@@ -1,9 +1,12 @@
 /* ============ game.js — flujo del juego y bucle principal ============
  *
- *   título ──> puerto (menú) ──> partida ──> resumen ──> puerto
+ *   título ──> puerto (menú) ──> partida (las islas de una saga) ──> resumen ──> puerto
  *                  ├─ Tripulación (elegir / reclutar)
  *                  ├─ Mejoras
  *                  └─ Ajustes
+ *
+ * Cada isla (world/island.js) acaba al subir al Going Merry tras vencer a su
+ * jefe; el nivel y las técnicas pasan a la siguiente.
  *
  * Estados del bucle: 'ui' (menús, con el mar de fondo), 'playing',
  * 'levelup', 'paused', 'over'.
@@ -18,8 +21,8 @@ G.Game = (() => {
   let state = 'ui';
   let time = 0, last = 0, now = 0, pendingLevels = 0;
   let pl = null;
-  let biomeIdx = 0, flashT = 0;
-  const BIOME_EVERY = 180;
+  let flashT = 0;
+  const MENU_SEED = 20250;
   const stats = { dealt: 0 };
 
   // ---------------- arranque ----------------
@@ -33,7 +36,7 @@ G.Game = (() => {
     addEventListener('resize', resize);
     G.Input.initTouch(cv);
     document.addEventListener('visibilitychange', () => { if (document.hidden) autoPause(); });
-    G.World.reset(20250);
+    G.World.reset(MENU_SEED);
     G.World.setBiome(0);
     G.Camera.x = 0; G.Camera.y = 0;
     last = performance.now();
@@ -72,20 +75,40 @@ G.Game = (() => {
     const save = G.Save.data;
     const crew = G.Crew.LIST.find(c => c.id === save.captain) || G.Crew.LIST[0];
     G.UI.hideAll();
-    G.FX.clear(); G.Projectiles.clear(); G.Combat.clear(); G.EnemyMgr.clear();
-    G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();
-    G.World.reset(Math.floor(Math.random() * 1e6));
-    biomeIdx = 0;
-    G.World.setBiome(0);
     time = 0; pendingLevels = 0; stats.dealt = 0;
     pl = new G.Player(crew, G.Upgrades.perks());
     pl.addMove(crew.start);
-    G.Camera.x = pl.x; G.Camera.y = pl.y; G.Camera.shake = 0;
     G.HUD.show(true);
     G.HUD.moves(pl);
-    G.HUD.banner(G.World.info.name, G.World.info.sub, '#ffd23f');
-    G.Audio.music('sea');
+    enterIsland(0);
     state = 'playing';
+  }
+
+  /** Llega a la isla i de la saga: mapa nuevo, mismo tripulante. */
+  function enterIsland(i) {
+    const def = G.Islands.SAGA.islands[i];
+    const seed = Math.floor(Math.random() * 1e6);
+    G.FX.clear(); G.Projectiles.clear(); G.Combat.clear(); G.EnemyMgr.clear();
+    G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();
+    G.World.reset(seed, def.radius);
+    G.World.setBiome(def.biome);
+    G.Island.setup(def, i, seed);
+    G.Minimap.build();
+    pl.x = 0; pl.y = 0;
+    G.Camera.x = 0; G.Camera.y = 0; G.Camera.shake = 0;
+    G.HUD.banner(def.name, def.sub, '#ffd23f');
+    G.Audio.music('sea');
+  }
+
+  /** Sube al Going Merry: siguiente isla o fin de la saga. */
+  function nextIsland() {
+    const i = G.Island.index + 1;
+    pl.islands++;
+    if (i >= G.Islands.SAGA.islands.length) { endRun(false, true); return; }
+    G.Audio.sfx('confirm');
+    flashT = 0.6;
+    pl.heal(pl.maxHp * 0.25);
+    enterIsland(i);
   }
 
   function gainXp(v) {
@@ -103,15 +126,16 @@ G.Game = (() => {
     pl.kills++;
     if (e.boss) {
       pl.bosses++;
-      G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Busca su cofre del tesoro', '#ffd23f');
+      G.Island.onBossKilled(e);
       G.Audio.sfx('chest');
       G.Audio.music('sea');
       G.Camera.kick(0.8);
     }
   }
 
-  function openChest() {
-    const bonus = 150 + pl.bosses * 100;
+  /** Cofre: berries y una carta. El del jefe (big) da más. */
+  function openChest(big = true) {
+    const bonus = big ? 150 + pl.bosses * 100 : 40 + G.Island.index * 20;
     pl.coins += bonus;
     G.Audio.sfx('chest');
     G.FX.text(pl.x, pl.y - 40, '+' + bonus + ' ฿', '#ffd23f', true);
@@ -145,7 +169,7 @@ G.Game = (() => {
     state = 'playing';
   }
 
-  function endRun(quit = false) {
+  function endRun(quit = false, won = false) {
     state = 'over';
     const save = G.Save.data;
     // Berries: los recogidos + un extra por enemigos y por tiempo aguantado.
@@ -161,15 +185,17 @@ G.Game = (() => {
     G.Save.commit();
     G.HUD.show(false);
     G.Audio.music('over');
-    if (!quit) G.Audio.sfx('death');
-    G.UI.over({ time, level: pl.level, kills: pl.kills, bosses: pl.bosses, earned, record, quit, crew: pl.crew });
+    if (won) G.Audio.sfx('chest');
+    else if (!quit) G.Audio.sfx('death');
+    G.UI.over({ time, level: pl.level, kills: pl.kills, bosses: pl.bosses, islands: pl.islands, earned, record, quit, won, crew: pl.crew });
   }
 
   function toMenu() {
     state = 'ui';
     pl = null;
     G.EnemyMgr.clear(); G.Projectiles.clear(); G.Pickups.clear(); G.FX.clear(); G.Combat.clear(); G.Hazards.clear();
-    G.World.reset(20250);
+    G.Island.clear();
+    G.World.reset(MENU_SEED);
     G.World.setBiome(0);
     G.HUD.show(false);
     G.UI.menu();
@@ -193,9 +219,10 @@ G.Game = (() => {
 
   function step(dt) {
     if (state === 'ui') {
-      // Fondo del menú: el mar pasa despacio.
+      // Fondo del menú: la cámara rodea la isla despacio.
       now += dt;
-      G.Camera.x += dt * 28; G.Camera.y = Math.sin(now * 0.1) * 60;
+      const r = G.World.radius * 0.45;
+      G.Camera.x = Math.cos(now * 0.02) * r; G.Camera.y = Math.sin(now * 0.02) * r * 0.7;
       return;
     }
     if (state === 'paused') {
@@ -216,7 +243,9 @@ G.Game = (() => {
     pl.update(dt, now);
     G.Combat.tick(dt, pl, now);
     G.Combat.update(dt, now);
-    G.Spawner.update(dt, pl, time);
+    G.Spawner.update(dt, pl, time, G.Island.busterT());
+    G.Island.update(dt, pl, now);
+    G.Minimap.update(dt, pl, now);
     G.EnemyMgr.update(dt, pl, now);
     G.Projectiles.update(dt, pl, now);
     G.Pickups.update(dt, pl, now);
@@ -224,15 +253,6 @@ G.Game = (() => {
     G.Hazards.update();
     G.Camera.follow(pl.x, pl.y, dt);
 
-    // Cambio de isla cada 3 minutos.
-    const bi = Math.floor(time / BIOME_EVERY);
-    if (bi !== biomeIdx) {
-      biomeIdx = bi;
-      G.World.setBiome(bi);
-      flashT = 0.6;
-      G.HUD.banner(G.World.info.name, G.World.info.sub, '#ffd23f');
-      G.Audio.sfx('confirm');
-    }
     if (flashT > 0) flashT -= dt;
 
     G.HUD.update(pl, time);
@@ -255,6 +275,7 @@ G.Game = (() => {
       G.FX.drawUnder(lctx, now);
       const list = [];
       G.World.collectProps(list, now);
+      G.Island.collect(list, now);
       G.Pickups.collect(list, now);
       G.EnemyMgr.collect(list, now);
       list.push({ y: pl.y, draw: c => pl.draw(c, now) });
@@ -330,7 +351,7 @@ G.Game = (() => {
   }
 
   return {
-    debugStep, init, startRun, toMenu, endRun, pause, resume, gainXp, onKill, openChest, stats,
+    debugStep, init, startRun, nextIsland, toMenu, endRun, pause, resume, gainXp, onKill, openChest, stats,
     get state() { return state; }, get now() { return now; }, get time() { return time; }, get player() { return pl; }
   };
 })();

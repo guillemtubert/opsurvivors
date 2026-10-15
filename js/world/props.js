@@ -147,10 +147,119 @@ G.Props = (() => {
     }
   };
 
+  // ---------------- objetivos de la isla (world/island.js) ----------------
+
+  /** Cofre de la isla: madera con flejes dorados. `open` = tapa levantada y oro dentro. */
+  function chestArt(open) {
+    const cv = canvas(28, 26);
+    const wood = ramp('#4e2c14', '#7a4a22', '#9a6434', '#c08048', '#dca068');
+    const gold = ramp('#8a5a10', '#c08a10', '#ffd23f', '#fff0a0');
+    // Caja.
+    for (let y = 12; y < 24; y++) for (let x = 2; x < 26; x++) {
+      const band = x === 6 || x === 7 || x === 20 || x === 21 || y === 12 || y === 23;
+      cv.set(x, y, tone(band ? gold : wood, 0.62 - (y - 12) / 24 - (x - 2) / 80 + (x % 6 === 0 && !band ? -0.12 : 0), x, y));
+    }
+    if (open) {
+      // Tapa abierta (vista por dentro) y monedas asomando.
+      for (let y = 3; y < 11; y++) for (let x = 3; x < 25; x++) cv.set(x, y, tone(wood, 0.25 + (y - 3) / 30, x, y), -1);
+      for (let x = 3; x < 25; x++) cv.set(x, 2, tone(gold, 0.6, x, 2), -1);
+      for (let i = 0; i < 9; i++) ball(cv, 5 + i * 2.2, 11.5 - (i % 3), 2.2, 1.6, gold, { tex: 0, z: 1 });
+    } else {
+      // Tapa curvada.
+      for (let y = 4; y < 12; y++) for (let x = 2; x < 26; x++) {
+        const ny = (y - 11) / 8, nx = (x - 14) / 14;
+        if (ny * ny + nx * nx * 0.15 > 1.05) continue;
+        const band = x === 6 || x === 7 || x === 20 || x === 21;
+        cv.set(x, y, tone(band ? gold : wood, 0.95 + ny * 0.5 - (x - 2) / 70, x, y));
+      }
+      // Cerradura.
+      for (let y = 10; y < 16; y++) for (let x = 12; x < 16; x++) cv.set(x, y, tone(gold, y === 13 && (x === 13 || x === 14) ? 0 : 0.8, x, y), 2);
+    }
+    return { cv, ox: 14, oy: 24 };
+  }
+
+  PAINT.chest = () => chestArt(false);
+  PAINT.chestOpen = () => chestArt(true);
+
+  /** Den Den Mushi de la Marina: caracol con el auricular encima de la concha. */
+  PAINT.denden = () => {
+    const cv = canvas(36, 34);
+    const skin = ramp('#6a7a3a', '#9aac54', '#c4d27a', '#e6eeaa');
+    const shell = ramp('#5a3a5a', '#8a5a7a', '#b884a0', '#e0b8c8');
+    const phone = ramp('#141418', '#2a2a32', '#4a4a56', '#7a7a8a');
+    const white = ramp('#a8b0c0', '#d8dee8', '#ffffff');
+    // Cuerpo (pie del caracol) y cabeza con antenas.
+    stroke(cv, 4, 29, 30, 29, 7, 7, skin);
+    ball(cv, 7, 20, 6, 8, skin, { tex: 0, z: 2 });
+    stroke(cv, 5, 13, 3, 6, 2, 2, skin, 2); stroke(cv, 9, 13, 10, 6, 2, 2, skin, 2);
+    ball(cv, 3, 5, 2, 2, white, { tex: 0, z: 3 }); ball(cv, 10, 5, 2, 2, white, { tex: 0, z: 3 });
+    cv.set(3, 5, [20, 20, 30], 9); cv.set(10, 5, [20, 20, 30], 9);
+    for (let x = 4; x < 10; x++) cv.set(x, 22, [70, 40, 40], 9);          // boca
+    // Concha con espiral.
+    ball(cv, 21, 20, 11, 10, shell, { tex: 0.05, z: 1 });
+    for (let t = 0; t < 14; t += 0.08) {
+      const r = 9 - t * 0.6;
+      if (r < 1) break;
+      cv.set(21 + Math.cos(t) * r, 20 + Math.sin(t) * r * 0.9, shell[0], 5);
+    }
+    // Auricular y teclado encima.
+    stroke(cv, 13, 9, 29, 9, 4, 4, phone, 6);
+    ball(cv, 13, 9, 3, 2.5, phone, { tex: 0, z: 6.5 }); ball(cv, 29, 9, 3, 2.5, phone, { tex: 0, z: 6.5 });
+    stroke(cv, 21, 11, 21, 13, 2, 2, phone, 6);
+    return { cv, ox: 18, oy: 31 };
+  };
+
+  /** Going Merry: casco de madera, vela con la calavera y cabeza de oveja. */
+  PAINT.merry = () => {
+    const cv = canvas(96, 92);
+    const hull = ramp('#3a2010', '#6a4020', '#8a5a2e', '#b07a44', '#d09a5a');
+    const rail = ramp('#5a3a1a', '#9a6a3a', '#d8b080');
+    const sail = ramp('#b8b0a0', '#dcd6c8', '#f4f0e6', '#ffffff');
+    const wool = ramp('#a8a090', '#d8d2c4', '#f6f2e8', '#ffffff');
+    const mast = ramp('#3a2414', '#5e3a1e', '#86562e');
+    const red = ramp('#7a1a20', '#c0303a', '#e8505a');
+    // Casco: media elipse con tablas.
+    for (let y = 56; y < 86; y++) for (let x = 4; x < 92; x++) {
+      const nx = (x - 48) / 44, ny = (y - 56) / 30;
+      if (nx * nx + ny * ny > 1) continue;
+      const plank = (y - 56) % 6 === 0;
+      cv.set(x, y, tone(hull, 0.7 - ny * 0.45 - nx * 0.12 + (plank ? -0.2 : 0), x, y));
+    }
+    for (let x = 6; x < 90; x++) cv.set(x, 56, tone(rail, 0.7, x, 56), 1);
+    for (let x = 6; x < 90; x += 6) for (let y = 52; y < 56; y++) cv.set(x, y, tone(rail, 0.5, x, y), 1);
+    for (let x = 6; x < 90; x++) cv.set(x, 51, tone(rail, 0.8, x, 51), 1);
+    // Mástil y vela con la calavera de Luffy.
+    stroke(cv, 46, 56, 46, 4, 4, 3, mast, 2);
+    stroke(cv, 26, 12, 66, 12, 3, 3, mast, 3);
+    for (let y = 13; y < 44; y++) {
+      const bow = Math.sin((y - 13) / 31 * Math.PI) * 4;
+      for (let x = Math.round(25 - bow); x < Math.round(67 + bow); x++) {
+        cv.set(x, y, tone(sail, 0.8 - (x - 25) / 90 + Math.sin((y - 13) / 31 * Math.PI) * 0.15, x, y), 4);
+      }
+    }
+    const k = [26, 18, 32];
+    ball(cv, 46, 25, 7, 6.5, ramp('#141418', '#141418'), { tex: 0, z: 5 });
+    ball(cv, 46, 32, 4, 3, ramp('#141418', '#141418'), { tex: 0, z: 5 });
+    [[43, 25], [44, 25], [48, 25], [49, 25], [43, 26], [49, 26]].forEach(([x, y]) => cv.set(x, y, [244, 240, 230], 6));
+    stroke(cv, 37, 19, 55, 19, 3, 3, ramp('#e0c050', '#f2d063'), 6);      // sombrero de paja
+    stroke(cv, 40, 17, 52, 17, 2, 2, red, 6.5);
+    stroke(cv, 36, 37, 56, 41, 2, 2, ramp('#141418', '#141418'), 5);     // huesos cruzados
+    stroke(cv, 36, 41, 56, 37, 2, 2, ramp('#141418', '#141418'), 5);
+    // Bandera arriba del mástil.
+    for (let y = 2; y < 8; y++) for (let x = 47; x < 56; x++) cv.set(x, y, [26, 18, 32], 3);
+    // Cabeza de oveja en la proa (a la derecha).
+    ball(cv, 88, 46, 7, 7, wool, { tex: 0.25, z: 3 });
+    ball(cv, 92, 49, 3, 3, ramp('#c0a080', '#e0c8a8', '#f4e2c8'), { tex: 0, z: 4 });
+    ball(cv, 84, 44, 3, 2.5, ramp('#c09040', '#e0b060'), { tex: 0, z: 4 });
+    cv.set(90, 45, k, 9);
+    return { cv, ox: 48, oy: 84 };
+  };
+
   const META = {
     tree: { solid: 6, big: true }, palm: { solid: 5, big: true }, cactus: { solid: 6, big: true },
     cloudtree: { solid: 5, big: true }, dead: { solid: 5, big: true },
-    rock: { solid: 10 }, barrel: { solid: 8, hp: 18 }, crate: { solid: 9, hp: 26 }
+    rock: { solid: 10 }, barrel: { solid: 8, hp: 18 }, crate: { solid: 9, hp: 26 },
+    chest: {}, chestOpen: {}, denden: {}, merry: {}
   };
 
   function make(name, biome) {
