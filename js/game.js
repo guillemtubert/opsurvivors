@@ -22,6 +22,7 @@ G.Game = (() => {
   let time = 0, last = 0, now = 0, pendingLevels = 0;
   let pl = null;
   let flashT = 0;
+  let god = false;                     // modo dios (tecla I o botón DIOS): para probar
   const MENU_SEED = 20250;
   const stats = { dealt: 0 };
 
@@ -109,6 +110,14 @@ G.Game = (() => {
     flashT = 0.6;
     pl.heal(pl.maxHp * 0.25);
     enterIsland(i);
+  }
+
+  /** Modo dios: invulnerable y todo muere de un golpe. Para probar islas y jefes. */
+  function toggleGod() {
+    god = !god;
+    G.HUD.god(god);
+    G.HUD.banner(god ? 'Modo dios' : 'Modo dios desactivado', god ? 'Invulnerable · todo muere de un golpe' : '', '#ffd23f');
+    G.Audio.sfx(god ? 'confirm' : 'select');
   }
 
   function gainXp(v) {
@@ -237,6 +246,7 @@ G.Game = (() => {
 
     // Teclas.
     for (let i = 0; i < 4; i++) if (G.Input.tap('digit' + (i + 1))) { pl.setActive(i); G.Audio.sfx('select'); }
+    if (G.Input.tap('keyi')) toggleGod();
     if (G.Input.tap('keyq')) pl.cycle(-1);
     if (G.Input.tap('keye')) pl.cycle(1);
     if (G.Input.tap('escape') || G.Input.tap('keyp')) { pause(); return; }
@@ -352,7 +362,7 @@ G.Game = (() => {
   }
 
   return {
-    debugStep, init, startRun, nextIsland, toMenu, endRun, pause, resume, gainXp, onKill, openChest, stats,
-    get state() { return state; }, get now() { return now; }, get time() { return time; }, get player() { return pl; }
+    debugStep, init, startRun, nextIsland, toggleGod, toMenu, endRun, pause, resume, gainXp, onKill, openChest, stats,
+    get god() { return god; }, get state() { return state; }, get now() { return now; }, get time() { return time; }, get player() { return pl; }
   };
 })();

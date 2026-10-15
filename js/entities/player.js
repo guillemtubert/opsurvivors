@@ -44,6 +44,7 @@ G.Player = class Player {
     this.stepN = 0;              // pasos dados (para el polvo al andar)
     this.walking = false;
     this.animT = 0;
+    this.walkDist = 0;                     // px de arte andados (marca los pasos)
     this.target = null;
     this.dead = false;
     this.atkAt = -9; this.hurtAt = -9;   // poses de ataque y de daño
@@ -86,7 +87,7 @@ G.Player = class Player {
 
   // ---------------- vida ----------------
   hurt(d, now) {
-    if (this.dead || this.invuln > 0) return;
+    if (this.dead || this.invuln > 0 || G.Game.god) return;
     d *= 1 - this.reduction;
     this.hp -= d;
     this.invuln = 0.4;
@@ -145,13 +146,14 @@ G.Player = class Player {
       }
       if (Math.abs(ax) > 0.1 && now - this.atkAt > 0.3) this.face = ax > 0 ? 1 : -1;
       if (now - this.atkAt > 0.3) this.dir = G.Pix.dir8(ax, ay);
-      // Polvo en cada paso (cuando el rebote toca el suelo).
-      const n = Math.floor(this.animT * 12 / Math.PI);
+      [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.8);
+      // Los pasos avanzan con lo andado de verdad; polvo en cada zancada.
+      this.walkDist += Math.hypot(this.x - ox, this.y - oy) / G.PX;
+      const n = Math.floor(G.Pix.stepPhase(G.Pix.sprite(this.sprite), this.walkDist));
       if (n !== this.stepN) {
         this.stepN = n;
         if (!G.World.waterAt(this.x, this.y)) G.FX.dust(this.x - this.face * 6, this.y, this.face);
       }
-      [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.8);
       if (G.World.waterAt(this.x, this.y) && Math.random() < 0.25) G.FX.puff(this.x, this.y, '#d8f2ff', 1);
     }
 
@@ -180,7 +182,7 @@ G.Player = class Player {
   draw(ctx, now) {
     const s = G.Pix.sprite(this.sprite);
     const sc = (s.scale || 1) * G.PX;
-    let anim = this.walking ? 'walk' : 'idle', t = this.walking ? this.animT : now;
+    let anim = this.walking ? 'walk' : 'idle', t = this.walking ? G.Pix.walkTime(s, this.dir, this.walkDist) : now;
     if (now - this.hurtAt < 0.25) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.3) { anim = 'attack'; t = now - this.atkAt; }
     const { f, flip } = G.Pix.pick(s, anim, t, this.face, this.dir);
@@ -191,7 +193,7 @@ G.Player = class Player {
     // Dibujo en código: respira 1 px quieto. Hoja con una sola pose de correr: rebota al andar.
     let bob = 0;
     if (anim === 'idle' && s.anims.idle.length === 1) bob = Math.floor(now * 2) % 2 ? 2 : 0;
-    if (anim === 'walk' && G.Pix.bounces(s, this.dir)) bob = -Math.round(Math.abs(Math.sin(this.animT * 12)) * 2) * 2;
+    if (anim === 'walk' && G.Pix.bounces(s, this.dir)) bob = -Math.round(Math.abs(Math.sin(G.Pix.stepPhase(s, this.walkDist) * Math.PI)) * 2) * 2;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2 + bob) / 2) * 2;
     ctx.fillStyle = 'rgba(0,0,0,.3)';
     ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.4, 0, 0, 6.283); ctx.fill();

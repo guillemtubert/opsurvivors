@@ -23,6 +23,7 @@ node tools/serve.js      # http://localhost:8080
 | `1` `2` `3` `4` | Elegir la técnica activa |
 | `Q` / `E` | Cambiar de técnica |
 | `Esc` / `P` | Pausa |
+| `I` / botón DIOS | Modo dios, para probar: invulnerable y todo muere de un golpe |
 
 En móvil: arrastra el dedo para moverte (el joystick sale donde tocas) y toca
 una técnica de abajo para cambiarla. Se juega en horizontal o en vertical: la

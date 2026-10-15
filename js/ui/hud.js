@@ -19,6 +19,8 @@ G.HUD = (() => {
     $('hud-ico-coins').innerHTML = G.Icons.html('coin', 18);
     el.pause.innerHTML = G.Icons.html('pause', 22);
     el.pause.addEventListener('click', () => G.Game.pause());
+    el.god = $('hud-god');
+    el.god.addEventListener('pointerdown', e => { e.stopPropagation(); G.Game.toggleGod(); });
   }
 
   function show(on) {
@@ -102,5 +104,8 @@ G.HUD = (() => {
     bannerT = setTimeout(() => el.banner.classList.add('hidden'), 3200);
   }
 
-  return { init, show, update, moves, banner, action };
+  /** Botón DIOS encendido o apagado. */
+  function god(on) { el.god.classList.toggle('on', on); }
+
+  return { init, show, update, moves, banner, action, god };
 })();

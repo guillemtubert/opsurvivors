@@ -147,11 +147,23 @@ G.Pix = (() => {
     return { f: list[once ? Math.min(i, list.length - 1) : i % list.length], flip: face < 0 };
   }
 
-  /** ¿Anda con un solo fotograma (la pose de correr) en esa dirección? Entonces el juego le pone rebote. */
-  function bounces(s, dir) {
-    const w = s.dirs ? (s.dirs[dir] || s.dirs.down).walk : s.anims.walk;
-    return (w || []).length === 1;
+  /**
+   * Pasos que no patinan: la animación de andar avanza con la distancia recorrida,
+   * no con el tiempo. Un ciclo (dos zancadas) mide STRIDE veces el alto del personaje.
+   */
+  const STRIDE = 0.8;
+  const stride = s => s.h * (s.scale || 1) * STRIDE;
+  const walkList = (s, dir) => (s.dirs ? (s.dirs[dir] || s.dirs.down).walk : s.anims.walk) || [];
+  /** Tiempo de animación (para pick) que corresponde a `dist` px de arte andados en esa dirección. */
+  function walkTime(s, dir, dist) {
+    const n = Math.max(1, walkList(s, dir).length);
+    return dist / (stride(s) / n) / (s.fps.walk || 8);
   }
+  /** Fase de los pasos: aumenta 1 en cada zancada (para el polvo y el rebote). */
+  function stepPhase(s, dist) { return dist / (stride(s) / 2); }
+
+  /** ¿Anda con un solo fotograma (la pose de correr) en esa dirección? Entonces el juego le pone rebote. */
+  function bounces(s, dir) { return walkList(s, dir).length === 1; }
 
   /**
    * Hojas propias (js/data/sprites-built.js, generado por tools/build-sprites.js,
@@ -218,5 +230,5 @@ G.Pix = (() => {
     return '<img class="px" src="' + url(s.frames[0]) + '" width="' + Math.round(size * s.w / s.h) + '" height="' + size + '" alt="">';
   }
 
-  return { paint, sprite, pick, bounces, dir8, white, flip, big, url, portrait, clean, preloadCustom };
+  return { paint, sprite, pick, bounces, walkTime, stepPhase, dir8, white, flip, big, url, portrait, clean, preloadCustom };
 })();

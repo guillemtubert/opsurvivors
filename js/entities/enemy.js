@@ -30,6 +30,7 @@ G.Enemy = class Enemy {
     this.dir = 'down';
     this.moving = false;
     this.animT = Math.random();
+    this.walkDist = Math.random() * 40;     // px de arte andados (marca los pasos)
     this.t1 = G.U.rand(1, 3);               // temporizador de su ataque especial
     this.state = 'walk'; this.stateT = 0;
     this.dashX = 0; this.dashY = 0;
@@ -116,6 +117,7 @@ G.Enemy = class Enemy {
     const k = Math.exp(-8 * dt);
     this.kx *= k; this.ky *= k;
     this.moving = Math.abs(mx) + Math.abs(my) > 0.1;
+    if (this.moving) this.walkDist += Math.hypot(mx, my) * spd * dt / G.PX;
     if (Math.abs(mx) > 0.1) this.face = mx > 0 ? 1 : -1;
     if (this.moving) this.dir = G.Pix.dir8(mx, my);
     // Al atacar mira a su objetivo.
@@ -142,7 +144,8 @@ G.Enemy = class Enemy {
   /** @param src  proyectil o técnica (para empuje, quemadura...) */
   damage(amount, now, src = null, col = null) {
     if (this.dead || this.hidden) return;
-    if (this.immune) {
+    if (G.Game.god) amount = Math.max(amount, this.hp);
+    else if (this.immune) {
       if (now - this.hurtAt > 0.4) { this.hurtAt = now; G.FX.text(this.x, this.y - this.r * 2, '0', '#c8d0e0'); }
       return;
     }
@@ -186,7 +189,7 @@ G.Enemy = class Enemy {
     if (this.hidden && !this.z) return;
     const s = G.Pix.sprite(this.sprite);
     const sc = this.scale * G.PX;
-    let anim = this.moving ? 'walk' : 'idle', t = this.animT;
+    let anim = this.moving ? 'walk' : 'idle', t = this.moving ? G.Pix.walkTime(s, this.dir, this.walkDist) : this.animT;
     if (this.pose || this.state === 'aim') { anim = 'attack'; t = 9; }
     else if (now - this.hurtAt < 0.18) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.35) { anim = 'attack'; t = now - this.atkAt; }
@@ -194,7 +197,7 @@ G.Enemy = class Enemy {
     // Un solo fotograma para andar: rebote.
     // Flotando: vaivén suave. Andando con una sola pose: rebote de los pasos.
     const hop = this.def.hover ? Math.round((Math.sin(this.animT * 2.5) + 1) * 1.5) * 2
-      : anim === 'walk' && G.Pix.bounces(s, this.dir) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
+      : anim === 'walk' && G.Pix.bounces(s, this.dir) ? Math.round(Math.abs(Math.sin(G.Pix.stepPhase(s, this.walkDist) * Math.PI)) * 2) * 2 : 0;
     const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
     const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2 - (this.z || 0)) / 2) * 2 - hop;
