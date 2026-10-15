@@ -35,7 +35,7 @@ G.Player = class Player {
     this.statsTaken = {};
 
     this.level = 1; this.xp = 0; this.xpNext = Player.xpFor(1);
-    this.kills = 0; this.bosses = 0; this.coins = 0;
+    this.kills = 0; this.bosses = 0; this.coins = 0; this.islands = 0;
 
     this.invuln = 0; this.flash = 0;
     this.aim = Math.PI / 2;
@@ -133,8 +133,14 @@ G.Player = class Player {
     const [ax, ay] = G.Input.axis();
     this.walking = !!(ax || ay);
     if (this.walking) {
-      const s = this.spd;
+      const s = this.spd, ox = this.x, oy = this.y;
       this.x += ax * s * dt; this.y += ay * s * dt;
+      // El mar profundo no se cruza: se resbala por la orilla.
+      if (G.World.waterAt(this.x, this.y) === 2) {
+        if (G.World.waterAt(this.x, oy) !== 2) this.y = oy;
+        else if (G.World.waterAt(ox, this.y) !== 2) this.x = ox;
+        else { this.x = ox; this.y = oy; }
+      }
       if (Math.abs(ax) > 0.1 && now - this.atkAt > 0.3) this.face = ax > 0 ? 1 : -1;
       if (now - this.atkAt > 0.3) this.dir = G.Pix.dir8(ax, ay);
       // Polvo en cada paso (cuando el rebote toca el suelo).

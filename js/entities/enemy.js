@@ -326,9 +326,8 @@ G.EnemyMgr = (() => {
     const far = G.Camera.outerRadius() * 2.2;
     for (const e of list) {
       if (!e.boss && G.U.dist2(e.x, e.y, pl.x, pl.y) > far * far) {
-        const a = Math.atan2(pl.y - e.y, pl.x - e.x) + Math.PI + G.U.rand(-0.5, 0.5);
-        const r = G.Camera.outerRadius() + 30;
-        e.x = pl.x - Math.cos(a) * r; e.y = pl.y - Math.sin(a) * r;
+        const p = G.Spawner.landPoint(pl, Math.atan2(pl.y - e.y, pl.x - e.x) + Math.PI);
+        if (p) [e.x, e.y] = p;
       }
     }
   }

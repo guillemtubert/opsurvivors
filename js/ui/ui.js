@@ -235,10 +235,11 @@ G.UI = (() => {
 
   function over(r) {
     show('scr-over');
-    $('over-title').textContent = r.quit ? 'Has vuelto a puerto' : r.time >= 600 ? '¡Qué aguante, capitán!' : '¡Has caído!';
+    $('over-title').textContent = r.won ? '¡' + G.Islands.SAGA.name + ' completada!' : r.quit ? 'Has vuelto a puerto' : '¡Has caído!';
     $('over-face').innerHTML = G.Pix.portrait(r.crew.id, 72);
     $('over-stats').innerHTML =
       '<span>Tiempo</span><b>' + G.U.mmss(r.time) + (r.record ? ' <em>¡récord!</em>' : '') + '</b>' +
+      '<span>Islas</span><b>' + r.islands + ' / ' + G.Islands.SAGA.islands.length + '</b>' +
       '<span>Nivel</span><b>' + r.level + '</b>' +
       '<span>Enemigos</span><b>' + G.U.fmt(r.kills) + '</b>' +
       '<span>Jefes</span><b>' + r.bosses + '</b>' +

@@ -1,13 +1,16 @@
-/* ============ spawner.js — oleadas y jefes ============
- * Los enemigos aparecen en un anillo justo fuera de la vista. Cada ~40 s hay
- * una "marea" desde un lado. Al llegar al tope, los nuevos salen como élite
- * (más vida, daño y experiencia) para que la dificultad no baje.
+/* ============ spawner.js — oleadas y Buster Call ============
+ * Los enemigos aparecen en un anillo justo fuera de la vista, siempre en
+ * tierra firme de la isla. Cada ~40 s hay una "marea" desde un lado. Al llegar
+ * al tope, los nuevos salen como élite (más vida, daño y experiencia).
+ * Con el Buster Call (ver world/island.js) el ritmo, el tope, la vida y las
+ * élites crecen sin parar: quedarse en la isla sale caro.
+ * El jefe no sale solo: lo llama el jugador con el Den Den Mushi (summon).
  */
 G.Spawner = (() => {
   const CAP = 90;
-  let acc = 0, bossIdx = 0, surgeT = 40, warned = -1;
+  let acc = 0, surgeT = 40;
 
-  function reset() { acc = 0; bossIdx = 0; surgeT = 40; warned = -1; }
+  function reset() { acc = 0; surgeT = 40; }
 
   /** Enemigos por segundo según el segundo de la run. */
   function rate(t) { return 0.9 + t * 0.012 + Math.pow(t / 60, 1.5) * 0.35; }
@@ -21,6 +24,15 @@ G.Spawner = (() => {
     return [pl.x + Math.cos(angle) * d, pl.y + Math.sin(angle) * d * 0.85];
   }
 
+  /** Punto del anillo en tierra firme, cerca del ángulo pedido (o null si es todo mar). */
+  function landPoint(pl, angle, r = 12) {
+    for (let i = 0; i < 10; i++) {
+      const [x, y] = ringPoint(pl, angle + (i ? G.U.rand(-0.8, 0.8) * (1 + i * 0.3) : 0));
+      if (G.World.isLand(x, y, r)) return [x, y];
+    }
+    return null;
+  }
+
   function pickDef(t) {
     const bag = G.Enemies.bagAt(t);
     let r = Math.random() * bag.reduce((a, e) => a + e.w, 0);
@@ -28,50 +40,41 @@ G.Spawner = (() => {
     return bag[0];
   }
 
-  function spawnOne(pl, t, angle) {
-    const def = pickDef(t);
-    for (let i = 0; i < 6; i++) {
-      const [x, y] = ringPoint(pl, angle + (i ? G.U.rand(-0.8, 0.8) : 0));
-      if (!G.World.isFree(x, y, 12)) continue;
-      const elite = G.EnemyMgr.count >= CAP * 0.85;
-      return G.EnemyMgr.add(new G.Enemy(def, { x, y, hpK: hpK(t), dmgK: dmgK(t), elite }));
-    }
-    return null;
+  function spawnOne(pl, t, angle, bt) {
+    const p = landPoint(pl, angle);
+    if (!p) return null;
+    const elite = G.EnemyMgr.count >= CAP * 0.85 || (bt > 0 && Math.random() < Math.min(0.5, bt / 120));
+    const hp = hpK(t) * (bt > 0 ? 1 + bt / 90 : 1);
+    return G.EnemyMgr.add(new G.Enemy(pickDef(t), { x: p[0], y: p[1], hpK: hp, dmgK: dmgK(t), elite }));
   }
 
-  function update(dt, pl, t) {
-    // Jefes.
-    const next = G.Enemies.bossAt(bossIdx);
-    if (t >= next.at - 5 && warned !== bossIdx) {
-      warned = bossIdx;
-      G.HUD.banner('¡Se acerca ' + next.name + '!', next.title, '#ff5f6d');
-      G.Audio.sfx('boss');
-    }
-    if (t >= next.at) {
-      bossIdx++;
-      const a = Math.random() * 6.283;
-      const [x, y] = ringPoint(pl, a);
-      G.EnemyMgr.add(new G.Enemy(next, { x, y, boss: true, dmgK: dmgK(t) * 0.8 }));
-      G.Audio.music('boss');
-    }
+  /** El jefe de la isla, llamado con el Den Den Mushi: aparece cerca, en tierra. */
+  function summon(def, pl) {
+    const a = Math.random() * 6.283;
+    const [x, y] = landPoint(pl, a, 24) || [pl.x + 260, pl.y];
+    return G.EnemyMgr.add(new G.Enemy(def, { x, y, boss: true, dmgK: dmgK(G.Game.time) * 0.8 }));
+  }
 
-    if (G.EnemyMgr.count >= CAP) return;
-    acc += rate(t) * dt;
+  /** t = segundos de la partida (dificultad) · bt = segundos de Buster Call, o -1. */
+  function update(dt, pl, t, bt = -1) {
+    const cap = bt > 0 ? CAP + Math.min(60, bt) : CAP;
+    if (G.EnemyMgr.count >= cap) return;
+    acc += rate(t) * (bt > 0 ? 1.6 + bt / 25 : 1) * dt;
     while (acc >= 1) {
       acc -= 1;
-      spawnOne(pl, t, Math.random() * 6.283);
+      spawnOne(pl, t, Math.random() * 6.283, bt);
     }
 
     // Marea: una avalancha desde un lado.
     surgeT -= dt;
     if (surgeT <= 0) {
-      surgeT = G.U.rand(35, 50);
+      surgeT = G.U.rand(35, 50) * (bt > 0 ? 0.6 : 1);
       const a = Math.random() * 6.283;
-      const n = Math.min(CAP - G.EnemyMgr.count, 10 + Math.floor(t / 20));
-      for (let i = 0; i < n; i++) spawnOne(pl, t, a + G.U.rand(-0.5, 0.5));
+      const n = Math.min(cap - G.EnemyMgr.count, 10 + Math.floor(t / 20));
+      for (let i = 0; i < n; i++) spawnOne(pl, t, a + G.U.rand(-0.5, 0.5), bt);
       G.HUD.banner('¡Una marea de enemigos!', '', '#ffd23f');
     }
   }
 
-  return { reset, update };
+  return { reset, update, summon, landPoint };
 })();

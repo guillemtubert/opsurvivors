@@ -10,7 +10,7 @@
  *   zoner    zonas de arena bajo tus pies que estallan (Crocodile, Imu)
  * hover: true  flota (vaivén suave en vez de pasos)
  *
- * `from` = segundo de la run en que empieza a salir; `w` = peso en la bolsa.
+ * `from` = segundo de dificultad en que empieza a salir (ver Spawner); `w` = peso en la bolsa.
  * La vida y el daño crecen con el tiempo (ver Spawner).
  */
 G.Enemies = (() => {
@@ -22,32 +22,21 @@ G.Enemies = (() => {
     { id: 'pacifista', name: 'Pacifista',       sprite: 'pacifista', from: 290, w: 2,  hp: 190, spd: 44, dmg: 16, xp: 20, behavior: 'beamer' }
   ];
 
+  // Cada isla tiene su jefe (data/islands.js): sale al llamarlo con el Den Den Mushi.
   const BOSSES = [
-    { id: 'morgan',    name: 'Capitán Morgan',  title: 'Mano de Hacha',  sprite: 'morgan',    at: 150, hp: 1100, spd: 62, dmg: 22, xp: 160, behavior: 'charger' },
-    { id: 'imu',       name: 'Imu',             title: 'Ocupante del Trono Vacío', sprite: 'imu', at: 330, hp: 2600, spd: 50, dmg: 28, xp: 320, behavior: 'zoner', hover: true },
-    { id: 'buggy',     name: 'Buggy',           title: 'El Payaso',      sprite: 'buggy',     at: 330, hp: 2200, spd: 58, dmg: 26, xp: 300, behavior: 'fan' },
-    { id: 'arlong',    name: 'Arlong',          title: 'Diente de Sierra', sprite: 'arlong',  at: 510, hp: 3600, spd: 70, dmg: 32, xp: 480, behavior: 'charger' },
-    { id: 'crocodile', name: 'Crocodile',       title: 'Señor 0',        sprite: 'crocodile', at: 690, hp: 5400, spd: 60, dmg: 36, xp: 700, behavior: 'zoner' }
+    { id: 'morgan',    name: 'Capitán Morgan',  title: 'Mano de Hacha',  sprite: 'morgan',    hp: 1100, spd: 62, dmg: 22, xp: 160, behavior: 'charger' },
+    { id: 'imu',       name: 'Imu',             title: 'Ocupante del Trono Vacío', sprite: 'imu', hp: 2600, spd: 50, dmg: 28, xp: 320, behavior: 'zoner', hover: true },
+    { id: 'buggy',     name: 'Buggy',           title: 'El Payaso',      sprite: 'buggy',     hp: 2200, spd: 58, dmg: 26, xp: 300, behavior: 'fan' },
+    { id: 'arlong',    name: 'Arlong',          title: 'Diente de Sierra', sprite: 'arlong',  hp: 3600, spd: 70, dmg: 32, xp: 480, behavior: 'charger' },
+    { id: 'crocodile', name: 'Crocodile',       title: 'Señor 0',        sprite: 'crocodile', hp: 5400, spd: 60, dmg: 36, xp: 700, behavior: 'zoner' }
   ];
-  // Tras el último, vuelven en bucle cada 3 minutos y cada vuelta más fuertes.
-  const LOOP_EVERY = 180;
+  const BOSS_BY_ID = Object.fromEntries(BOSSES.map(b => [b.id, b]));
 
   // Los activos ahora (ver data/scope.js).
-  const on = (list, key) => list.filter(e => !G.SCOPE || G.SCOPE[key].includes(e.id));
-  const ACTIVE = on(LIST, 'enemies'), ACTIVE_BOSSES = on(BOSSES, 'bosses');
-
-  /** Jefe que toca en el índice i (0, 1, 2...). */
-  function bossAt(i) {
-    const n = ACTIVE_BOSSES.length;
-    const round = Math.floor(i / n);
-    const b = ACTIVE_BOSSES[i % n];
-    const k = Math.pow(2.2, round);
-    const at = i < n ? b.at : ACTIVE_BOSSES[n - 1].at + (i - n + 1) * LOOP_EVERY;
-    return Object.assign({}, b, { at, hp: b.hp * k, dmg: b.dmg * (1 + round * 0.4), xp: b.xp * (1 + round) });
-  }
+  const ACTIVE = LIST.filter(e => !G.SCOPE || G.SCOPE.enemies.includes(e.id));
 
   /** Enemigos que pueden salir en el segundo t (con sus pesos). */
   function bagAt(t) { return ACTIVE.filter(e => t >= e.from); }
 
-  return { LIST, BOSSES, bossAt, bagAt };
+  return { LIST, BOSSES, BOSS_BY_ID, bagAt };
 })();

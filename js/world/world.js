@@ -1,4 +1,9 @@
-/* ============ world.js — islas infinitas pintadas en pixel art ============
+/* ============ world.js — la isla, pintada en pixel art ============
+ * Cada isla es un mapa limitado: el terreno se va hundiendo hacia el borde
+ * y fuera sólo hay mar profundo, que no se puede cruzar. La costa es una
+ * curva sin entrantes cerrados (el radio sólo depende del ángulo), así que no
+ * hay rincones donde quedar atrapado.
+ *
  * Terreno por tile (16 px de arte = G.TILE unidades de mundo):
  *   0 mar profundo (frena mucho) · 1 agua (frena) · 2 arena · 3 suelo
  * El suelo se hornea por chunks de 16×16 tiles escribiendo píxel a píxel en un
@@ -53,18 +58,33 @@ G.World = (() => {
       pal: () => ({ p: '#ffc0c8', P: '#e8909c' }), ox: 2, oy: 3 }
   };
 
-  let seed = 1, biome = 0;
+  let seed = 1, biome = 0, radius = 50;  // radio de la isla en tiles
   const chunks = new Map();             // "cx,cy" -> canvas
+  const reserved = new Set();           // "tx,ty" sin objetos (cofres, Den Den Mushi, muelle...)
+  let pier = null;                      // muelle: { x0, y0, x1, y1 } en unidades de mundo, se anda sobre él
   const broken = new Set();             // "tx,ty" de barriles rotos
   const damage = new Map();             // "tx,ty" -> { hp, flash }
   const propCache = new Map();          // "bioma/prop" -> { img, white }
 
   function B() { return BIOMES[biome]; }
 
-  function reset(s) {
-    seed = s | 0;
-    chunks.clear(); broken.clear(); damage.clear();
+  function reset(s, r = 50) {
+    seed = s | 0; radius = r;
+    chunks.clear(); broken.clear(); damage.clear(); reserved.clear(); terrCache.clear();
+    pier = null;
   }
+
+  /** Deja sin objetos los tiles a menos de r tiles de (x, y) (en unidades de mundo). */
+  function reserve(x, y, r) {
+    const cx = Math.floor(x / G.TILE), cy = Math.floor(y / G.TILE);
+    for (let ty = cy - r; ty <= cy + r; ty++) for (let tx = cx - r; tx <= cx + r; tx++) {
+      if ((tx - cx) ** 2 + (ty - cy) ** 2 <= r * r) reserved.add(tx + ',' + ty);
+    }
+  }
+
+  /** Muelle: rectángulo de mundo por el que se anda aunque haya agua debajo. */
+  function setPier(rect) { pier = rect; chunks.clear(); }
+  const onPier = (x, y) => pier && x >= pier.x0 && x <= pier.x1 && y >= pier.y0 && y <= pier.y1;
 
   function setBiome(i) {
     biome = ((i % BIOMES.length) + BIOMES.length) % BIOMES.length;
@@ -81,11 +101,20 @@ G.World = (() => {
    */
   const W0 = 0.26, W1 = 0.33, S1 = 0.39;
 
+  /** Radio de la costa (en tiles) según el ángulo: una curva suave. */
+  function coastAt(fx, fy) {
+    const a = Math.atan2(fy, fx);
+    return radius * (0.86 + 0.28 * G.U.noise(Math.cos(a) * 1.6 + 7, Math.sin(a) * 1.6 + 7, seed + 3));
+  }
+
   /** Valor del campo en coordenadas de tile (con decimales). */
   function field(fx, fy) {
-    let n = G.U.fbm(fx * 0.05, fy * 0.05, seed);
-    // Lo cerca del origen siempre es tierra: se empieza en una isla.
     const d = Math.hypot(fx, fy);
+    // Por dentro casi todo es tierra (con alguna charca); hacia la costa se hunde.
+    let n = G.U.fbm(fx * 0.05, fy * 0.05, seed) + 0.17;
+    const k = d / coastAt(fx, fy);
+    if (k > 0.72) n -= Math.min(1, (k - 0.72) / 0.32) ** 1.6 * 0.75;
+    // Lo cerca del origen siempre es tierra: se empieza en tierra firme.
     if (d < 9) n += (9 - d) * 0.04;
     return n;
   }
@@ -113,6 +142,7 @@ G.World = (() => {
   /** Objeto de un tile (o null). Mismo resultado siempre para la misma semilla. */
   function propAt(tx, ty) {
     if (Math.abs(tx) < SPAWN_SAFE && Math.abs(ty) < SPAWN_SAFE) return null;
+    if (reserved.has(tx + ',' + ty)) return null;
     const t = terrAt(tx, ty);
     const h = G.U.hash(tx, ty, seed + 5);
     const b = B();
@@ -350,11 +380,15 @@ G.World = (() => {
     return !solidsNear(x, y, r + 24).some(s => G.U.dist2(x, y, s.x, s.y) < (r + s.r) ** 2);
   }
 
-  /** 0 tierra · 1 agua · 2 mar profundo */
+  /** 0 tierra · 1 agua · 2 mar profundo (no se puede cruzar) */
   function waterAt(x, y) {
+    if (onPier(x, y)) return 0;
     const t = classify(field(x / G.TILE, y / G.TILE));
     return t === 0 ? 2 : t === 1 ? 1 : 0;
   }
+
+  /** Tierra firme y sin objetos sólidos: sirve para que aparezcan enemigos. */
+  function isLand(x, y, r = 12) { return waterAt(x, y) === 0 && isFree(x, y, r); }
 
   /** Daña barriles y cajas dentro del círculo. */
   function hitBreakables(x, y, r, dmg, now) {
@@ -378,6 +412,7 @@ G.World = (() => {
 
   return {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
-    drawGround, collectProps, resolve, isFree, waterAt, hitBreakables, solidsNear
+    get radius() { return radius * G.TILE; },
+    drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier
   };
 })();
