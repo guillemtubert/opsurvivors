@@ -41,8 +41,17 @@
 - [x] Quitar el cambio de isla automático cada 3 minutos
 - [x] Verificar con Playwright: escritorio, móvil en horizontal y en vertical; que no haya zonas trampa (prueba de recorrer toda la costa)
 
-## Paso 2 — Islas 2-4 con los jefes que ya existen
-## Paso 3 — Jefes nuevos de uno en uno (Kuro, Krieg, Mr. 3, Wapol, Enel, Lucci, Moria)
+## Paso 2 — Islas 2-4 (Orange Town, Villa Syrup, Baratie)
+
+- [x] Todas las islas del mismo tamaño: `scale: 1` = radio `G.Islands.SIZE` (48 tiles, unos 30 s de punta a punta); 0.5 o 2.5 la encogen o agrandan
+- [x] Buggy (`fan`): cuchillos en abanico y en anillo
+- [x] Kuro (`blinker`): se esfuma, reaparece a tu lado, avisa con una línea y corta; 3 veces seguidas y descansa
+- [x] Don Krieg (`barrage`): 3 ráfagas de balas en cono; una de cada tres veces, bombas MH5 que dejan nube de gas
+- [x] Vida de los jefes escalonada: Morgan 1100 · Buggy 1600 · Kuro 2100 · Krieg 2700
+- [ ] Hojas de 8 direcciones de Buggy, Kuro y Krieg (ahora llevan dibujos provisionales de 16×20 a escala 3)
+- [ ] Dificultad entre islas (ahora sigue subiendo con el tiempo total de la partida)
+
+## Paso 3 — Jefes nuevos de uno en uno (Mr. 3, Wapol, Enel, Lucci, Moria)
 
 ## Decisiones
 - Duración: partidas por **sagas** (East Blue = islas 1-5, Alabasta = 6-8, Cielo/Thriller Bark = 9-11). Buster Call a los **3:00**; llamar al jefe antes da berries extra (1,5 ฿ por segundo que falte).

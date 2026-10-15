@@ -5,5 +5,5 @@
 G.SCOPE = {
   crew: ['luffy', 'sanji'],
   enemies: ['marine'],
-  islands: ['shells']
+  islands: ['shells', 'orange', 'syrup', 'baratie']
 };

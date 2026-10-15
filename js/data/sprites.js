@@ -307,7 +307,8 @@ G.SPRITES = {
       '....|kBk.|.kBk|....',
       '...k|kkk.|.kkk|k...'] },
 
-  buggy: { scale: 2, pal: { b: '#3a7ad8', B: '#2a589a', r: '#e0383e', R: '#a82430', h: '#2a2a3a', y: '#f2d063', p: '#e8e0f0', o: '#ff8a2a' },
+  // Provisionales hasta tener sus hojas de 8 direcciones (a escala 3 = 60 px, como Morgan).
+  buggy: { scale: 3, pal: { b: '#3a7ad8', B: '#2a589a', r: '#e0383e', R: '#a82430', h: '#2a2a3a', y: '#f2d063', p: '#e8e0f0', o: '#ff8a2a' },
     rows: [
       '....|kkkk|kkkk|....',
       '...k|hhhh|hhhh|k...',
@@ -329,6 +330,54 @@ G.SPRITES = {
       '...k|oooo|oooo|k...',
       '....|kok.|.kok|....',
       '...k|kkk.|.kkk|k...'] },
+
+  // Kuro: pelo negro peinado hacia atrás, gafas, traje negro y las garras de gato.
+  kuro: { scale: 3, pal: { h: '#1e1e2a', g: '#d8e4f0', c: '#2a2a3a', C: '#1a1a26', t: '#c8a060' },
+    rows: [
+      '....|....|....|....',
+      '....|kkkk|kkkk|....',
+      '...k|hhhh|hhhh|k...',
+      '..kh|hhhh|hhhh|hk..',
+      '..kh|ssss|ssss|hk..',
+      '..ks|kkkk|kkkk|sk..',
+      '..ks|kggk|kggk|sk..',
+      '..ks|kkss|sskk|sk..',
+      '..ks|ssss|ssss|sk..',
+      '...k|ssmm|mmss|k...',
+      '..kk|kwww|wwwk|kk..',
+      '.kcc|cwtw|wtwc|cck.',
+      '.kcc|ccww|wwcc|cck.',
+      'kxcc|cccc|cccc|ccxk',
+      'xkSk|cccc|cccc|kSkx',
+      'xx.k|CCCC|CCCC|k.xx',
+      'x..k|CCCC|CCCC|k..x',
+      '...k|CCCC|CCCC|k...',
+      '....|kCk.|.kCk|....',
+      '...k|kkk.|.kkk|k...'] },
+
+  // Don Krieg: armadura dorada, pelo negro en tupé y pañuelo rojo.
+  krieg: { scale: 3, pal: { h: '#1e1e2a', y: '#f2c84a', Y: '#b88a22', o: '#fff0a0', r: '#c83a3a', p: '#5a4a6a' },
+    rows: [
+      '...k|kkkk|kkkk|....',
+      '..kh|hhhh|hhhh|k...',
+      '.khh|hhhh|hhhh|hk..',
+      '..kh|ssss|ssss|hk..',
+      '..ks|kkss|sskk|sk..',
+      '..ks|skss|ssks|sk..',
+      '..ks|ssss|ssss|sk..',
+      '...k|smmm|mmms|k...',
+      '..kk|rrrr|rrrr|kk..',
+      'kkyy|yrrr|rrry|yykk',
+      'kyoy|yyyy|yyyy|yoyk',
+      'kyyY|yyoy|yoyy|Yyyk',
+      'kyyk|yyyy|yyyy|kyyk',
+      'kYYk|yyYy|yYyy|kYYk',
+      '.kSk|YYYY|YYYY|kSk.',
+      '...k|pppp|pppp|k...',
+      '...k|pppp|pppp|k...',
+      '...k|YYk.|.kYY|k...',
+      '...k|yyk.|.kyy|k...',
+      '..kk|kkk.|.kkk|kk..'] },
 
   arlong: { scale: 2, pal: { f: '#5a9ad8', F: '#3a6aa8', n: '#9ac0e0', h: '#1a2a4a', a: '#e8d8a0', A: '#bfa870', y: '#f2d063' },
     rows: [

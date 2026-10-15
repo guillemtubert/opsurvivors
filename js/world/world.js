@@ -68,7 +68,7 @@ G.World = (() => {
 
   function B() { return BIOMES[biome]; }
 
-  function reset(s, r = 50) {
+  function reset(s, r = 48) {
     seed = s | 0; radius = r;
     chunks.clear(); broken.clear(); damage.clear(); reserved.clear(); terrCache.clear();
     pier = null;

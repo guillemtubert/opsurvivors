@@ -90,7 +90,7 @@ G.Game = (() => {
     const seed = Math.floor(Math.random() * 1e6);
     G.FX.clear(); G.Projectiles.clear(); G.Combat.clear(); G.EnemyMgr.clear();
     G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();
-    G.World.reset(seed, def.radius);
+    G.World.reset(seed, G.Islands.radius(def));
     G.World.setBiome(def.biome);
     G.Island.setup(def, i, seed);
     G.Minimap.build();
