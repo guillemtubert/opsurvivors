@@ -55,7 +55,8 @@
 - [x] Bioma nevado para Drum
 - [x] Se mantiene el minimapa en todas las islas
 - [x] Hojas de 8 direcciones: Buggy, Krieg, Arlong, Mr. 3, Crocodile, Enel, Lucci y Moria
-- [ ] Hojas de Kuro y Wapol (siguen con el dibujo provisional)
+- [x] Hojas de Kuro y Wapol
+- [x] Sin puntos blancos: bolsas de fondo encerradas (`pockets: 'auto'`) y motas sueltas (`dropSpecks`)
 - [ ] Dificultad entre islas (ahora sigue subiendo con el tiempo total de la partida)
 - [ ] Equilibrar el daño de cada ataque jugando
 

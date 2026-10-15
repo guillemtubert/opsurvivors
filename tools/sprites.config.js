@@ -115,7 +115,7 @@ module.exports = {
     // Buggy: andar en 8 direcciones (Buggy8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
     buggy: {
       sheet: REF + 'buggy/Buggy8D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 60, colors: 24,
       fps: { idle: 1, walk: 7, attack: 5 },
       dirs8: {
@@ -152,7 +152,7 @@ module.exports = {
     // Arlong: andar en 8 direcciones (Arlong8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
     arlong: {
       sheet: REF + 'arlong/Arlong8D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 64, colors: 24,
       fps: { idle: 1, walk: 7, attack: 5 },
       dirs8: {
@@ -171,7 +171,7 @@ module.exports = {
     // Mr. 3: andar en 8 direcciones (Mr38D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
     mr3: {
       sheet: REF + 'mr3/Mr38D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 62, colors: 24,
       fps: { idle: 1, walk: 7 },
       dirs8: {
@@ -189,7 +189,7 @@ module.exports = {
     // Crocodile: andar en 8 direcciones (Crocodile8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
     crocodile: {
       sheet: REF + 'crocodile/Crocodile8D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 64, colors: 24,
       fps: { idle: 1, walk: 7 },
       dirs8: {
@@ -207,7 +207,7 @@ module.exports = {
     // Enel: andar en 8 direcciones (Enel8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
     enel: {
       sheet: REF + 'enel/Enel8D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 64, colors: 24,
       fps: { idle: 1, walk: 7 },
       dirs8: {
@@ -243,7 +243,7 @@ module.exports = {
     // Gecko Moria: andar en 8 direcciones (Moria8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
     moria: {
       sheet: REF + 'moria/Moria8D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 78, colors: 24,
       fps: { idle: 1, walk: 7 },
       dirs8: {
@@ -255,6 +255,42 @@ module.exports = {
         'up-left': [[1503, 5, 292, 430], [1545, 452, 227, 433]],
         'left': { mirror: 'right' },
         'down-left': [[309, 0, 285, 440], [321, 451, 261, 434]]
+      }
+    },
+
+    // Kuro: andar en 8 direcciones (Kuro8D.png, convertida del .jfif; paneles y etiquetas tapados con el color del fondo). Las direcciones que faltan, en espejo.
+    kuro: {
+      sheet: REF + 'kuro/Kuro8D.png',
+      bgFlat: { color: '#26292f', thr: 9, r: 3, fringe: 1 },
+      height: 62, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[59, 92, 349, 437], [511, 89, 296, 444]],
+        'down-right': [[1405, 121, 287, 405], [1406, 2003, 327, 358]],
+        'right': [[73, 706, 313, 445], [504, 718, 273, 430], [494, 1916, 351, 439]],
+        'up-right': [[975, 716, 320, 433], [1389, 712, 317, 437], [1397, 1310, 321, 442]],
+        'up': [[95, 1302, 271, 450], [521, 1302, 272, 454], [990, 1304, 274, 448]],
+        'up-left': { mirror: 'up-right' },
+        'left': { mirror: 'right' },
+        'down-left': [[982, 134, 318, 398], [945, 1956, 352, 404]]
+      }
+    },
+
+    // Wapol: andar en 8 direcciones (Wapol8D.png, convertida del .jfif; sin diagonales de espaldas: usan las de espaldas). Las direcciones que faltan, en espejo.
+    wapol: {
+      sheet: REF + 'wapol/Wapol8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 64, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[11, 25, 215, 271], [11, 625, 218, 267]],
+        'down-right': { mirror: 'down-left' },
+        'right': [[759, 25, 169, 270], [996, 26, 177, 269], [1232, 25, 168, 271], [1460, 26, 185, 266]],
+        'up-right': [[1931, 24, 212, 270], [2171, 25, 215, 273], [2169, 621, 219, 265]],
+        'up': [[1931, 24, 212, 270], [2171, 25, 215, 273], [2169, 621, 219, 265]],
+        'up-left': [[1931, 24, 212, 270], [2171, 25, 215, 273], [2169, 621, 219, 265]],
+        'left': [[516, 323, 185, 261], [747, 324, 198, 269], [1003, 322, 168, 270], [1241, 322, 166, 270]],
+        'down-left': [[253, 26, 217, 270], [492, 26, 204, 259], [22, 325, 212, 258], [275, 325, 198, 259]]
       }
     },
 

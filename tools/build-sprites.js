@@ -38,7 +38,7 @@ function sheetOf(cfg) {
   const key = cfg.sheet + '#sinfondo';
   if (!cache.has(key)) {
     const o = cfg.bgFlat;
-    cache.set(key, P.removeFlatBg(load(cfg.sheet), o.color || '#000000', o.thr || 14, o.r || 3, o.fringe === undefined ? 1 : o.fringe, !!o.pockets));
+    cache.set(key, P.removeFlatBg(load(cfg.sheet), o.color || '#000000', o.thr || 14, o.r || 3, o.fringe === undefined ? 1 : o.fringe, o.pockets === 'auto' ? 'auto' : !!o.pockets));
   }
   return cache.get(key);
 }
@@ -133,7 +133,8 @@ function build(id, cfg, K) {
   // (Con 8 direcciones y poses de otra hoja, cada hoja lleva su escala: sideHeight.)
   const k = cfg.height ? order[0].src.h / (cfg.height - 2) : K / (cfg.size || 1);
   const kSide = cfg.sideHeight && order.find(o => o.side) ? order.find(o => o.side).src.h / (cfg.sideHeight - 2) : k;
-  const small = order.map(o => P.downscale(o.src, o.side ? kSide : k, 0.5, cfg.accent || null));
+  // Sin motas sueltas (restos del fondo que quedan como puntos al reducir).
+  const small = order.map(o => P.dropSpecks(P.downscale(o.src, o.side ? kSide : k, 0.5, cfg.accent || null)));
   const pal = P.medianCut(P.colorsOf(small), cfg.colors || 16);
   // Detalles reservados (accent): los colores intensos, aunque sean pocos píxeles,
   // tienen sitio fijo en la paleta (si no, la mediana los descarta: ojos de Imu).

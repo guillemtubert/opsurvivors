@@ -118,8 +118,9 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | | Thriller Bark | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
 | (sin isla) | | Imu | Látigo negro que gira · anillos de espinas con un hueco |
 
-Andan en 8 direcciones Luffy, Sanji, el marine y todos los jefes menos Kuro y Wapol, que llevan
-un dibujo provisional de 16×20 (`js/data/sprites.js`) hasta tener sus hojas.
+Andan en 8 direcciones Luffy, Sanji, el marine y todos los jefes (Imu, sin isla, usa su atlas de
+Treasure Cruise). Al generar las hojas se quitan también las bolsas de fondo encerradas en el dibujo
+(`pockets: 'auto'`, menos en quien lleva ropa blanca lisa, como el marine) y las motas sueltas.
 
 Para elegir los fotogramas de una hoja nueva:
 

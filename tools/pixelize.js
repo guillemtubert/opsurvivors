@@ -55,15 +55,34 @@
     const bg = new Uint8Array(N), stack = [];
     for (let x = 0; x < w; x++) { stack.push(x + r * w, (h - 1 - r) * w + x); }
     for (let y = 0; y < h; y++) { stack.push(y * w + r, y * w + w - 1 - r); }
-    if (pockets) for (let p = 0; p < N; p++) if (thick[p]) stack.push(p);
-    while (stack.length) {
-      const p = stack.pop();
-      if (p < 0 || p >= N || bg[p] || !thick[p]) continue;
-      bg[p] = 1;
-      const x = p % w;
-      stack.push(p + w, p - w);
-      if (x > 0) stack.push(p - 1);
-      if (x < w - 1) stack.push(p + 1);
+    if (pockets === true) for (let p = 0; p < N; p++) if (thick[p]) stack.push(p);
+    const fill = (st, mark) => {
+      const list = [];
+      while (st.length) {
+        const p = st.pop();
+        if (p < 0 || p >= N || mark[p] || !thick[p]) continue;
+        mark[p] = 1; list.push(p);
+        const x = p % w;
+        st.push(p + w, p - w);
+        if (x > 0) st.push(p - 1);
+        if (x < w - 1) st.push(p + 1);
+      }
+      return list;
+    };
+    fill(stack, bg);
+    // pockets 'auto' (fondos claros): una bolsa encerrada es fondo si es de color liso, igual
+    // que el fondo. Ojo con los personajes con ropa blanca lisa (el marine): sin pockets.
+    if (pockets === 'auto' && (R + Gc + B) / 3 > 128) {
+      const seen = Uint8Array.from(bg);
+      for (let s = 0; s < N; s++) {
+        if (seen[s] || !thick[s]) continue;
+        const comp = fill([s], seen);
+        // Fondo encerrado: color liso, casi idéntico al del fondo (el JPG apenas lo toca).
+        // (Si el personaje lleva ropa blanca lisa, como el marine, no uses 'auto'.)
+        let pure = 0;
+        for (const p of comp) if (Math.max(Math.abs(data[p * 4] - R), Math.abs(data[p * 4 + 1] - Gc), Math.abs(data[p * 4 + 2] - B)) <= 6) pure++;
+        if (pure / comp.length >= 0.9) for (const p of comp) bg[p] = 1;
+      }
     }
     // El fondo ocupa también el margen de la erosión (r) y `fringe` más, sólo sobre oscuro.
     let cur = bg;
@@ -145,6 +164,25 @@
    * Deja sólo la figura principal: el grupo de píxeles (8 vecinos, alfa >= 128)
    * más grande y su borde suavizado. Quita humo, chispas o restos sueltos.
    */
+  /** Quita las motas sueltas: trozos de menos de minPx píxeles separados de la figura (restos del fondo del JPG). */
+  function dropSpecks(img, minPx = 4) {
+    const { w, h, data } = img, seen = new Uint8Array(w * h), out = { w, h, data: Uint8Array.from(data) };
+    for (let s = 0; s < w * h; s++) {
+      if (seen[s] || data[s * 4 + 3] < 128) continue;
+      const comp = [s], stack = [s]; seen[s] = 1;
+      while (stack.length) {
+        const p = stack.pop(), x = p % w, y = (p / w) | 0;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx, ny = y + dy, q = ny * w + nx;
+          if (nx < 0 || ny < 0 || nx >= w || ny >= h || seen[q] || data[q * 4 + 3] < 128) continue;
+          seen[q] = 1; stack.push(q); comp.push(q);
+        }
+      }
+      if (comp.length < minPx) for (const p of comp) out.data[p * 4 + 3] = 0;
+    }
+    return out;
+  }
+
   function largestOnly(img) {
     const { w, h, data } = img;
     const label = new Int32Array(w * h).fill(-1), stack = [];
@@ -335,5 +373,5 @@
     return out;
   }
 
-  return { blank, rgbOf, removeBg, removeFlatBg, crop, trim, components, largestOnly, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
+  return { blank, rgbOf, removeBg, removeFlatBg, crop, trim, components, largestOnly, dropSpecks, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
 });
