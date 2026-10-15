@@ -97,7 +97,8 @@ js/
 
 ## Alcance actual
 
-Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y **Sanji**, y el
+Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y **Sanji**.
+
 La historia entera está en `js/data/islands.js`: 11 sagas y 37 islas, una por arco. Cada saga
 lleva su enemigo normal (de momento, dibujos provisionales) y su barco (el Thousand Sunny desde
 Post-Enies Lobby). Una isla se activa sola en cuanto existen todos sus jefes, y las sagas sin
