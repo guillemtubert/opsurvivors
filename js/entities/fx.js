@@ -108,6 +108,7 @@ G.FX = (() => {
       const k = m.steady ? 1 : 1 - m.life / m.max;
       ctx.globalAlpha = 0.25 + 0.35 * k;
       ctx.fillStyle = m.col;
+      if (m.kind === 'smoke') continue;          // va por encima (drawOver)
       if (m.kind === 'pillar') {
         // Pilar de cera: columna con brillo.
         ctx.globalAlpha = 1;
@@ -158,6 +159,20 @@ G.FX = (() => {
 
   /** Lo que va por encima de todo. */
   function drawOver(ctx) {
+    // Humo espeso (Smoker): bolas grises que tapan lo de debajo.
+    for (const m of marks) {
+      if (m.kind !== 'smoke') continue;
+      const fade = Math.min(1, m.life / 0.8, (m.max - m.life) / 0.4);
+      const t = G.Game.now;
+      for (let i = 0; i < 9; i++) {
+        const a = i / 9 * 6.283 + t * 0.3, rr = m.r * (i % 3 === 0 ? 0 : 0.55);
+        const x = m.x + Math.cos(a) * rr, y = m.y - G.LIFT + Math.sin(a) * rr * 0.6;
+        ctx.globalAlpha = 0.85 * fade;
+        ctx.fillStyle = i % 2 ? '#d8dce4' : '#b8bec8';
+        ctx.beginPath(); ctx.ellipse(x, y, m.r * 0.6, m.r * 0.45, 0, 0, 6.283); ctx.fill();
+      }
+    }
+    ctx.globalAlpha = 1;
     for (const r of rings) {
       const k = 1 - r.life / r.max;
       ctx.globalAlpha = 1 - k;

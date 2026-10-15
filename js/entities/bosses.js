@@ -15,6 +15,12 @@
  *   kuro       Shakushi: se esfuma y caen cortes en línea a tu alrededor
  *   krieg      bombas MH5 (nube de gas) · Daisensō: lanza que estalla en cono
  *   arlong     se sumerge y emerge bajo tus pies · dientes que se quedan clavados en el suelo
+ *   smoker     (huida) White Blow: brazo de humo que te arrastra · nubes de humo que tapan la vista ·
+ *              al rato, un vendaval de Dragon te empuja hacia el barco
+ *   mr9        bates que rebotan en la costa y en los árboles
+ *   wednesday  cuchillas que giran a su alrededor y a veces se abren
+ *   mr5        mocos-bomba que estallan donde caen
+ *   valentine  sube, su sombra te persigue y cae encima con 10.000 kg
  *   mr3        Candle Lock: jaula de cera con una salida · charcos de cera que frenan
  *   wapol      Baku Baku: te aspira y muerde · salto que aplasta
  *   crocodile  Desert Spada: grietas de arena que avanzan · Sables: tornado que te sigue
@@ -245,7 +251,114 @@ G.Bosses = (() => {
       return { mx: k.nx, my: k.ny };
     },
 
+    smoker(e, k) {
+      e.ai.t = (e.ai.t || 0) + k.dt;
+      // Vendaval de Dragon (una vez): te empuja hacia el barco y lo aparta a él.
+      if (!e.ai.gust && e.ai.t > 45) {
+        e.ai.gust = true;
+        const d = G.Island.pois().dock, [gx, gy] = G.U.norm(d.endX - k.pl.x, d.endY - k.pl.y);
+        k.pl.push(gx * 320, gy * 320, 1.2);
+        e.kx -= k.nx * 900; e.ky -= k.ny * 900;
+        e.state = 'blown'; e.stateT = 2.5;
+        G.HUD.banner('¡Un vendaval!', 'Dragon te ayuda a escapar', '#9ad0ff');
+        for (let i = 0; i < 20; i++) G.FX.puff(k.pl.x + G.U.rand(-120, 120), k.pl.y + G.U.rand(-90, 90), '#e8f4ff', 1);
+      }
+      if (e.state === 'blown') { if ((e.stateT -= k.dt) <= 0) e.state = 'walk'; return STOP; }
+      // White Blow: aviso en línea y el brazo de humo te arrastra hacia él.
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const a = e.ai.aim, x1 = e.x + Math.cos(a) * 300, y1 = e.y + Math.sin(a) * 300;
+          G.FX.beam(e.x, e.y - 10, x1, y1 - 10, 14, '#d8dce4', 0.3);
+          if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 14 + k.pl.r) {
+            k.pl.hurt(e.dmg * 0.6, k.now);
+            k.pl.push(-Math.cos(a) * 300, -Math.sin(a) * 300, 0.35);
+          }
+        }
+        return STOP;
+      }
+      e.pose = false;
+      if (ready(e, k, 't1', 3.5, 4.5, 320)) {
+        e.state = 'aim'; e.stateT = 0.6; e.ai.aim = Math.atan2(k.dy, k.dx);
+        warnLine(e.x, e.y, e.ai.aim, 300, 22, '#b8bec8', 0.6);
+      }
+      // Nubes de humo: no hacen daño, pero no dejan ver.
+      if (ready(e, k, 't2', 7, 9, 500)) {
+        for (let i = 0; i < 3; i++) zone(k.pl.x + G.U.rand(-90, 90), k.pl.y + G.U.rand(-70, 70), 60, '#d8dce4', 6, () => {}, 'smoke');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
     // ---------------- Alabasta ----------------
+
+    mr9(e, k) {
+      // Nine Bats: dos bates que rebotan en la costa y en los árboles.
+      if (ready(e, k, 't1', 2.4, 3.0, 420)) {
+        e.atkAt = k.now;
+        const a0 = Math.atan2(k.dy, k.dx);
+        for (const da of [-0.25, 0.25]) shot(e, a0 + da, 230, e.dmg * 0.6, { vis: 'club', r: 7, life: 3.5, bounce: 3 });
+        G.Audio.sfx('slash');
+      }
+      return { mx: k.nx * 0.9, my: k.ny * 0.9 };
+    },
+
+    wednesday(e, k) {
+      // Peacock Slashers: dos cuchillas que giran a su alrededor; cada poco se abren.
+      if (!e.ai.blades) {
+        e.ai.blades = [0, Math.PI].map(a => shot(e, 0, 0, e.dmg * 0.6, { vis: 'knife', r: 8, keep: true, orbit: { owner: e, r: 44, w: 3.2, a } }));
+      }
+      if (ready(e, k, 't1', 4.5, 5.5, 400)) { e.ai.open = 1.6; e.atkAt = k.now; G.Audio.sfx('slash'); }
+      if (e.ai.open > 0) e.ai.open -= k.dt;
+      const r = e.ai.open > 0 ? 44 + Math.sin(Math.min(1, e.ai.open / 1.6) * Math.PI) * 60 : 44;
+      for (const b of e.ai.blades) { b.orbit.r = r; b.orbit.w = e.ai.open > 0 ? 5 : 3.2; }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    mr5(e, k) {
+      // Nose Fancy Cannon: mocos-bomba que caen donde estabas y estallan (tres de una vez, a veces).
+      if (ready(e, k, 't1', 2.2, 2.8, 420)) {
+        e.atkAt = k.now;
+        const a0 = Math.atan2(k.dy, k.dx), n = turn(e) % 3 ? 1 : 3;
+        for (let i = 0; i < n; i++) {
+          const a = a0 + (i - (n - 1) / 2) * 0.35, sp = 200;
+          shot(e, a, sp, e.dmg * 0.4, {
+            r: 6, color: '#9ad04a', life: Math.min(1.6, k.d / sp),
+            land: (x, y) => warn(x, y, 42, '#ff8a2a', 0.5, () => {
+              G.FX.ring(x, y, 6, 50, '#ffb040', 0.3, 5); G.FX.burst(x, y, '#ff8a2a', 12, 160);
+              G.Audio.sfx('boom');
+              if (near(k.pl, x, y, 42)) k.pl.hurt(e.dmg, G.Game.now);
+            })
+          });
+        }
+        G.Audio.sfx('shoot');
+      }
+      return { mx: k.nx * 0.8, my: k.ny * 0.8 };
+    },
+
+    valentine(e, k) {
+      // Kilo Kilo: sube con el paraguas, su sombra te persigue y cae con 10.000 kg.
+      if (e.state === 'up') {
+        e.stateT -= k.dt;
+        e.z = Math.min(220, (e.z || 0) + 420 * k.dt);
+        const m = e.ai.shadow;
+        if (e.stateT > 0.5) { m.x = G.U.lerp(m.x, k.pl.x, Math.min(1, 3 * k.dt)); m.y = G.U.lerp(m.y, k.pl.y, Math.min(1, 3 * k.dt)); }
+        if (e.stateT <= 0) {
+          e.x = m.x; e.y = m.y; e.z = 0; e.hidden = false; e.state = 'walk'; e.atkAt = k.now;
+          G.FX.ring(m.x, m.y, 10, 60, '#ffe14d', 0.35, 6); G.FX.burst(m.x, m.y, '#d8c8b0', 14, 160);
+          G.Audio.sfx('boom'); G.Camera.kick(0.4);
+          if (near(k.pl, m.x, m.y, 50)) k.pl.hurt(e.dmg * 1.5, k.now);
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 4.0, 5.0, 420)) {
+        e.state = 'up'; e.stateT = 2.4; e.hidden = true;
+        e.ai.shadow = G.FX.mark(k.pl.x, k.pl.y, 50, '#ff3a3a', 2.4);
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    // ---------------- Alabasta (jefes de isla) ----------------
 
     mr3(e, k) {
       // Charco de cera bajo tus pies: frena.
@@ -433,7 +546,7 @@ G.Bosses = (() => {
         e.atkAt = k.now;
         if (turn(e) % 3 === 0 && (e.ai.zombies || []).filter(z => !z.dead).length < 6) {
           // Levanta zombis del suelo.
-          const base = G.Enemies.LIST.find(d => d.id === 'marine');
+          const base = G.Enemies.BY_ID.zombie;
           const zdef = Object.assign({}, base, { name: 'Zombi', hp: 70, spd: 46, dmg: 10, xp: 6 });
           e.ai.zombies = (e.ai.zombies || []).filter(z => !z.dead);
           for (let i = 0; i < 4; i++) {

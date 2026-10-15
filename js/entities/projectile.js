@@ -3,6 +3,9 @@
  *   foe: true  -> los dispara un enemigo y te dañan a ti
  *     homing   giro hacia ti (murciélagos de Moria)
  *     back     segundos de ida; luego vuelve a `owner` (mano de Buggy). keep: no se rompe al darte
+ *     bounce   rebotes en la costa y en árboles o rocas (bates de Mr. 9)
+ *     orbit    { owner, r, w }: gira alrededor de owner mientras viva (cuchillas de Miss Wednesday)
+ *     land     función(x, y) al caer al suelo sin darte (mocos-bomba de Mr. 5)
  */
 G.Projectiles = (() => {
   let list = [];
@@ -37,12 +40,29 @@ G.Projectiles = (() => {
           p.vy = G.U.damp(p.vy, ny * sp, p.homing, dt);
         }
       }
-      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.orbit) {
+        const o = p.orbit;
+        if (o.owner.dead) { p.life = 0; continue; }
+        o.a = (o.a || 0) + o.w * dt;
+        const nx = o.owner.x + Math.cos(o.a) * o.r, ny = o.owner.y + Math.sin(o.a) * o.r * 0.8;
+        p.vx = (nx - p.x) / dt; p.vy = (ny - p.y) / dt;      // para que el dibujo apunte bien
+        p.x = nx; p.y = ny; p.life = 1;
+      } else if (p.bounce > 0) {
+        const nx = p.x + p.vx * dt, ny = p.y + p.vy * dt;
+        const blocked = (x, y) => G.World.waterAt(x, y) === 2 || !G.World.isFree(x, y, 4);
+        if (blocked(nx, ny)) {
+          if (blocked(nx, p.y)) p.vx = -p.vx;
+          if (blocked(p.x, ny)) p.vy = -p.vy;
+          p.bounce--;
+        }
+        p.x += p.vx * dt; p.y += p.vy * dt;
+      } else { p.x += p.vx * dt; p.y += p.vy * dt; }
+      if (p.foe && p.land && p.life <= 0) { p.land(p.x, p.y); p.land = null; }
 
       if (p.foe) {
         if (!pl.dead && G.U.dist2(p.x, p.y, pl.x, pl.y) < (p.r + pl.r) ** 2) {
           pl.hurt(p.dmg, now);
-          if (!p.keep) p.life = 0;
+          if (!p.keep) { p.life = 0; if (p.land) { p.land(p.x, p.y); p.land = null; } }
         }
         continue;
       }
@@ -95,6 +115,14 @@ G.Projectiles = (() => {
           ctx.strokeStyle = p.color; ctx.lineWidth = 4;
           ctx.beginPath(); ctx.arc(p.x - Math.cos(a) * p.r * 0.6, y - Math.sin(a) * p.r * 0.6, p.r, a - 1.1, a + 1.1); ctx.stroke();
           ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+          break;
+        }
+        case 'club': {
+          ctx.save(); ctx.translate(Math.round(p.x), Math.round(y)); ctx.rotate(p.age * 14);
+          ctx.fillStyle = '#1a1220'; ctx.fillRect(-9, -3, 18, 6);
+          ctx.fillStyle = '#c08048'; ctx.fillRect(-7, -2, 14, 4);
+          ctx.fillStyle = '#e8b878'; ctx.fillRect(1, -2, 6, 2);
+          ctx.restore();
           break;
         }
         case 'bat': {

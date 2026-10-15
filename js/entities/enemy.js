@@ -145,7 +145,7 @@ G.Enemy = class Enemy {
   damage(amount, now, src = null, col = null) {
     if (this.dead || this.hidden) return;
     if (G.Game.god) amount = Math.max(amount, this.hp);
-    else if (this.immune) {
+    else if (this.immune || this.def.invincible) {
       if (now - this.hurtAt > 0.4) { this.hurtAt = now; G.FX.text(this.x, this.y - this.r * 2, '0', '#c8d0e0'); }
       return;
     }
@@ -317,7 +317,8 @@ G.EnemyMgr = (() => {
   return {
     clear, add, update, query, nearest, collect,
     get list() { return list; }, get count() { return list.length; },
-    boss() { return list.find(e => e.boss && !e.dead) || null; }
+    boss() { return list.find(e => e.boss && !e.dead) || null; },
+    bosses() { return list.filter(e => e.boss && !e.dead); }
   };
 })();
 

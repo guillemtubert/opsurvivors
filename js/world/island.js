@@ -2,7 +2,11 @@
  *
  *   explorar ──(3:00)──> Buster Call: cada vez más enemigos y más fuertes
  *      │
- *      └─ Den Den Mushi (cuando quieras) ──> jefe ──> el Going Merry se abre ──> siguiente isla
+ *      └─ Den Den Mushi (cuando quieras) ──> jefe(s) ──> el barco se abre ──> siguiente isla
+ *
+ * Isla de huida (escape): no hay Den Den Mushi; el jefe, invencible, aparece a los
+ * ESCAPE_AT segundos y te persigue. El barco está abierto desde el principio.
+ * Dúo: def.boss es una lista; el barco se abre cuando caen todos.
  *
  * Los cofres son opcionales: si no los coges, sigues más débil. Todo se
  * coloca con la semilla de la isla: cofres repartidos alrededor del centro,
@@ -48,6 +52,7 @@ G.Island = (() => {
     G.World.reserve(px, py, 3);
 
     const taken = [{ x: 0, y: 0 }, { x: px, y: py }];
+    if (d.escape) snail = { x: 1e9, y: 1e9, none: true };      // sin Den Den Mushi (nunca está cerca)
     // Den Den Mushi: a media distancia, lejos del muelle y del centro.
     for (let k = 0; k < 200 && !snail; k++) {
       const a = rnd() * 6.283, r = R * (0.35 + rnd() * 0.25);
@@ -55,13 +60,13 @@ G.Island = (() => {
       if (land(x, y) && far(x, y, taken, R * 0.45)) snail = { x, y };
     }
     if (!snail) snail = { x: R * 0.3, y: 0 };
-    taken.push(snail);
-    G.World.reserve(snail.x, snail.y, 2);
+    if (!snail.none) { taken.push(snail); G.World.reserve(snail.x, snail.y, 2); }
 
     // Cofres: repartidos en sectores alrededor del centro.
-    for (let c = 0; c < d.chests; c++) {
+    const nChests = d.chests || 5;
+    for (let c = 0; c < nChests; c++) {
       for (let k = 0; k < 120; k++) {
-        const a = (c + 0.15 + rnd() * 0.7) / d.chests * 6.283, r = R * (0.25 + rnd() * 0.55);
+        const a = (c + 0.15 + rnd() * 0.7) / nChests * 6.283, r = R * (0.25 + rnd() * 0.55);
         const x = Math.cos(a) * r, y = Math.sin(a) * r;
         if (!land(x, y) || !far(x, y, taken, R * 0.22)) continue;
         const ch = { x, y, open: false };
@@ -74,8 +79,9 @@ G.Island = (() => {
 
   // ---------------- partida ----------------
 
-  const bossDef = () => G.Enemies.BOSS_BY_ID[def.boss];
-  const bossName = () => bossDef().name.replace('Capitán ', '');
+  const bossDefs = () => G.Islands.bossIds(def).map(id => G.Enemies.BOSS_BY_ID[id]);
+  const bossName = () => bossDefs().map(b => b.name.replace('Capitán ', '')).join(' y ');
+  const bossTitle = () => bossDefs().map(b => b.title).join(' · ');
 
   function update(dt, pl, now) {
     if (!def) return;
@@ -90,7 +96,8 @@ G.Island = (() => {
       }
     }
 
-    if (!warned && t >= G.Islands.BUSTER_AT - 20 && boss === 'idle') {
+    if (def.escape && boss === 'idle' && t >= G.Islands.ESCAPE_AT) summon();
+    if (!warned && t >= G.Islands.BUSTER_AT - 20 && boss === 'idle' && !def.escape) {
       warned = true;
       G.HUD.banner('Buster Call en 20 s', 'Llama al jefe con el Den Den Mushi o corre', '#ff8a5a');
     }
@@ -102,10 +109,10 @@ G.Island = (() => {
 
     // Qué se puede hacer donde estás.
     action = null;
-    if (boss === 'idle' && G.U.dist2(snail.x, snail.y, pl.x, pl.y) < USE_R * USE_R) {
+    if (boss === 'idle' && !snail.none && G.U.dist2(snail.x, snail.y, pl.x, pl.y) < USE_R * USE_R) {
       action = { label: 'Llamar a ' + bossName(), fn: summon };
     } else if (G.U.dist2(dock.endX, dock.endY, pl.x, pl.y) < USE_R * USE_R * 1.4) {
-      action = boss === 'dead' ? { label: 'Zarpar', fn: () => G.Game.nextIsland() }
+      action = boss === 'dead' || def.escape ? { label: 'Zarpar', fn: () => G.Game.nextIsland() }
                                : { label: 'Derrota a ' + bossName() + ' para zarpar', off: true };
     }
     G.HUD.action(action);
@@ -117,13 +124,13 @@ G.Island = (() => {
   function summon() {
     const pl = G.Game.player;
     boss = 'called';
-    G.Spawner.summon(bossDef(), pl);
-    G.HUD.banner('¡Llega ' + bossDef().name + '!', bossDef().title, '#ff5f6d');
+    bossDefs().forEach((b, i) => G.Spawner.summon(b, pl, i));
+    G.HUD.banner((def.escape ? '¡Huye! Llega ' : '¡Llega ') + bossName() + '!', def.escape ? 'No se le puede vencer: corre al barco' : bossTitle(), '#ff5f6d');
     G.Audio.sfx('boss');
     G.Audio.music('boss');
     // Llamarlo antes del Buster Call tiene premio.
     const left = G.Islands.BUSTER_AT - t;
-    if (left > 0) {
+    if (left > 0 && !def.escape) {
       const bonus = Math.round(left * 1.5);
       pl.coins += bonus;
       G.FX.text(pl.x, pl.y - 44, '¡Valiente! +' + bonus + ' ฿', '#ffd23f', true);
@@ -131,8 +138,10 @@ G.Island = (() => {
   }
 
   function onBossKilled(e) {
+    // Dúo: el barco se abre cuando caen todos.
+    if (G.EnemyMgr.bosses().some(b => b !== e)) { G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Aún queda otro', '#ffd23f'); return; }
     boss = 'dead';
-    G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Coge su cofre y sube al Going Merry', '#ffd23f');
+    G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Coge su cofre y sube al barco', '#ffd23f');
   }
 
   /** Segundos de Buster Call (o -1 si aún no ha empezado). */
@@ -143,7 +152,8 @@ G.Island = (() => {
     if (!def) return '';
     const got = chests.filter(c => c.open).length;
     const box = 'Cofres ' + got + '/' + chests.length;
-    if (boss === 'dead') return box + ' · ¡Al Going Merry!';
+    if (def.escape) return box + (boss === 'idle' ? ' · Llega ' + bossName() + ' en ' + Math.max(0, Math.ceil(G.Islands.ESCAPE_AT - t)) + ' s' : ' · ¡Huye al barco!');
+    if (boss === 'dead') return box + ' · ¡Al barco!';
     if (boss === 'called') return box + ' · Derrota a ' + bossName();
     const left = G.Islands.BUSTER_AT - t;
     return box + ' · ' + (left > 0 ? 'Buster Call ' + G.U.mmss(Math.ceil(left)) : '¡BUSTER CALL!');
@@ -186,7 +196,7 @@ G.Island = (() => {
         }
         ctx.fillStyle = '#3a2410';
         for (let y = y0 + 20; y < y1; y += 64) { ctx.fillRect(x0 - 8, y, 8, 12); ctx.fillRect(x1, y, 8, 12); }
-        if (boss === 'dead') {
+        if (boss === 'dead' || def.escape) {
           ctx.globalAlpha = 0.35 + Math.sin(now * 5) * 0.2;
           ctx.fillStyle = '#ffd23f';
           ctx.beginPath(); ctx.ellipse(dock.endX, dock.endY, 30, 12, 0, 0, 6.283); ctx.fill();
@@ -194,15 +204,16 @@ G.Island = (() => {
         }
       } });
     }
-    put('merry', dock.shipX, dock.shipY, { bob: true, noShadow: true });
-    put('denden', snail.x, snail.y, { glow: boss === 'idle' ? '#ff9ec4' : null, bob: boss === 'idle' });
+    const ship = def.ship || G.Islands.SAGA.ship || 'merry';
+    put(G.Props.has(ship) ? ship : 'merry', dock.shipX, dock.shipY, { bob: true, noShadow: true });
+    if (!snail.none) put('denden', snail.x, snail.y, { glow: boss === 'idle' ? '#ff9ec4' : null, bob: boss === 'idle' });
     for (const c of chests) put(c.open ? 'chestOpen' : 'chest', c.x, c.y, { glow: c.open ? null : '#ffd23f' });
   }
 
   /** Puntos para el minimapa. */
   function pois() {
     if (!def) return null;
-    return { chests, snail, boss, dock };
+    return { chests, snail, boss, dock, escape: !!def.escape };
   }
 
   return {

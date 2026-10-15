@@ -1,3 +1,18 @@
+# Toda la historia (por fases)
+
+Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ningún jefe repite ataques.
+
+- [x] Fase 0 — Motor: islas de huida, dúos, efectos sobre el jugador (aturdir, piedra, controles al revés,
+      sin ataques, empujón), humo que tapa la vista, proyectiles que rebotan / giran / caen y estallan,
+      las 11 sagas con su enemigo provisional y su barco (Sunny desde Post-Enies Lobby; usa el Merry hasta tener su dibujo)
+- [x] Fase 1 — Smoker (Loguetown, huida), Mr. 9 y Miss Wednesday (Reverse Mountain), Mr. 5 y Miss Valentine (Whisky Peak)
+- [ ] Fase 2 — Bellamy, Foxy, Franky, Garp (huida), Perona, Oars + dibujo del Thousand Sunny
+- [ ] Fase 3 — Kizaru (huida), Hancock, Magellan (huida), Akainu (huida), Rayleigh, PX-1, Hody
+- [ ] Fase 4 — Caesar, Doflamingo, Jack, Katakuri, Big Mom (huida)
+- [ ] Fase 5 — Queen, King, Kaido (dos fases), San Saturn, Loki, Sommers y Killingham, Gunko, Shamrock (comprobar en la wiki)
+- [ ] Biomas propios: canales, selva, prisión, manglar, coral, fuego/hielo, juguetes, dulces, Japón, futurista, bosque gigante
+- [ ] Hojas de 8 direcciones de los jefes nuevos y de los enemigos de cada saga
+
 # Islas con objetivo (estilo Megabonk, a lo One Piece)
 
 ## Diseño acordado

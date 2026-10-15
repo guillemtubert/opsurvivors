@@ -34,7 +34,7 @@ G.Spawner = (() => {
   }
 
   function pickDef(t) {
-    const bag = G.Enemies.bagAt(t);
+    const bag = G.Enemies.bagAt(t, G.Islands.SAGA.enemies);
     let r = Math.random() * bag.reduce((a, e) => a + e.w, 0);
     for (const e of bag) { r -= e.w; if (r <= 0) return e; }
     return bag[0];
@@ -49,8 +49,8 @@ G.Spawner = (() => {
   }
 
   /** El jefe de la isla, llamado con el Den Den Mushi: aparece cerca, en tierra. */
-  function summon(def, pl) {
-    const a = Math.random() * 6.283;
+  function summon(def, pl, i = 0) {
+    const a = Math.random() * 6.283 + i * 2.1;
     const [x, y] = landPoint(pl, a, 24) || [pl.x + 260, pl.y];
     return G.EnemyMgr.add(new G.Enemy(def, { x, y, boss: true, dmgK: dmgK(G.Game.time) * 0.8 }));
   }

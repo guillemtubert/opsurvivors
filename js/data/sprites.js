@@ -331,6 +331,126 @@ G.SPRITES = {
       '....|kok.|.kok|....',
       '...k|kkk.|.kkk|k...'] },
 
+  // Smoker: pelo gris de punta, dos puros, chaqueta blanca de la Marina sin camisa.
+  smoker: { scale: 3, pal: { h: '#c8ccd4', p: '#8a5a3a', o: '#ff8a2a', j: '#f4f1ea', J: '#c4bdb0', b: '#4a6a9a' },
+    rows: [
+      '....|kkkk|kkkk|....',
+      '...k|hhkh|hkhh|k...',
+      '..kh|hhhh|hhhh|hk..',
+      '..kh|ssss|ssss|hk..',
+      '..ks|kkss|sskk|sk..',
+      '..ks|skss|ssks|sk..',
+      '.oks|sspp|ppss|sko.',
+      '...k|ssmm|mmss|k...',
+      '..kk|jjss|ssjj|kk..',
+      '.kjj|jsss|sssj|jjk.',
+      '.kjj|jsSs|sSsj|jjk.',
+      '.kjj|jsss|sssj|jjk.',
+      '.kjJ|jkkk|kkkj|Jjk.',
+      '.ksk|jbbb|bbbj|ksk.',
+      '...k|jbbb|bbbj|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '....|kbk.|.kbk|....',
+      '...k|kkk.|.kkk|k...'] },
+
+  // Mr. 9: pelo en punta, banda de capitán y un bate en cada mano.
+  mr9: { scale: 3, pal: { h: '#e05a2a', c: '#f4f1ea', r: '#c83a3a', a: '#c08048', A: '#8a5a2a', b: '#2a2a3a' },
+    rows: [
+      '....|.khk|hk..|....',
+      '...k|hhhh|hhhk|....',
+      '..kh|hhhh|hhhh|k...',
+      '..kr|rrrr|rrrr|k...',
+      '..ks|ssss|ssss|k...',
+      '..ks|kkss|kkss|k...',
+      '..ks|ssss|ssss|k...',
+      '...k|smmm|mmsk|....',
+      'ka.k|kccc|cckk|.a.k',
+      'ka.k|cccc|cccc|kak.',
+      'kaks|cccc|cccc|ska.',
+      'kAks|cccc|cccc|skAk',
+      '.k.k|bbbb|bbbb|k.k.',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '....|kbk.|.kbk|....',
+      '...k|kkk.|.kkk|k...'] },
+
+  // Miss Wednesday: coleta azul, camisa clara y pantalón.
+  wednesday: { scale: 3, pal: { h: '#3a8ad8', H: '#2a6ab8', c: '#f4d0e0', C: '#d8a0b8', b: '#3a3a5a' },
+    rows: [
+      '....|kkkk|kkkk|.kk.',
+      '...k|hhhh|hhhh|khhk',
+      '..kh|hhhh|hhhh|hhHk',
+      '..kh|ssss|ssss|khHk',
+      '..ks|kkss|sskk|skHk',
+      '..ks|skss|ssks|sk.k',
+      '..ks|ssss|ssss|sk..',
+      '...k|ssmm|mmss|k...',
+      '..kk|cccc|cccc|kk..',
+      '.kcc|cccc|cccc|cck.',
+      '.ksc|cCcc|ccCc|csk.',
+      '.ksk|cccc|cccc|ksk.',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '...k|bbbb|bbbb|k...',
+      '....|kbk.|.kbk|....',
+      '...k|kkk.|.kkk|k...'] },
+
+  // Mr. 5: gafas de sol, pelo en tupé y abrigo largo.
+  mr5: { scale: 3, pal: { h: '#1e1e2a', g: '#2a2a3a', c: '#3a6ac0', C: '#2a4a90', y: '#f2d063' },
+    rows: [
+      '....|.kkk|kk..|....',
+      '...k|hhhh|hhk.|....',
+      '..kh|hhhh|hhhk|....',
+      '..kh|ssss|ssss|k...',
+      '..ks|gggg|gggg|k...',
+      '..ks|gggk|kggg|k...',
+      '..ks|ssss|ssss|k...',
+      '...k|smmm|mmsk|....',
+      '..kk|cccy|yccc|kk..',
+      '.kcc|cccc|cccc|cck.',
+      '.kcc|cccc|cccc|cck.',
+      '.ksc|cccc|cccc|csk.',
+      '.kSk|cccc|cccc|kSk.',
+      '...k|cCCC|CCCc|k...',
+      '...k|CCCC|CCCC|k...',
+      '...k|CCCC|CCCC|k...',
+      '...k|CCCC|CCCC|k...',
+      '...k|CCCC|CCCC|k...',
+      '....|kCk.|.kCk|....',
+      '...k|kkk.|.kkk|k...'] },
+
+  // Miss Valentine: paraguas amarillo, pelo corto y vestido de limones.
+  valentine: { scale: 3, pal: { y: '#f2d063', Y: '#c9a23a', h: '#e8a040', c: '#f4f1ea', l: '#9ad04a' },
+    rows: [
+      '..ky|yyyy|yyyy|yk..',
+      '.kyy|yYyy|yyYy|yyk.',
+      'kYYY|YYYY|YYYY|YYYk',
+      '....|..kk|....|....',
+      '...k|hhhk|hhk.|....',
+      '..kh|hhhh|hhhk|....',
+      '..kh|ssss|ssss|k...',
+      '..ks|kkss|kkss|k...',
+      '...k|ssmm|mmsk|....',
+      '..kk|cccc|cccc|kk..',
+      '.kcc|clcc|cclc|ck..',
+      '.ksc|cccc|lccc|csk.',
+      '.kSk|cclc|cccc|kSk.',
+      '...k|cccc|cccc|k...',
+      '..kc|cccc|cccc|ck..',
+      '..kc|cccc|cccc|ck..',
+      '...k|ssss|ssss|k...',
+      '...k|ssk.|.kss|k...',
+      '....|kck.|.kck|....',
+      '...k|kkk.|.kkk|k...'] },
+
   // Mr. 3: pelo en forma de 3 (con su llama), gafas y traje a rayas.
   mr3: { scale: 3, pal: { h: '#1e1e2a', f: '#ffb040', g: '#d8e4f0', c: '#e8e0f0', C: '#8a7aa8', y: '#f2d063' },
     rows: [
@@ -545,5 +665,20 @@ G.SPRITES = {
       '....|kCk.|.kCk|....',
       '...k|kkk.|.kkk|k...'] }
 };
+
+// Enemigos provisionales de cada saga: dibujos ya hechos (marine, pirata) con otros colores.
+(() => {
+  const swap = (base, pal) => ({ rows: G.SPRITES[base].rows, pal: Object.assign({}, G.SPRITES[base].pal, pal) });
+  Object.assign(G.SPRITES, {
+    baroque:     swap('pirate', { r: '#8a5a3a', R: '#6a4028', h: '#2a2230', c: '#5a4a3a' }),
+    enelsoldier: swap('pirate', { r: '#f4f1ea', R: '#c4bdb0', h: '#f2d063', c: '#e88a2a', a: '#c8a060' }),
+    cp9agent:    swap('marine', { c: '#2a2a36', b: '#1a1a24', B: '#101018' }),
+    zombie:      swap('pirate', { s: '#9ac08a', S: '#6a9060', r: '#5e5070', R: '#3a3046', h: '#3a3446' }),
+    toysoldier:  swap('marine', { c: '#c83a3a', b: '#f2d063', B: '#c9a23a' }),
+    chess:       swap('marine', { c: '#e8e0f0', b: '#2a2a3a', B: '#1a1a26' }),
+    gifter:      swap('pirate', { r: '#4a3a2a', R: '#2a2018', h: '#c83a3a', c: '#6a2a2a' }),
+    seraphim:    swap('marine', { c: '#f4f1ea', b: '#ffd23f', B: '#c9a23a', s: '#5a3a2a', S: '#3a2418' })
+  });
+})();
 
 /* Las hojas de sprites propias, que sustituyen a estos dibujos, van en js/data/custom-sprites.js. */

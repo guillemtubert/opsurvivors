@@ -23,7 +23,7 @@ G.Combat = (() => {
   }
 
   function tick(dt, pl, now) {
-    if (pl.dead) return;
+    if (pl.dead || !pl.canAttack) return;
     const m = pl.activeMove;
     if (!m) return;
     if (m.kind === 'orbit') { orbit(pl, m, dt, now); return; }

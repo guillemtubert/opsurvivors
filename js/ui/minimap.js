@@ -55,15 +55,15 @@ G.Minimap = (() => {
     ctx.drawImage(base, 0, 0);
     const p = G.Island.pois();
     if (p) {
-      ctx.fillStyle = p.boss === 'dead' ? '#ffd23f' : '#8a5a2e';
+      const open = p.boss === 'dead' || p.escape;
+      ctx.fillStyle = open ? '#ffd23f' : '#8a5a2e';
       const [a, b] = toMap(p.dock.x0, p.dock.y0), [c, d] = toMap(p.dock.x1, p.dock.y1);
       ctx.fillRect(a, b, Math.max(2, c - a), Math.max(2, d - b));
-      dot(p.dock.shipX, p.dock.shipY, p.boss === 'dead' ? '#ffd23f' : '#c9a46a', 3);
+      dot(p.dock.shipX, p.dock.shipY, open ? '#ffd23f' : '#c9a46a', 3);
       for (const c of p.chests) if (!c.open) dot(c.x, c.y, '#ffd23f');
-      if (p.boss === 'idle') dot(p.snail.x, p.snail.y, '#ff9ec4', 3);
+      if (p.boss === 'idle' && !p.snail.none) dot(p.snail.x, p.snail.y, '#ff9ec4', 3);
     }
-    const boss = G.EnemyMgr.boss();
-    if (boss && Math.floor(now * 4) % 2) dot(boss.x, boss.y, '#ff3a4a', 3);
+    if (Math.floor(now * 4) % 2) for (const b of G.EnemyMgr.bosses()) dot(b.x, b.y, '#ff3a4a', 3);
     dot(pl.x, pl.y, '#ffffff', 2);
   }
 

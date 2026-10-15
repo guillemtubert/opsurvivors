@@ -98,11 +98,16 @@ js/
 ## Alcance actual
 
 Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y **Sanji**, y el
-**marine** como enemigo (`js/data/scope.js`). Las tres sagas están abiertas, con sus 11 islas
-y un jefe en cada una; se elige la saga en el puerto. Con `allSagas: false`, cada saga se abre
-al completar la anterior.
+La historia entera está en `js/data/islands.js`: 11 sagas y 37 islas, una por arco. Cada saga
+lleva su enemigo normal (de momento, dibujos provisionales) y su barco (el Thousand Sunny desde
+Post-Enies Lobby). Una isla se activa sola en cuanto existen todos sus jefes, y las sagas sin
+ninguna isla activa no salen en el puerto. Con `allSagas: false` (`js/data/scope.js`), cada
+saga se abre al completar la anterior. Hoja de ruta por fases: `tasks/todo.md`.
 
-Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js`):
+Tipos de isla: **jefe** (Den Den Mushi), **dúo** (dos jefes a la vez, una barra con la vida de los
+dos) y **huida** (`escape`: el jefe es invencible, aparece a los 12 s y hay que llegar al barco).
+
+Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js`). Hechos:
 
 | Saga | Isla | Jefe | Ataques |
 |---|---|---|---|
@@ -111,13 +116,19 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | | Villa Syrup | Kuro | Shakushi: se esfuma y caen cortes en línea a tu alrededor |
 | | Baratie | Don Krieg | Bombas MH5 (nube de gas) · lanza que estalla en cono |
 | | Arlong Park | Arlong | Se sumerge (aleta) y emerge bajo tus pies · dientes clavados en el suelo |
-| Alabasta | Little Garden | Mr. 3 | Candle Lock: jaula de cera con una salida · charcos que frenan |
+| | Loguetown | Smoker (huida) | White Blow: brazo de humo que te arrastra · nubes que tapan la vista · vendaval de Dragon |
+| Alabasta | Reverse Mountain | Mr. 9 y Miss Wednesday | Bates que rebotan · cuchillas que giran a su alrededor |
+| | Whisky Peak | Mr. 5 y Miss Valentine | Mocos-bomba · sube y su sombra te persigue hasta caer encima |
+| | Little Garden | Mr. 3 | Candle Lock: jaula de cera con una salida · charcos que frenan |
 | | Drum | Wapol | Baku Baku: te aspira y muerde · salto que aplasta |
 | | Alabasta | Crocodile | Desert Spada: grietas que avanzan · Sables: tornado que te sigue |
-| Cielo / Thriller Bark | Skypiea | Enel | Sango: rayos que te persiguen · Raigo: zona enorme |
-| | Enies Lobby | Lucci | Rankyaku · Tekkai (inmune) · Rokuogan (estallido si estás cerca) |
-| | Thriller Bark | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
-| (sin isla) | | Imu | Látigo negro que gira · anillos de espinas con un hueco |
+| Islas del Cielo | Skypiea | Enel | Sango: rayos que te persiguen · Raigo: zona enorme |
+| Water 7 | Enies Lobby | Lucci | Rankyaku · Tekkai (inmune) · Rokuogan (estallido si estás cerca) |
+| Thriller Bark | Mástil | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
+| Final | El Trono Vacío | Imu (jefe final) | Látigo negro que gira · anillos de espinas con un hueco |
+
+Efectos que pueden poner los jefes al jugador (`player.affect`): aturdido, piedra, controles al
+revés, sin ataques; y empujones (`player.push`).
 
 Andan en 8 direcciones Luffy, Sanji, el marine y todos los jefes (Imu, sin isla, usa su atlas de
 Treasure Cruise). Al generar las hojas se quitan también las bolsas de fondo encerradas en el dibujo

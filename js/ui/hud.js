@@ -47,12 +47,16 @@ G.HUD = (() => {
     set('kills', pl.kills, v => { el.kills.textContent = G.U.fmt(v); });
     set('coins', pl.coins, v => { el.coins.textContent = G.U.fmt(v); });
 
-    const b = G.EnemyMgr.boss();
-    set('boss', b ? b.name : '', v => {
+    const bs = G.EnemyMgr.bosses(), b = bs[0];
+    const inv = b && b.def.invincible;
+    set('boss', bs.map(o => o.name).join(' y '), v => {
       el.boss.classList.toggle('hidden', !v);
-      if (v) el.bossName.innerHTML = '<b>' + v + '</b> <span>' + (b.title || '') + '</span>';
+      if (v) el.bossName.innerHTML = '<b>' + v + '</b> <span>' + (inv ? 'Invencible: ¡huye!' : bs.map(o => o.title || '').join(' · ')) + '</span>';
     });
-    if (b) set('bossHp', Math.ceil(b.hp / b.maxHp * 200), v => { el.bossHp.style.width = (v / 2) + '%'; });
+    if (b) {
+      const hp = bs.reduce((a, o) => a + o.hp, 0), max = bs.reduce((a, o) => a + o.maxHp, 0);
+      set('bossHp', inv ? 200 : Math.ceil(hp / max * 200), v => { el.bossHp.style.width = (v / 2) + '%'; });
+    }
 
     // Recarga de cada técnica.
     pl.moves.forEach((m, i) => {
