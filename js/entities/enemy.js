@@ -59,7 +59,10 @@ G.Enemy = class Enemy {
     const slow = this.boss ? 1 : [1, 0.6, 0.45][G.World.waterAt(this.x, this.y)];
     let spd = this.spd * slow;
 
-    switch (this.behavior) {
+    // Jefes: cada uno con sus ataques (entities/bosses.js).
+    const ai = this.boss ? G.Bosses.update(this, { dt, now, pl, dx, dy, d, nx, ny }) : null;
+    if (ai) { mx = ai.mx; my = ai.my; spd = this.spd * (ai.spd || 1); }
+    else switch (this.behavior) {
       case 'ranged': {
         if (d > 230) { mx = nx; my = ny; }
         else if (d < 150) { mx = -nx; my = -ny; }
@@ -95,134 +98,6 @@ G.Enemy = class Enemy {
         }
         break;
       }
-      case 'charger': {
-        if (this.state === 'aim') {
-          this.stateT -= dt;
-          if (this.stateT <= 0) { this.state = 'dash'; this.stateT = 0.55; }
-        } else if (this.state === 'dash') {
-          this.stateT -= dt;
-          mx = this.dashX; my = this.dashY; spd = this.spd * 4;
-          if (Math.random() < 0.5) G.FX.puff(this.x, this.y, '#c9b28a', 1);
-          if (this.stateT <= 0) this.state = 'walk';
-        } else {
-          mx = nx; my = ny;
-          this.t1 -= dt;
-          if (this.t1 <= 0 && d < 340) {
-            this.t1 = G.U.rand(3.2, 4.4);
-            this.state = 'aim'; this.stateT = 0.7;
-            this.dashX = nx; this.dashY = ny;
-            G.FX.mark(this.x, this.y, 0, '#ff3a3a', 0.7, 'line', { a: Math.atan2(ny, nx), len: this.spd * 4 * 0.55, w: this.r * 2 });
-          }
-        }
-        break;
-      }
-      case 'fan': {
-        mx = nx * 0.8; my = ny * 0.8;
-        this.t1 -= dt;
-        if (this.t1 <= 0 && d < 380) {
-          this.t1 = G.U.rand(2.0, 2.6);
-          const a0 = Math.atan2(dy, dx);
-          const ring = Math.random() < 0.3;
-          const n = ring ? 14 : 5;
-          for (let i = 0; i < n; i++) {
-            const a = ring ? i / n * 6.283 : a0 + (i - (n - 1) / 2) * 0.22;
-            this.shoot(Math.cos(a), Math.sin(a), ring ? 140 : 200, this.dmg * 0.6, 'knife');
-          }
-          G.Audio.sfx('slash');
-          this.atkAt = now;
-        }
-        break;
-      }
-      case 'zoner': {
-        mx = nx * 0.7; my = ny * 0.7;
-        this.t1 -= dt;
-        if (this.t1 <= 0 && d < 420) {
-          this.t1 = G.U.rand(2.6, 3.4);
-          this.atkAt = now;
-          for (let i = 0; i < 3; i++) {
-            const zx = pl.x + (i ? G.U.rand(-70, 70) : 0), zy = pl.y + (i ? G.U.rand(-50, 50) : 0);
-            const m = G.FX.mark(zx, zy, 34, '#e0c070', 1.0);
-            m.onEnd = () => {
-              G.FX.burst(zx, zy, '#e0c070', 14, 160);
-              G.FX.ring(zx, zy, 8, 40, '#e0c070', 0.3, 4);
-              if (G.U.dist(pl.x, pl.y, zx, zy) < 34 + pl.r) pl.hurt(this.dmg * 0.8, now);
-            };
-            G.Hazards.add(m);
-          }
-        }
-        break;
-      }
-      case 'blinker': {
-        // Shakushi: se esfuma, reaparece a tu lado, avisa y corta en línea. 3 veces y descansa.
-        if (this.state === 'vanish') {
-          this.stateT -= dt;
-          if (this.stateT <= 0) {
-            const p = this.besidePlayer(pl, 120);
-            if (p) [this.x, this.y] = p;
-            G.FX.puff(this.x, this.y, '#2a2a3a', 4);
-            const [ax, ay] = G.U.norm(pl.x - this.x, pl.y - this.y);
-            this.dashX = ax; this.dashY = ay;
-            this.state = 'aim'; this.stateT = 0.45;
-            G.FX.mark(this.x, this.y, 0, '#ff3a3a', 0.45, 'line', { a: Math.atan2(ay, ax), len: this.spd * 7 * 0.3, w: this.r * 1.6 });
-          }
-        } else if (this.state === 'aim') {
-          this.stateT -= dt;
-          if (this.stateT <= 0) { this.state = 'dash'; this.stateT = 0.3; G.Audio.sfx('slash'); }
-        } else if (this.state === 'dash') {
-          this.stateT -= dt;
-          mx = this.dashX; my = this.dashY; spd = this.spd * 7;
-          if (Math.random() < 0.6) G.FX.puff(this.x, this.y - 8, '#c8c8d8', 1);
-          if (this.stateT <= 0) {
-            if (--this.combo > 0) { this.state = 'vanish'; this.stateT = 0.3; }
-            else this.state = 'walk';
-          }
-        } else {
-          mx = nx; my = ny;
-          this.t1 -= dt;
-          if (this.t1 <= 0 && d < 380) {
-            this.t1 = G.U.rand(4.5, 5.5);
-            this.combo = 3;
-            this.state = 'vanish'; this.stateT = 0.35;
-            G.FX.puff(this.x, this.y, '#2a2a3a', 4);
-          }
-        }
-        break;
-      }
-      case 'barrage': {
-        // Ráfagas de balas en cono; una de cada tres veces, bombas de gas (MH5) que dejan zona.
-        if (this.state === 'aim') {
-          this.stateT -= dt;
-          if (this.stateT <= 0) { this.state = 'fire'; this.stateT = 0; this.volleys = 3; }
-        } else if (this.state === 'fire') {
-          this.stateT -= dt;
-          if (this.stateT <= 0) {
-            this.stateT = 0.2;
-            const a0 = this.aim + (this.volleys % 2 ? 0.07 : -0.07);
-            for (let i = 0; i < 7; i++) {
-              const a = a0 + (i - 3) * 0.14;
-              this.shoot(Math.cos(a), Math.sin(a), 230, this.dmg * 0.45);
-            }
-            G.Audio.sfx('shoot');
-            this.atkAt = now;
-            if (--this.volleys <= 0) this.state = 'walk';
-          }
-        } else {
-          mx = nx * 0.6; my = ny * 0.6;
-          this.t1 -= dt;
-          if (this.t1 <= 0 && d < 400) {
-            this.t1 = G.U.rand(3.0, 3.8);
-            this.atkAt = now;
-            this.shots = (this.shots || 0) + 1;
-            if (this.shots % 3 === 0) this.gasBombs(pl, now);
-            else {
-              this.aim = Math.atan2(dy, dx);
-              this.state = 'aim'; this.stateT = 0.6;
-              G.FX.mark(this.x, this.y, 0, '#ff3a3a', 0.6, 'line', { a: this.aim, len: 260, w: 70 });
-            }
-          }
-        }
-        break;
-      }
       default:
         mx = nx; my = ny;
     }
@@ -249,44 +124,12 @@ G.Enemy = class Enemy {
     // Chocan con árboles y rocas (los jefes no: no deben quedarse atascados).
     if (!this.boss) [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.7);
 
-    // Golpe al tocarte.
-    if (!pl.dead && d < this.r + pl.r && now - this.hitT > 0.7) {
+    // Golpe al tocarte (no si está bajo tierra o en el aire).
+    if (!pl.dead && !this.hidden && d < this.r + pl.r && now - this.hitT > 0.7) {
       this.hitT = now;
       this.atkAt = now;
       pl.hurt(this.dmg, now);
     }
-  }
-
-  /** Punto en tierra a `dist` del jugador (para reaparecer a su lado), o null. */
-  besidePlayer(pl, dist) {
-    for (let i = 0; i < 10; i++) {
-      const a = Math.random() * 6.283;
-      const x = pl.x + Math.cos(a) * dist, y = pl.y + Math.sin(a) * dist * 0.8;
-      if (G.World.waterAt(x, y) === 0) return [x, y];
-    }
-    return null;
-  }
-
-  /** MH5: 3 bombas con aviso; al estallar dejan una nube de gas que hace daño mientras dura. */
-  gasBombs(pl, now) {
-    for (let i = 0; i < 3; i++) {
-      const zx = pl.x + (i ? G.U.rand(-90, 90) : 0), zy = pl.y + (i ? G.U.rand(-70, 70) : 0);
-      const m = G.FX.mark(zx, zy, 40, '#9ad04a', 1.1);
-      m.onEnd = () => {
-        G.FX.burst(zx, zy, '#9ad04a', 12, 140);
-        G.FX.puff(zx, zy, '#7aa040', 5);
-        const gas = G.FX.mark(zx, zy, 40, '#7aa040', 3.5);
-        let hitT = -9;
-        gas.tick = () => {
-          const t = G.Game.now;
-          if (t - hitT > 0.5 && G.U.dist(pl.x, pl.y, zx, zy) < 40 + pl.r) { hitT = t; pl.hurt(this.dmg * 0.35, t); }
-          if (Math.random() < 0.15) G.FX.puff(zx + G.U.rand(-30, 30), zy + G.U.rand(-20, 20), '#9ad04a', 1);
-        };
-        G.Hazards.add(gas);
-      };
-      G.Hazards.add(m);
-    }
-    G.Audio.sfx('boom');
   }
 
   shoot(nx, ny, speed, dmg, vis = 'ebullet') {
@@ -298,7 +141,11 @@ G.Enemy = class Enemy {
 
   /** @param src  proyectil o técnica (para empuje, quemadura...) */
   damage(amount, now, src = null, col = null) {
-    if (this.dead) return;
+    if (this.dead || this.hidden) return;
+    if (this.immune) {
+      if (now - this.hurtAt > 0.4) { this.hurtAt = now; G.FX.text(this.x, this.y - this.r * 2, '0', '#c8d0e0'); }
+      return;
+    }
     let crit = false;
     if (src && src.owner && Math.random() < src.owner.crit) { amount *= 2; crit = true; }
     this.hp -= amount;
@@ -328,10 +175,19 @@ G.Enemy = class Enemy {
   }
 
   draw(ctx, now) {
+    // Bajo tierra (Arlong): sólo la aleta.
+    if (this.fin) {
+      const x = Math.round(this.x / 2) * 2, y = Math.round(this.y / 2) * 2;
+      ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.fillRect(x - 12, y - 2, 24, 4);
+      ctx.fillStyle = '#1a1220'; ctx.beginPath(); ctx.moveTo(x - 10, y); ctx.lineTo(x + 6, y - 22); ctx.lineTo(x + 10, y); ctx.fill();
+      ctx.fillStyle = '#5a9ad8'; ctx.beginPath(); ctx.moveTo(x - 6, y - 2); ctx.lineTo(x + 5, y - 17); ctx.lineTo(x + 7, y - 2); ctx.fill();
+      return;
+    }
+    if (this.hidden && !this.z) return;
     const s = G.Pix.sprite(this.sprite);
     const sc = this.scale * G.PX;
     let anim = this.moving ? 'walk' : 'idle', t = this.animT;
-    if (this.state === 'aim' || this.state === 'dash' || this.state === 'fire') { anim = 'attack'; t = 9; }
+    if (this.pose || this.state === 'aim') { anim = 'attack'; t = 9; }
     else if (now - this.hurtAt < 0.18) { anim = 'hurt'; t = now - this.hurtAt; }
     else if (now - this.atkAt < 0.35) { anim = 'attack'; t = now - this.atkAt; }
     const { f, flip } = G.Pix.pick(s, anim, t, this.face, this.dir);
@@ -341,7 +197,7 @@ G.Enemy = class Enemy {
       : anim === 'walk' && G.Pix.bounces(s, this.dir) ? Math.round(Math.abs(Math.sin(this.animT * 11)) * 2) * 2 : 0;
     const img = this.flash > 0 ? (flip ? s.whiteFlip[f] : s.white[f]) : (flip ? s.flip[f] : s.frames[f]);
     const w = s.w * sc, h = s.h * sc;
-    const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2) / 2) * 2 - hop;
+    const x = Math.round((this.x - w / 2) / 2) * 2, y = Math.round((this.y - h + 2 - (this.z || 0)) / 2) * 2 - hop;
     // Sombra.
     ctx.fillStyle = 'rgba(0,0,0,.28)';
     ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.45, 0, 0, 6.283); ctx.fill();
@@ -355,6 +211,11 @@ G.Enemy = class Enemy {
     // Esfumándose (Kuro): se desvanece.
     if (this.state === 'vanish') ctx.globalAlpha = Math.max(0.1, Math.min(1, this.stateT / 0.35));
     ctx.drawImage(img, x, y, w, h);
+    // Tekkai: brillo metálico.
+    if (this.immune) {
+      ctx.globalAlpha = 0.35 + Math.sin(now * 10) * 0.15;
+      ctx.drawImage(flip ? s.whiteFlip[f] : s.white[f], x, y, w, h);
+    }
     ctx.globalAlpha = 1;
     if (this.burnT > 0 && Math.random() < 0.3) G.FX.puff(this.x + G.U.rand(-6, 6), this.y - h * 0.5, '#ff8a2a', 1);
     // Barra de vida de los élite y de los heridos grandes.
@@ -411,7 +272,7 @@ G.EnemyMgr = (() => {
   function nearest(x, y, maxR, exclude = null) {
     let best = null, bd = maxR * maxR;
     for (const e of query(x, y, maxR)) {
-      if (e.dead || (exclude && exclude.has(e))) continue;
+      if (e.dead || e.hidden || (exclude && exclude.has(e))) continue;
       const d = G.U.dist2(x, y, e.x, e.y);
       if (d < bd) { bd = d; best = e; }
     }
@@ -464,9 +325,9 @@ G.Hazards = (() => {
     clear() { list = []; },
     add(m) { list.push(m); },
     // onEnd: al acabar el aviso · tick: cada frame mientras dura (zonas que hacen daño)
-    update() {
+    update(dt) {
       for (const m of list) {
-        if (m.life > 0 && m.tick) m.tick();
+        if (m.life > 0 && m.tick) m.tick(dt);
         if (m.life <= 0 && m.onEnd) { m.onEnd(); m.onEnd = null; }
       }
       list = list.filter(m => m.onEnd || (m.tick && m.life > 0));

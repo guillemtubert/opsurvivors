@@ -104,9 +104,41 @@ G.FX = (() => {
   /** Lo que va pegado al suelo (antes que los personajes). */
   function drawUnder(ctx, now) {
     for (const m of marks) {
-      const k = 1 - m.life / m.max;
+      // Las zonas que duran (steady) se ven siempre igual; los avisos se van llenando.
+      const k = m.steady ? 1 : 1 - m.life / m.max;
       ctx.globalAlpha = 0.25 + 0.35 * k;
       ctx.fillStyle = m.col;
+      if (m.kind === 'pillar') {
+        // Pilar de cera: columna con brillo.
+        ctx.globalAlpha = 1;
+        const x = Math.round(m.x - m.r), w = m.r * 2, h = m.r * 3;
+        ctx.fillStyle = '#1a1220'; ctx.fillRect(x - 2, m.y - h - 2, w + 4, h + 4);
+        ctx.fillStyle = '#e8e0c8'; ctx.fillRect(x, m.y - h, w, h);
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(x + 2, m.y - h + 2, 3, h - 6);
+        ctx.fillStyle = '#b8ac90'; ctx.fillRect(x + w - 4, m.y - h, 4, h);
+        continue;
+      }
+      if (m.kind === 'tornado') {
+        // Tornado de arena: anillos que giran, más anchos hacia arriba.
+        const t = G.Game.now;
+        for (let i = 0; i < 7; i++) {
+          const w = m.r * (0.35 + i * 0.12), cx = m.x + Math.sin(t * 9 + i * 0.9) * (2 + i * 1.5), cy = m.y - i * 9;
+          ctx.globalAlpha = 0.75;
+          ctx.strokeStyle = '#5a3a1a'; ctx.lineWidth = 6;
+          ctx.beginPath(); ctx.ellipse(cx, cy, w, w * 0.3, 0, 0, 6.283); ctx.stroke();
+          ctx.strokeStyle = i % 2 ? '#e0c070' : '#c89a50'; ctx.lineWidth = 3;
+          ctx.beginPath(); ctx.ellipse(cx, cy, w, w * 0.3, 0, (t * 6 + i) % 6.283, (t * 6 + i) % 6.283 + 4); ctx.stroke();
+        }
+        continue;
+      }
+      if (m.kind === 'tooth') {
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#1a1220';
+        ctx.beginPath(); ctx.moveTo(m.x - 6, m.y + 1); ctx.lineTo(m.x, m.y - 12); ctx.lineTo(m.x + 6, m.y + 1); ctx.fill();
+        ctx.fillStyle = '#f4f1ea';
+        ctx.beginPath(); ctx.moveTo(m.x - 4, m.y); ctx.lineTo(m.x, m.y - 9); ctx.lineTo(m.x + 4, m.y); ctx.fill();
+        continue;
+      }
       if (m.kind === 'line') {
         ctx.save();
         ctx.translate(m.x, m.y); ctx.rotate(m.a);

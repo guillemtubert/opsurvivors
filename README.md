@@ -87,7 +87,7 @@ js/
   world/    world (la isla: ruido continuo con caída hacia la costa, horneado por chunks, colisiones),
             island (cofres, Den Den Mushi, muelle y Going Merry, Buster Call),
             props (árboles, palmeras, rocas, barriles pintados a escala de los personajes)
-  entities/ fx, projectile, enemy (+ gestor y rejilla espacial), pickup, player
+  entities/ fx, projectile, enemy (+ gestor y rejilla espacial), bosses (los ataques de cada jefe), pickup, player
   systems/  combat (las técnicas), spawner (oleadas, Buster Call y jefe), levelup (cartas)
   ui/       icons, minimap, hud, ui (pantallas)
   game.js   flujo y bucle principal
@@ -96,10 +96,30 @@ js/
 
 ## Alcance actual
 
-Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y
-**Sanji**, el **marine** y la isla **Shells Town** con **Morgan** de jefe (`js/data/scope.js`).
-Luffy, Sanji, el marine y Morgan andan en 8 direcciones. El resto de tripulantes, enemigos e islas
-sigue en los datos y se activa añadiéndolo ahí (una isla sólo se activa si su jefe ya existe).
+Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y **Sanji**, y el
+**marine** como enemigo (`js/data/scope.js`). Las tres sagas están abiertas, con sus 11 islas
+y un jefe en cada una; se elige la saga en el puerto. Con `allSagas: false`, cada saga se abre
+al completar la anterior.
+
+Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js`):
+
+| Saga | Isla | Jefe | Ataques |
+|---|---|---|---|
+| East Blue | Shells Town | Morgan | Embestida en línea |
+| | Orange Town | Buggy | Abanico de cuchillos · Bara Bara Hō (la mano vuela y vuelve) |
+| | Villa Syrup | Kuro | Shakushi: se esfuma y caen cortes en línea a tu alrededor |
+| | Baratie | Don Krieg | Bombas MH5 (nube de gas) · lanza que estalla en cono |
+| | Arlong Park | Arlong | Se sumerge (aleta) y emerge bajo tus pies · dientes clavados en el suelo |
+| Alabasta | Little Garden | Mr. 3 | Candle Lock: jaula de cera con una salida · charcos que frenan |
+| | Drum | Wapol | Baku Baku: te aspira y muerde · salto que aplasta |
+| | Alabasta | Crocodile | Desert Spada: grietas que avanzan · Sables: tornado que te sigue |
+| Cielo / Thriller Bark | Skypiea | Enel | Sango: rayos que te persiguen · Raigo: zona enorme |
+| | Enies Lobby | Lucci | Rankyaku · Tekkai (inmune) · Rokuogan (estallido si estás cerca) |
+| | Thriller Bark | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
+| (sin isla) | | Imu | Látigo negro que gira · anillos de espinas con un hueco |
+
+Luffy, Sanji, el marine y Morgan andan en 8 direcciones. Los demás jefes llevan un dibujo
+provisional de 16×20 (`js/data/sprites.js`) hasta tener sus hojas.
 
 ## Sprites (hojas)
 

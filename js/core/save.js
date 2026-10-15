@@ -5,6 +5,7 @@
  *   captain     el que juegas
  *   upg         nivel de cada mejora permanente
  *   best        mejor tiempo (segundos) por tripulante
+ *   sagas       sagas completadas (abren la siguiente)
  *   stats       totales (kills, runs, jefes)
  *   settings    sonido, sacudidas, números de daño
  */
@@ -16,6 +17,7 @@ G.Save = (() => {
     captain: 'luffy',
     upg: {},
     best: {},
+    sagas: [],
     stats: { kills: 0, runs: 0, bosses: 0, time: 0 },
     settings: { music: 0.5, sfx: 0.7, shake: true, dmgNums: true }
   });

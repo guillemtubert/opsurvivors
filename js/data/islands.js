@@ -25,7 +25,7 @@ G.Islands = (() => {
     ] },
     { id: 'grandline', name: 'Saga de Alabasta', islands: [
       { id: 'littlegarden', name: 'Little Garden', sub: 'La isla de los gigantes', biome: 0, boss: 'mr3',       scale: 1, chests: 6 },
-      { id: 'drum',         name: 'Isla de Drum',  sub: 'El reino nevado',          biome: 2, boss: 'wapol',     scale: 1, chests: 6 },
+      { id: 'drum',         name: 'Isla de Drum',  sub: 'El reino nevado',          biome: 4, boss: 'wapol',     scale: 1, chests: 6 },
       { id: 'alabasta',     name: 'Alabasta',      sub: 'El Reino de la Arena',     biome: 1, boss: 'crocodile', scale: 1, chests: 6 }
     ] },
     { id: 'sky', name: 'Del cielo a Thriller Bark', islands: [
@@ -35,12 +35,24 @@ G.Islands = (() => {
     ] }
   ];
 
-  // Las activas ahora (ver data/scope.js): de momento, la primera saga.
+  // Las que se pueden jugar (ver data/scope.js): islas activas y con su jefe hecho.
   const on = i => (!G.SCOPE || G.SCOPE.islands.includes(i.id)) && !!G.Enemies.BOSS_BY_ID[i.boss];
-  const SAGA = Object.assign({}, SAGAS[0], { islands: SAGAS[0].islands.filter(on) });
+  const PLAYABLE = SAGAS.map(s => Object.assign({}, s, { islands: s.islands.filter(on) })).filter(s => s.islands.length);
+  let cur = 0;
+
+  /** ¿Se puede jugar la saga i? La primera siempre; las demás, al completar la anterior. */
+  function unlocked(i) {
+    if (i <= 0 || (G.SCOPE && G.SCOPE.allSagas)) return true;
+    return (G.Save.data.sagas || []).includes(PLAYABLE[i - 1].id);
+  }
 
   /** Radio en tiles de una isla. */
   const radius = def => Math.round(SIZE * (def.scale || 1));
 
-  return { BUSTER_AT, SIZE, SAGAS, SAGA, radius };
+  return {
+    BUSTER_AT, SIZE, SAGAS, PLAYABLE, radius, unlocked,
+    /** La saga elegida en el puerto. */
+    get SAGA() { return PLAYABLE[cur]; }, get index() { return cur; },
+    select(i) { cur = Math.max(0, Math.min(PLAYABLE.length - 1, i)); }
+  };
 })();

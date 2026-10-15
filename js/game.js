@@ -182,6 +182,7 @@ G.Game = (() => {
     const best = save.best[pl.crew.id] || 0;
     const record = time > best;
     if (record) save.best[pl.crew.id] = Math.floor(time);
+    if (won && !save.sagas.includes(G.Islands.SAGA.id)) save.sagas.push(G.Islands.SAGA.id);
     G.Save.commit();
     G.HUD.show(false);
     G.Audio.music('over');
@@ -250,7 +251,7 @@ G.Game = (() => {
     G.Projectiles.update(dt, pl, now);
     G.Pickups.update(dt, pl, now);
     G.FX.update(dt);
-    G.Hazards.update();
+    G.Hazards.update(dt);
     G.Camera.follow(pl.x, pl.y, dt);
 
     if (flashT > 0) flashT -= dt;

@@ -42,7 +42,13 @@ G.World = (() => {
       sand: ['#5e5a50', '#58544a', '#66625a'], sandDot: '#4a463e',
       water: '#3a4a3a', deep: '#2a362a', foam: '#7a8a6a', sparkle: '#9aac88',
       tree: 'dead', palm: 'dead', leaf: ['#3a3048', '#4a3e5a', '#5e5070', '#74688a'], trunk: ['#2e2638', '#463a50'],
-      rock: ['#4a4656', '#625e70', '#7c788a'], flowers: ['#9a8ad0', '#5fe0c0', '#c9cfdc'], tuft: ['#3a3446', '#5a5470'] }
+      rock: ['#4a4656', '#625e70', '#7c788a'], flowers: ['#9a8ad0', '#5fe0c0', '#c9cfdc'], tuft: ['#3a3446', '#5a5470'] },
+    { name: 'Isla de Drum', sub: 'El reino nevado', music: 'sea',
+      ground: ['#e6edf4', '#dde6ef', '#eff4f9'], speck: '#c4d0de', light: '#ffffff', path: ['#b4c0ce', '#aab6c6'],
+      sand: ['#d4dde8', '#ccd6e2', '#dee5ee'], sandDot: '#aab8c8',
+      water: '#4a86b8', deep: '#2a5a8a', foam: '#ffffff', sparkle: '#d8f0ff',
+      tree: 'tree', palm: 'tree', leaf: ['#24504a', '#33665a', '#c8dce4', '#ffffff'], trunk: ['#4a3a2a', '#6a5040'],
+      rock: ['#7a8696', '#9aa6b6', '#c4ccd8'], flowers: ['#ffffff', '#bfe4ff', '#e8f0f4'], tuft: ['#c4d0de', '#ffffff'] }
   ];
 
   // ---------------- detalles pequeños (por bioma) ----------------

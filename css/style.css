@@ -135,6 +135,11 @@ kbd {
 .menu-item:hover, .menu-item:focus-visible { background: rgba(255,255,255,.08); outline: none; }
 .menu-item:hover::before, .menu-item:focus-visible::before { opacity: 1; }
 .menu-item.play { font-size: 32px; color: var(--gold); }
+.menu-item:disabled { opacity: .45; cursor: not-allowed; }
+.saga-pick { display: flex; align-items: center; gap: 8px; margin: 0 0 6px; }
+.saga-pick .saga-name { flex: 1; text-align: center; min-width: 0; }
+.saga-pick b { display: block; font-size: 17px; color: var(--gold); }
+.saga-pick small { display: block; font-size: 12px; color: var(--muted); }
 
 /* ---------- cartel de "SE BUSCA" ---------- */
 .poster {

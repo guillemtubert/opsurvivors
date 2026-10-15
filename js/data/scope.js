@@ -5,5 +5,6 @@
 G.SCOPE = {
   crew: ['luffy', 'sanji'],
   enemies: ['marine'],
-  islands: ['shells', 'orange', 'syrup', 'baratie']
+  islands: ['shells', 'orange', 'syrup', 'baratie', 'arlong', 'littlegarden', 'drum', 'alabasta', 'skypiea', 'enieslobby', 'thriller'],
+  allSagas: true            // mientras se prueba: todas las sagas abiertas sin completar la anterior
 };

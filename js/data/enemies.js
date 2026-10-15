@@ -5,11 +5,7 @@
  *   ranged   se queda a distancia y dispara
  *   tank     lento y con mucha vida
  *   beamer   láser con aviso en el suelo (Pacifista)
- *   charger  se para, apunta y embiste (jefes)
- *   fan      lanza cuchillos en abanico (Buggy)
- *   zoner    zonas de arena bajo tus pies que estallan (Crocodile, Imu)
- *   blinker  se esfuma y reaparece a tu lado para cortar en línea, varias veces seguidas (Kuro)
- *   barrage  ráfagas de balas en cono y bombas de gas que dejan zona (Don Krieg)
+ * Los jefes no llevan behavior: cada uno tiene sus propios ataques en entities/bosses.js.
  * hover: true  flota (vaivén suave en vez de pasos)
  *
  * `from` = segundo de dificultad en que empieza a salir (ver Spawner); `w` = peso en la bolsa.
@@ -25,15 +21,25 @@ G.Enemies = (() => {
   ];
 
   // Cada isla tiene su jefe (data/islands.js): sale al llamarlo con el Den Den Mushi.
-  // Vida pensada para el orden de East Blue: cada isla, un poco más.
+  // Cada saga empieza de cero (nivel 1): la vida sube isla a isla dentro de la saga,
+  // y cada saga empieza algo más fuerte que la anterior. Sus ataques, en entities/bosses.js.
   const BOSSES = [
-    { id: 'morgan',    name: 'Capitán Morgan',  title: 'Mano de Hacha',  sprite: 'morgan',    hp: 1100, spd: 62, dmg: 22, xp: 160, behavior: 'charger' },
-    { id: 'imu',       name: 'Imu',             title: 'Ocupante del Trono Vacío', sprite: 'imu', hp: 2600, spd: 50, dmg: 28, xp: 320, behavior: 'zoner', hover: true },
-    { id: 'buggy',     name: 'Buggy',           title: 'El Payaso',      sprite: 'buggy',     hp: 1600, spd: 58, dmg: 24, xp: 220, behavior: 'fan' },
-    { id: 'kuro',      name: 'Capitán Kuro',    title: 'El de los Mil Planes', sprite: 'kuro', hp: 2100, spd: 66, dmg: 26, xp: 280, behavior: 'blinker' },
-    { id: 'krieg',     name: 'Don Krieg',       title: 'El Almirante Pirata', sprite: 'krieg', hp: 2700, spd: 48, dmg: 28, xp: 340, behavior: 'barrage' },
-    { id: 'arlong',    name: 'Arlong',          title: 'Diente de Sierra', sprite: 'arlong',  hp: 3600, spd: 70, dmg: 32, xp: 480, behavior: 'charger' },
-    { id: 'crocodile', name: 'Crocodile',       title: 'Señor 0',        sprite: 'crocodile', hp: 5400, spd: 60, dmg: 36, xp: 700, behavior: 'zoner' }
+    // East Blue
+    { id: 'morgan',    name: 'Capitán Morgan', title: 'Mano de Hacha',          sprite: 'morgan',    hp: 1100, spd: 62, dmg: 22, xp: 160 },
+    { id: 'buggy',     name: 'Buggy',          title: 'El Payaso',              sprite: 'buggy',     hp: 1600, spd: 58, dmg: 24, xp: 220 },
+    { id: 'kuro',      name: 'Capitán Kuro',   title: 'El de los Mil Planes',   sprite: 'kuro',      hp: 2100, spd: 66, dmg: 26, xp: 280 },
+    { id: 'krieg',     name: 'Don Krieg',      title: 'El Almirante Pirata',    sprite: 'krieg',     hp: 2700, spd: 48, dmg: 28, xp: 340 },
+    { id: 'arlong',    name: 'Arlong',         title: 'Diente de Sierra',       sprite: 'arlong',    hp: 3300, spd: 64, dmg: 30, xp: 420 },
+    // Alabasta
+    { id: 'mr3',       name: 'Mr. 3',          title: 'El Hombre de Cera',      sprite: 'mr3',       hp: 1800, spd: 54, dmg: 26, xp: 260 },
+    { id: 'wapol',     name: 'Wapol',          title: 'Baku Baku',              sprite: 'wapol',     hp: 2600, spd: 50, dmg: 30, xp: 340 },
+    { id: 'crocodile', name: 'Crocodile',      title: 'Señor 0',                sprite: 'crocodile', hp: 3500, spd: 58, dmg: 32, xp: 440 },
+    // Del cielo a Thriller Bark
+    { id: 'enel',      name: 'Enel',           title: 'El Dios de Skypiea',     sprite: 'enel',      hp: 2200, spd: 62, dmg: 32, xp: 300 },
+    { id: 'lucci',     name: 'Rob Lucci',      title: 'CP9',                    sprite: 'lucci',     hp: 3100, spd: 70, dmg: 34, xp: 400 },
+    { id: 'moria',     name: 'Gecko Moria',    title: 'Shichibukai',            sprite: 'moria',     hp: 4000, spd: 44, dmg: 36, xp: 500 },
+    // Sin isla todavía
+    { id: 'imu',       name: 'Imu',            title: 'Ocupante del Trono Vacío', sprite: 'imu',     hp: 4500, spd: 50, dmg: 38, xp: 600, hover: true }
   ];
   const BOSS_BY_ID = Object.fromEntries(BOSSES.map(b => [b.id, b]));
 

@@ -44,14 +44,19 @@
 ## Paso 2 — Islas 2-4 (Orange Town, Villa Syrup, Baratie)
 
 - [x] Todas las islas del mismo tamaño: `scale: 1` = radio `G.Islands.SIZE` (48 tiles, unos 30 s de punta a punta); 0.5 o 2.5 la encogen o agrandan
-- [x] Buggy (`fan`): cuchillos en abanico y en anillo
-- [x] Kuro (`blinker`): se esfuma, reaparece a tu lado, avisa con una línea y corta; 3 veces seguidas y descansa
-- [x] Don Krieg (`barrage`): 3 ráfagas de balas en cono; una de cada tres veces, bombas MH5 que dejan nube de gas
-- [x] Vida de los jefes escalonada: Morgan 1100 · Buggy 1600 · Kuro 2100 · Krieg 2700
-- [ ] Hojas de 8 direcciones de Buggy, Kuro y Krieg (ahora llevan dibujos provisionales de 16×20 a escala 3)
-- [ ] Dificultad entre islas (ahora sigue subiendo con el tiempo total de la partida)
+- [x] Buggy, Kuro y Don Krieg con sus islas
 
-## Paso 3 — Jefes nuevos de uno en uno (Mr. 3, Wapol, Enel, Lucci, Moria)
+## Paso 3 — Todos los jefes, cada uno con sus ataques (ninguno repite)
+
+- [x] `js/entities/bosses.js`: una IA por jefe (tabla en el README). Fuera los comportamientos compartidos (charger, fan, zoner...)
+- [x] Jefes nuevos: Mr. 3, Wapol, Enel, Lucci y Moria (Arlong y Crocodile, con ataques propios)
+- [x] Vida: sube isla a isla dentro de cada saga (cada saga empieza a nivel 1)
+- [x] Selector de saga en el puerto; cada saga se abre al completar la anterior (`allSagas: true` mientras se prueba)
+- [x] Bioma nevado para Drum
+- [x] Se mantiene el minimapa en todas las islas
+- [ ] Hojas de 8 direcciones de los jefes (ahora: dibujos provisionales de 16×20 a escala 3, Moria a 4)
+- [ ] Dificultad entre islas (ahora sigue subiendo con el tiempo total de la partida)
+- [ ] Equilibrar el daño de cada ataque jugando
 
 ## Decisiones
 - Duración: partidas por **sagas** (East Blue = islas 1-5, Alabasta = 6-8, Cielo/Thriller Bark = 9-11). Buster Call a los **3:00**; llamar al jefe antes da berries extra (1,5 ฿ por segundo que falte).

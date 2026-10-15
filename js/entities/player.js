@@ -37,7 +37,7 @@ G.Player = class Player {
     this.level = 1; this.xp = 0; this.xpNext = Player.xpFor(1);
     this.kills = 0; this.bosses = 0; this.coins = 0; this.islands = 0;
 
-    this.invuln = 0; this.flash = 0;
+    this.invuln = 0; this.flash = 0; this.slowT = 0;
     this.aim = Math.PI / 2;
     this.face = 1;
     this.dir = 'down';           // de las 8 direcciones (para las hojas que las tienen)
@@ -55,7 +55,8 @@ G.Player = class Player {
   get atk() { return this.atkMul * (1 + this.buffs.atk.n * this.buffs.atk.amount); }
   get spd() {
     const water = [1, 0.62, 0.45][G.World.waterAt(this.x, this.y)];
-    return this.baseSpd * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * water;
+    const stuck = this.slowT > 0 ? 0.5 : 1;     // pegado a la cera (Mr. 3)
+    return this.baseSpd * this.spdMul * (1 + this.buffs.spd.n * this.buffs.spd.amount) * water * stuck;
   }
   get reduction() { return Math.min(0.8, this.dmgReduce + this.buffs.def.n * this.buffs.def.amount); }
   get regen() { return this.regenFlat + this.buffs.regen.n * this.buffs.regen.amount; }
@@ -128,6 +129,7 @@ G.Player = class Player {
     if (this.dead) return;
     this.animT += dt;
     if (this.invuln > 0) this.invuln -= dt;
+    if (this.slowT > 0) this.slowT -= dt;
     if (this.flash > 0) this.flash -= dt;
 
     const [ax, ay] = G.Input.axis();
