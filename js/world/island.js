@@ -18,7 +18,7 @@ G.Island = (() => {
 
   function img(name) {
     if (!art[name]) art[name] = G.Props.make(name);
-    return art[name];
+    return art[name];                   // null si su PNG no cargó: no se dibuja
   }
 
   function clear() { def = null; chests = []; snail = null; dock = null; action = null; }
@@ -43,7 +43,7 @@ G.Island = (() => {
     const y0 = dir > 0 ? py - 2 * G.TILE : py - L, y1 = dir > 0 ? py + L : py + 2 * G.TILE;
     dock = { x0: px - W / 2, x1: px + W / 2, y0, y1, dir, coastY: py,
              endX: px, endY: dir > 0 ? y1 - 24 : y0 + 24 };
-    dock.shipX = px + 120; dock.shipY = dock.endY + (dir > 0 ? 40 : 20);
+    dock.shipX = px + 130; dock.shipY = dock.endY + (dir > 0 ? 40 : 20);
     G.World.setPier(dock);
     G.World.reserve(px, py, 3);
 
@@ -157,7 +157,9 @@ G.Island = (() => {
     const put = (name, x, y, o = {}) => {
       if (!G.Camera.sees(x, y, 160)) return;
       list.push({ y: o.flat ? y - 1000 : y, draw(ctx) {
-        const p = img(name), w = p.img.width * P, h = p.img.height * P;
+        const p = img(name);
+        if (!p) return;
+        const w = p.img.width * P, h = p.img.height * P;
         const bob = o.bob ? Math.round(Math.sin(now * 3) * 1.5) * P : 0;
         if (o.glow) {
           ctx.globalAlpha = 0.25 + Math.sin(now * 5) * 0.12;
@@ -165,8 +167,10 @@ G.Island = (() => {
           ctx.beginPath(); ctx.ellipse(x, y, w * 0.55, w * 0.2, 0, 0, 6.283); ctx.fill();
           ctx.globalAlpha = 1;
         }
-        ctx.fillStyle = 'rgba(0,0,0,.25)';
-        ctx.beginPath(); ctx.ellipse(x, y, w * 0.4, w * 0.12, 0, 0, 6.283); ctx.fill();
+        if (!o.noShadow) {
+          ctx.fillStyle = 'rgba(0,0,0,.25)';
+          ctx.beginPath(); ctx.ellipse(x, y, w * 0.4, w * 0.12, 0, 0, 6.283); ctx.fill();
+        }
         ctx.drawImage(p.img, Math.round((x - p.ox * P) / P) * P, Math.round((y - p.oy * P + bob) / P) * P, w, h);
       } });
     };
@@ -190,7 +194,7 @@ G.Island = (() => {
         }
       } });
     }
-    put('merry', dock.shipX, dock.shipY, { bob: true });
+    put('merry', dock.shipX, dock.shipY, { bob: true, noShadow: true });
     put('denden', snail.x, snail.y, { glow: boss === 'idle' ? '#ff9ec4' : null, bob: boss === 'idle' });
     for (const c of chests) put(c.open ? 'chestOpen' : 'chest', c.x, c.y, { glow: c.open ? null : '#ffd23f' });
   }
