@@ -75,6 +75,7 @@ assets/chars/         hojas de sprites propias (ver "el taller")
 tools/serve.js        servidor local mínimo
 tools/sprites.html    taller de sprites (recortar hojas / convertir dibujos)
 tools/build-sprites.js  generador: assets/ref/ -> assets/chars/ (config en sprites.config.js)
+tools/build-props.js   objetos hechos en pixel art ampliado (Going Merry): assets/ref/props/ -> assets/props/
 tools/png.js, pixelize.js  PNG sin dependencias y conversión a pixel art
 assets/ref/characters/<id>/  originales de cada personaje (NO están en el repositorio: ver abajo)
 js/

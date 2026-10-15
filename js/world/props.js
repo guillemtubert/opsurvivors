@@ -6,6 +6,7 @@
  * sprites de One Piece Treasure Cruise pasados a pixel art.
  *
  *   G.Props.make(name, biome)  -> { img, ox, oy }   (ox, oy = pies, en píxeles de arte)
+ *   G.Props.preload()          carga los que vienen de un PNG (assets/props/)
  *   G.Props.META[name]         -> { solid, hp, big } (solid = radio en píxeles de arte)
  */
 G.Props = (() => {
@@ -209,63 +210,33 @@ G.Props = (() => {
     return { cv, ox: 18, oy: 31 };
   };
 
-  /** Going Merry: casco de madera, vela con la calavera y cabeza de oveja. */
-  PAINT.merry = () => {
-    const cv = canvas(96, 92);
-    const hull = ramp('#3a2010', '#6a4020', '#8a5a2e', '#b07a44', '#d09a5a');
-    const rail = ramp('#5a3a1a', '#9a6a3a', '#d8b080');
-    const sail = ramp('#b8b0a0', '#dcd6c8', '#f4f0e6', '#ffffff');
-    const wool = ramp('#a8a090', '#d8d2c4', '#f6f2e8', '#ffffff');
-    const mast = ramp('#3a2414', '#5e3a1e', '#86562e');
-    const red = ramp('#7a1a20', '#c0303a', '#e8505a');
-    // Casco: media elipse con tablas.
-    for (let y = 56; y < 86; y++) for (let x = 4; x < 92; x++) {
-      const nx = (x - 48) / 44, ny = (y - 56) / 30;
-      if (nx * nx + ny * ny > 1) continue;
-      const plank = (y - 56) % 6 === 0;
-      cv.set(x, y, tone(hull, 0.7 - ny * 0.45 - nx * 0.12 + (plank ? -0.2 : 0), x, y));
-    }
-    for (let x = 6; x < 90; x++) cv.set(x, 56, tone(rail, 0.7, x, 56), 1);
-    for (let x = 6; x < 90; x += 6) for (let y = 52; y < 56; y++) cv.set(x, y, tone(rail, 0.5, x, y), 1);
-    for (let x = 6; x < 90; x++) cv.set(x, 51, tone(rail, 0.8, x, 51), 1);
-    // Mástil y vela con la calavera de Luffy.
-    stroke(cv, 46, 56, 46, 4, 4, 3, mast, 2);
-    stroke(cv, 26, 12, 66, 12, 3, 3, mast, 3);
-    for (let y = 13; y < 44; y++) {
-      const bow = Math.sin((y - 13) / 31 * Math.PI) * 4;
-      for (let x = Math.round(25 - bow); x < Math.round(67 + bow); x++) {
-        cv.set(x, y, tone(sail, 0.8 - (x - 25) / 90 + Math.sin((y - 13) / 31 * Math.PI) * 0.15, x, y), 4);
-      }
-    }
-    const k = [26, 18, 32];
-    ball(cv, 46, 25, 7, 6.5, ramp('#141418', '#141418'), { tex: 0, z: 5 });
-    ball(cv, 46, 32, 4, 3, ramp('#141418', '#141418'), { tex: 0, z: 5 });
-    [[43, 25], [44, 25], [48, 25], [49, 25], [43, 26], [49, 26]].forEach(([x, y]) => cv.set(x, y, [244, 240, 230], 6));
-    stroke(cv, 37, 19, 55, 19, 3, 3, ramp('#e0c050', '#f2d063'), 6);      // sombrero de paja
-    stroke(cv, 40, 17, 52, 17, 2, 2, red, 6.5);
-    stroke(cv, 36, 37, 56, 41, 2, 2, ramp('#141418', '#141418'), 5);     // huesos cruzados
-    stroke(cv, 36, 41, 56, 37, 2, 2, ramp('#141418', '#141418'), 5);
-    // Bandera arriba del mástil.
-    for (let y = 2; y < 8; y++) for (let x = 47; x < 56; x++) cv.set(x, y, [26, 18, 32], 3);
-    // Cabeza de oveja en la proa (a la derecha).
-    ball(cv, 88, 46, 7, 7, wool, { tex: 0.25, z: 3 });
-    ball(cv, 92, 49, 3, 3, ramp('#c0a080', '#e0c8a8', '#f4e2c8'), { tex: 0, z: 4 });
-    ball(cv, 84, 44, 3, 2.5, ramp('#c09040', '#e0b060'), { tex: 0, z: 4 });
-    cv.set(90, 45, k, 9);
-    return { cv, ox: 48, oy: 84 };
-  };
-
   const META = {
     tree: { solid: 6, big: true }, palm: { solid: 5, big: true }, cactus: { solid: 6, big: true },
     cloudtree: { solid: 5, big: true }, dead: { solid: 5, big: true },
-    rock: { solid: 10 }, barrel: { solid: 8, hp: 18 }, crate: { solid: 9, hp: 26 },
-    chest: {}, chestOpen: {}, denden: {}, merry: {}
+    rock: { solid: 10 }, barrel: { solid: 8, hp: 18 }, crate: { solid: 9, hp: 26 }
   };
 
+  // Objetos sacados de pixel art ya hecho (tools/build-props.js): un píxel del PNG
+  // es un píxel de arte del juego. ox/oy = punto de apoyo (la línea de flotación).
+  const FILES = { merry: { file: 'assets/props/merry.png', ox: 55, oy: 114 } };
+  const loaded = {};
+
+  function preload() {
+    return Promise.all(Object.entries(FILES).map(([id, f]) => new Promise(done => {
+      const img = new Image();
+      img.onload = () => { loaded[id] = img; done(); };
+      img.onerror = () => { console.warn('[Props] no se pudo cargar', f.file); done(); };
+      img.src = f.file;
+    })));
+  }
+
+  /** Imagen de un objeto: { img, ox, oy } (o null si su PNG no ha cargado). */
   function make(name, biome) {
+    const f = FILES[name];
+    if (f) return loaded[name] ? { img: loaded[name], ox: f.ox, oy: f.oy } : null;
     const { cv, ox, oy } = PAINT[name](biome);
     return { img: finish(cv), ox, oy };
   }
 
-  return { make, META, has: name => !!PAINT[name] };
+  return { make, preload, META, has: name => !!PAINT[name] || !!FILES[name] };
 })();
