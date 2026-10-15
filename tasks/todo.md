@@ -54,7 +54,8 @@
 - [x] Selector de saga en el puerto; cada saga se abre al completar la anterior (`allSagas: true` mientras se prueba)
 - [x] Bioma nevado para Drum
 - [x] Se mantiene el minimapa en todas las islas
-- [ ] Hojas de 8 direcciones de los jefes (ahora: dibujos provisionales de 16×20 a escala 3, Moria a 4)
+- [x] Hojas de 8 direcciones: Buggy, Krieg, Arlong, Mr. 3, Crocodile, Enel, Lucci y Moria
+- [ ] Hojas de Kuro y Wapol (siguen con el dibujo provisional)
 - [ ] Dificultad entre islas (ahora sigue subiendo con el tiempo total de la partida)
 - [ ] Equilibrar el daño de cada ataque jugando
 

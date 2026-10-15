@@ -112,6 +112,152 @@ module.exports = {
       }
     },
 
+    // Buggy: andar en 8 direcciones (Buggy8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    buggy: {
+      sheet: REF + 'buggy/Buggy8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 60, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 5 },
+      dirs8: {
+        'down': [[9, 16, 132, 190], [0, 476, 144, 186], [6, 240, 136, 189], [6, 710, 126, 186]],
+        'down-right': [[159, 16, 138, 189], [309, 15, 133, 190], [461, 15, 134, 190], [162, 238, 133, 191]],
+        'right': [[317, 238, 109, 192], [469, 238, 109, 192]],
+        'up-right': { mirror: 'up-left' },
+        'up': [[757, 16, 136, 184], [758, 240, 134, 188], [1056, 240, 137, 187], [1055, 16, 139, 189]],
+        'up-left': [[614, 18, 130, 186], [475, 707, 114, 184], [739, 708, 100, 184]],
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
+      anims: { attack: [[155, 474, 141, 186]] }
+    },
+
+    // Don Krieg: andar en 8 direcciones (Krieg8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    krieg: {
+      sheet: REF + 'krieg/Krieg8D.png',
+      bgFlat: { color: '#000000', thr: 14, r: 3, fringe: 1 },
+      height: 64, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[39, 56, 237, 378], [39, 507, 236, 376], [40, 961, 234, 372], [40, 1426, 234, 361]],
+        'down-right': [[343, 69, 224, 365], [339, 519, 221, 363], [332, 974, 230, 359], [345, 1430, 208, 357]],
+        'right': [[926, 67, 218, 364], [931, 516, 201, 365], [907, 969, 257, 363]],
+        'up-right': [[1541, 63, 217, 371], [1554, 510, 210, 371]],
+        'up': [[1221, 55, 240, 363], [1222, 509, 237, 363], [1225, 963, 235, 370], [1229, 1417, 230, 355]],
+        'up-left': { mirror: 'up-right' },
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      }
+    },
+
+    // Arlong: andar en 8 direcciones (Arlong8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    arlong: {
+      sheet: REF + 'arlong/Arlong8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 64, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 5 },
+      dirs8: {
+        'down': [[28, 35, 245, 402], [24, 476, 249, 408], [2128, 933, 248, 403], [2132, 1385, 252, 397]],
+        'down-right': [[306, 35, 257, 393], [329, 483, 244, 389], [314, 1391, 261, 389]],
+        'right': [[628, 33, 242, 389], [1802, 938, 271, 395], [613, 1389, 271, 393], [1847, 1392, 251, 389]],
+        'up-right': [[915, 35, 260, 393], [937, 484, 250, 393], [1529, 1384, 289, 397]],
+        'up': [[1225, 28, 239, 405], [1225, 476, 241, 402], [1225, 925, 249, 407], [1226, 1385, 254, 396]],
+        'up-left': { mirror: 'up-right' },
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
+      anims: { attack: [[613, 1389, 271, 393]] }
+    },
+
+    // Mr. 3: andar en 8 direcciones (Mr38D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    mr3: {
+      sheet: REF + 'mr3/Mr38D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 62, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[48, 18, 165, 417], [52, 465, 160, 418], [1249, 465, 160, 418]],
+        'down-right': [[517, 19, 172, 413], [518, 465, 171, 416]],
+        'right': [[770, 19, 142, 416], [764, 465, 148, 417]],
+        'up-right': { mirror: 'up-left' },
+        'up': [[985, 19, 162, 415], [2190, 19, 162, 410], [991, 466, 160, 409], [2188, 465, 161, 416]],
+        'up-left': [[1474, 19, 158, 410], [1470, 465, 159, 417]],
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      }
+    },
+
+    // Crocodile: andar en 8 direcciones (Crocodile8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    crocodile: {
+      sheet: REF + 'crocodile/Crocodile8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 64, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[8, 35, 275, 402], [2136, 35, 253, 402], [10, 488, 273, 403], [2136, 488, 252, 403]],
+        'down-right': [[309, 37, 273, 387], [604, 36, 264, 386], [309, 492, 276, 387], [608, 489, 250, 391]],
+        'right': [[905, 40, 278, 380], [907, 491, 276, 385], [1831, 939, 217, 390], [1701, 1402, 194, 379]],
+        'up-right': { mirror: 'up-left' },
+        'up': [[1208, 35, 286, 384], [1208, 486, 286, 389], [1211, 939, 278, 380], [937, 1394, 260, 387]],
+        'up-left': [[1512, 36, 284, 384], [1513, 492, 272, 381], [1472, 1393, 219, 387]],
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      }
+    },
+
+    // Enel: andar en 8 direcciones (Enel8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    enel: {
+      sheet: REF + 'enel/Enel8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 64, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[13, 12, 118, 206], [12, 234, 119, 208]],
+        'down-right': [[468, 6, 128, 211], [460, 230, 107, 210]],
+        'right': [[307, 6, 114, 210]],
+        'up-right': [[788, 230, 94, 211]],
+        'up': [[617, 13, 113, 198], [617, 237, 112, 199], [1068, 14, 118, 201], [1068, 235, 111, 206]],
+        'up-left': [[783, 7, 118, 210]],
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      }
+    },
+
+    // Rob Lucci: andar en 8 direcciones (Lucci8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    lucci: {
+      sheet: REF + 'lucci/Lucci8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 64, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[20, 45, 161, 386], [20, 501, 160, 385]],
+        'down-right': [[257, 43, 133, 372], [261, 505, 131, 367]],
+        'right': [[637, 43, 143, 369], [654, 495, 122, 380]],
+        'up-right': [[818, 38, 176, 375], [811, 495, 157, 377]],
+        'up': [[1241, 40, 159, 382], [1444, 30, 134, 376], [1240, 495, 158, 377], [1449, 488, 129, 376]],
+        'up-left': { mirror: 'up-right' },
+        'left': { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      }
+    },
+
+    // Gecko Moria: andar en 8 direcciones (Moria8D.png, convertida del .jfif). Las direcciones que faltan, en espejo.
+    moria: {
+      sheet: REF + 'moria/Moria8D.png',
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      height: 78, colors: 24,
+      fps: { idle: 1, walk: 7 },
+      dirs8: {
+        'down': [[8, 0, 287, 440], [9, 452, 285, 435], [2106, 6, 285, 416], [2109, 451, 282, 437]],
+        'down-right': { mirror: 'down-left' },
+        'right': [[648, 0, 204, 440], [957, 5, 192, 436], [651, 450, 201, 436]],
+        'up-right': { mirror: 'up-left' },
+        'up': [[1204, 0, 289, 434], [1201, 452, 293, 434]],
+        'up-left': [[1503, 5, 292, 430], [1545, 452, 227, 433]],
+        'left': { mirror: 'right' },
+        'down-left': [[309, 0, 285, 440], [321, 451, 261, 434]]
+      }
+    },
+
     // Morgan: andar en 8 direcciones (Morgan8D.png, convertida del .jfif; fondo blanco).
     // Jefe: más grande que los demás a propósito.
     morgan: {

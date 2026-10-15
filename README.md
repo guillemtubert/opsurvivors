@@ -118,8 +118,17 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | | Thriller Bark | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
 | (sin isla) | | Imu | Látigo negro que gira · anillos de espinas con un hueco |
 
-Luffy, Sanji, el marine y Morgan andan en 8 direcciones. Los demás jefes llevan un dibujo
-provisional de 16×20 (`js/data/sprites.js`) hasta tener sus hojas.
+Andan en 8 direcciones Luffy, Sanji, el marine y todos los jefes menos Kuro y Wapol, que llevan
+un dibujo provisional de 16×20 (`js/data/sprites.js`) hasta tener sus hojas.
+
+Para elegir los fotogramas de una hoja nueva:
+
+```
+node tools/contact.js assets/ref/characters/<id>/<Hoja>.png contactos.png [fondo] [umbral]
+```
+
+quita el fondo, numera cada figura en una hoja de contactos e imprime su recuadro
+`[x, y, w, h]`, que es lo que va en `dirs8` de `tools/sprites.config.js`.
 
 ## Sprites (hojas)
 
