@@ -157,8 +157,16 @@ G.Enemy = class Enemy {
     }
 
     // Empuje: se va frenando.
+    const ox = this.x, oy = this.y;
     this.x += (mx * spd + this.kx) * dt;
     this.y += (my * spd + this.ky) * dt;
+    // Los jefes no entran en el mar profundo (como el jugador, se resbalan por la
+    // orilla): si no, al embestir cerca de la costa su cofre caería donde no se llega.
+    if (this.boss && G.World.waterAt(this.x, this.y) === 2) {
+      if (G.World.waterAt(this.x, oy) !== 2) this.y = oy;
+      else if (G.World.waterAt(ox, this.y) !== 2) this.x = ox;
+      else { this.x = ox; this.y = oy; }
+    }
     const k = Math.exp(-8 * dt);
     this.kx *= k; this.ky *= k;
     this.moving = Math.abs(mx) + Math.abs(my) > 0.1;
