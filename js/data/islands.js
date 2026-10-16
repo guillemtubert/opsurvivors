@@ -27,7 +27,7 @@ G.Islands = (() => {
   const ESCAPE_AT = 8;
 
   const SAGAS = [
-    { id: 'eastblue', name: 'Saga de East Blue', enemies: ['marine'], islands: [
+    { id: 'eastblue', name: 'Saga de East Blue', enemies: ['marine', 'marinegun', 'rifle'], islands: [
       { id: 'shells',     name: 'Shells Town',   sub: 'La base del capitán Morgan', biome: 0, boss: 'morgan' },
       { id: 'orange',     name: 'Orange Town',   sub: 'El pueblo tomado por Buggy', biome: 0, boss: 'buggy' },
       { id: 'syrup',      name: 'Villa Syrup',   sub: 'La mansión de Kaya',         biome: 0, boss: 'kuro' },
@@ -35,49 +35,49 @@ G.Islands = (() => {
       { id: 'arlong',     name: 'Arlong Park',   sub: 'Villa Cocoyashi',            biome: 0, boss: 'arlong', chests: 6 },
       { id: 'loguetown',  name: 'Loguetown',     sub: 'Huye de Smoker',             biome: 0, boss: 'smoker', escape: true }
     ] },
-    { id: 'grandline', name: 'Saga de Alabasta', enemies: ['baroque'], islands: [
+    { id: 'grandline', name: 'Saga de Alabasta', enemies: ['baroque', 'baroquegun', 'baroqueshield'], islands: [
       { id: 'reverse',      name: 'Reverse Mountain', sub: 'Cabo Gemelo y Laboon',          biome: 0, boss: ['mr9', 'wednesday'] },
       { id: 'whisky',       name: 'Whisky Peak',      sub: 'El pueblo de los cazarrecompensas', biome: 1, boss: ['mr5', 'valentine'] },
       { id: 'littlegarden', name: 'Little Garden',    sub: 'La isla de los gigantes',       biome: 6, boss: 'mr3' },
       { id: 'drum',         name: 'Isla de Drum',     sub: 'El reino nevado',               biome: 4, boss: 'wapol' },
       { id: 'alabasta',     name: 'Alabasta',         sub: 'El Reino de la Arena',          biome: 1, boss: 'crocodile', chests: 6 }
     ] },
-    { id: 'sky', name: 'Saga de las Islas del Cielo', enemies: ['enelsoldier'], islands: [
+    { id: 'sky', name: 'Saga de las Islas del Cielo', enemies: ['enelsoldier', 'shandian', 'shandianjump'], islands: [
       { id: 'jaya',    name: 'Jaya',     sub: 'Mock Town',         biome: 0, boss: 'bellamy' },
       { id: 'skypiea', name: 'Skypiea',  sub: 'La isla del cielo', biome: 2, boss: 'enel', chests: 6 }
     ] },
-    { id: 'water7', name: 'Saga de Water 7', enemies: ['cp9agent'], islands: [
+    { id: 'water7', name: 'Saga de Water 7', enemies: ['cp9agent', 'cp9ranged', 'cp9heavy'], islands: [
       { id: 'longring',   name: 'Long Ring Long Land', sub: 'El Davy Back Fight', biome: 0, boss: 'foxy' },
       { id: 'water7',     name: 'Water 7',     sub: 'La ciudad del agua',       biome: 5, boss: 'franky' },
       { id: 'enieslobby', name: 'Enies Lobby', sub: 'La isla judicial',         biome: 16, boss: 'lucci', chests: 6 },
       { id: 'postenies',  name: 'Water 7',     sub: 'Huye de Garp',             biome: 5, boss: 'garp', escape: true, ship: 'sunny' }
     ] },
-    { id: 'thriller', name: 'Saga de Thriller Bark', enemies: ['zombie'], ship: 'sunny', islands: [
+    { id: 'thriller', name: 'Saga de Thriller Bark', enemies: ['zombie', 'zombieaxe', 'zombievomit'], ship: 'sunny', islands: [
       { id: 'mansion',  name: 'Thriller Bark', sub: 'La mansión de Hogback', biome: 3, boss: 'perona' },
       { id: 'freezer',  name: 'Thriller Bark', sub: 'El congelador de Oars', biome: 3, boss: 'oars' },
       { id: 'thriller', name: 'Thriller Bark', sub: 'El mástil del barco',   biome: 3, boss: 'moria', chests: 6 }
     ] },
-    { id: 'summit', name: 'Saga de la Guerra en la Cumbre', enemies: ['marine', 'pacifista'], ship: 'sunny', islands: [
+    { id: 'summit', name: 'Saga de la Guerra en la Cumbre', enemies: ['pacifista', 'marinegun2', 'marine2'], ship: 'sunny', islands: [
       { id: 'sabaody',    name: 'Archipiélago Sabaody', sub: 'Huye de Kizaru',          biome: 8, boss: 'kizaru', escape: true },
       { id: 'amazon',     name: 'Amazon Lily',  sub: 'La isla de las mujeres',          biome: 6, boss: 'hancock' },
       { id: 'impeldown',  name: 'Impel Down',   sub: 'Huye de Magellan',                biome: 7, boss: 'magellan', escape: true },
       { id: 'marineford', name: 'Marineford',   sub: 'Huye de Akainu',                  biome: 0, boss: 'akainu', escape: true },
       { id: 'rusukaina',  name: 'Rusukaina',    sub: 'Dos años con Rayleigh',           biome: 6, boss: 'rayleigh' }
     ] },
-    { id: 'gyojin', name: 'Saga de la Isla Gyojin', enemies: ['fishman'], ship: 'sunny', islands: [
+    { id: 'gyojin', name: 'Saga de la Isla Gyojin', enemies: ['fishman', 'fishsword', 'fishspear'], ship: 'sunny', islands: [
       { id: 'resabaody', name: 'Archipiélago Sabaody', sub: 'Dos años después',     biome: 8, boss: 'px1' },
       { id: 'gyojin',    name: 'Isla Gyojin',         sub: 'El reino bajo el mar', biome: 9, boss: 'hody' }
     ] },
-    { id: 'dressrosa', name: 'Saga de Dressrosa', enemies: ['toysoldier'], ship: 'sunny', islands: [
+    { id: 'dressrosa', name: 'Saga de Dressrosa', enemies: ['toysoldier', 'toygun', 'thundersoldier'], ship: 'sunny', islands: [
       { id: 'punkhazard', name: 'Punk Hazard', sub: 'Fuego y hielo',             biome: 10, boss: 'caesar' },
       { id: 'dressrosa',  name: 'Dressrosa',   sub: 'El reino de los juguetes',  biome: 11, boss: 'doflamingo' }
     ] },
-    { id: 'wholecake', name: 'Saga de Whole Cake', enemies: ['chess'], ship: 'sunny', islands: [
+    { id: 'wholecake', name: 'Saga de Whole Cake', enemies: ['chess', 'chessknight', 'chessmarimo'], ship: 'sunny', islands: [
       { id: 'zou',       name: 'Zou',       sub: 'El elefante que camina',   biome: 6, boss: 'jack' },
       { id: 'cacao',     name: 'Isla Cacao', sub: 'El espejo de Katakuri',    biome: 12, boss: 'katakuri' },
       { id: 'tottoland', name: 'Tottoland', sub: 'Huye de Big Mom',          biome: 12, boss: 'bigmom', escape: true }
     ] },
-    { id: 'wano', name: 'Saga de Wano', enemies: ['gifter'], ship: 'sunny', islands: [
+    { id: 'wano', name: 'Saga de Wano', enemies: ['gifter', 'gifterrifle', 'gifterdash'], ship: 'sunny', islands: [
       { id: 'udon',       name: 'Udon',             sub: 'La prisión de Queen',  biome: 13, boss: 'queen' },
       { id: 'onitejado',  name: 'Onigashima',       sub: 'El tejado del castillo', biome: 13, boss: 'king' },
       { id: 'onigashima', name: 'Onigashima',       sub: 'La isla de Kaido',     biome: 13, boss: 'kaido', chests: 6 }

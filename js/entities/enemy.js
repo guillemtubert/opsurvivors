@@ -65,6 +65,38 @@ G.Enemy = class Enemy {
     const ai = this.boss ? G.Bosses.update(this, { dt, now, pl, dx, dy, d, nx, ny }) : null;
     if (ai) { mx = ai.mx; my = ai.my; spd = this.spd * (ai.spd || 1); }
     else switch (this.behavior) {
+      case 'dash': {
+        // Carga: cada pocos segundos se lanza hacia ti con un aviso en el suelo.
+        if (this.state === 'aim') {
+          this.stateT -= dt;
+          if (this.stateT <= 0) { this.state = 'dash'; this.stateT = 0.4; }
+        } else if (this.state === 'dash') {
+          this.stateT -= dt;
+          mx = this.dashX; my = this.dashY; spd = this.spd * 3.2;
+          if (this.stateT <= 0) this.state = 'walk';
+        } else {
+          mx = nx * 0.7; my = ny * 0.7;
+          this.t1 -= dt;
+          if (this.t1 <= 0 && d < 300) {
+            this.t1 = G.U.rand(2.6, 3.4);
+            this.state = 'aim'; this.stateT = 0.45;
+            this.dashX = nx; this.dashY = ny;
+          }
+        }
+        break;
+      }
+      case 'cone': {
+        // Escopeta: abanico de proyectiles hacia ti, cada pocos segundos.
+        mx = nx * 0.6; my = ny * 0.6;
+        this.t1 -= dt;
+        if (this.t1 <= 0 && d < 260) {
+          this.t1 = G.U.rand(2.4, 3.0);
+          const a0 = Math.atan2(dy, dx), n = this.def.shot || 7;
+          for (let i = 0; i < n; i++) { const a = a0 + (i - (n - 1) / 2) * 0.12; this.shoot(Math.cos(a), Math.sin(a), 190, this.dmg * 0.6, 'pellet'); }
+          this.atkAt = now;
+        }
+        break;
+      }
       case 'ranged': {
         if (d > 230) { mx = nx; my = ny; }
         else if (d < 150) { mx = -nx; my = -ny; }

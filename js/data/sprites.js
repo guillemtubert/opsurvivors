@@ -1286,6 +1286,23 @@ G.SPRITES = {
     jupiter:     Object.assign(swap('saturn', { t: '#3a6ad8', T: '#2a4a98', h: '#f2d063' }), { scale: 3 }),
     venus:       Object.assign(swap('saturn', { t: '#f4c0d0', T: '#d890a8', h: '#ff8ac0' }), { scale: 3 }),
     mercury:     Object.assign(swap('saturn', { t: '#4a8a4a', T: '#2a5a2a', h: '#9ad04a' }), { scale: 3 }),
+    marinegun:   swap('marine', { c: '#2a4a8a', b: '#1a2a5a', B: '#101a3a' }),
+    baroquegun:  swap('pirate', { c: '#5a2a7a', C: '#3a1a50' }),
+    baroqueshield: swap('pirate', { c: '#3a6a8a', C: '#2a4a6a' }),
+    shandian:    swap('pirate', { r: '#f2d063', R: '#c9a23a', h: '#5a3a20' }),
+    shandianjump: swap('pirate', { r: '#e8e0d0', R: '#b8b0a0', h: '#3a2a20' }),
+    cp9ranged:   swap('marine', { c: '#1a1a24', b: '#2a2a36', B: '#101018' }),
+    cp9heavy:    swap('marine', { c: '#3a3a4a', b: '#2a2a36', B: '#1a1a24' }),
+    zombieaxe:   swap('pirate', { s: '#8aa878', S: '#5a7a58' }),
+    zombievomit: swap('pirate', { s: '#a8b878', S: '#7a8a58' }),
+    fishsword:   swap('fishman', { f: '#5a8ad8', F: '#3a5ab8' }),
+    fishspear:   swap('fishman', { f: '#6ab0a0', F: '#4a8a7a' }),
+    toygun:      swap('marine', { c: '#3a8ad8', b: '#f2d063', B: '#c9a23a' }),
+    thundersoldier: swap('marine', { c: '#f2d063', b: '#3a3a4a', B: '#2a2a36' }),
+    chessknight: swap('pirate', { c: '#f4f1ea', b: '#8a6a3a', B: '#5a4020' }),
+    chessmarimo: swap('pirate', { c: '#5aaa5a', b: '#3a7a3a', B: '#2a5a2a' }),
+    gifterrifle: swap('pirate', { c: '#6a4a2a', C: '#4a3018' }),
+    gifterdash:  swap('pirate', { c: '#2a6a4a', C: '#1a4a30' }),
     seraphim:    swap('marine', { c: '#f4f1ea', b: '#ffd23f', B: '#c9a23a', s: '#5a3a2a', S: '#3a2418' })
   });
 })();
