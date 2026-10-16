@@ -433,5 +433,16 @@ module.exports = {
         attack: [[20, 825, 130, 180]]
       }
     },
+  enel: {
+      sheet: REF + 'enel/Atlas_3244.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[10, 515, 175, 215]],
+        walk: [[10, 515, 175, 215], [195, 515, 170, 215], [380, 515, 170, 215]],
+        attack: [[400, 790, 290, 220]]
+      }
+    },
   }
 };
