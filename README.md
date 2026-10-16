@@ -179,14 +179,14 @@ Treasure Cruise). Al generar las hojas se quitan también las bolsas de fondo en
 ### Hojas nuevas con Gemini (el proceso de Sanji)
 
 1. **Atlas de Treasure Cruise** de Spriters Resource (sección Playable Characters) en
-   , con su nombre ().
-2. **Hoja de andar con Gemini**: el atlas y el texto de  (5 filas: abajo, diagonal
+   `assets/ref/characters/<id>/`, con su nombre (`#4156 - Sanji - Puzzled Aloha.png`).
+2. **Hoja de andar con Gemini**: el atlas y el texto de `tools/gemini-8d.js` (5 filas: abajo, diagonal
    abajo, de lado, diagonal arriba, arriba × 4 pasos, fondo magenta liso). Se guarda como
-   . El script lo hace por la API (necesita facturación en Google Cloud: la cuota
+   `<Id>Walk.png`. El script lo hace por la API (necesita facturación en Google Cloud: la cuota
    gratuita no incluye imágenes); si no, en la web de Gemini con el mismo texto.
-3. **En **:  (la hoja de Gemini) con  (se corta
-   sola; : hacia dónde miran las filas de lado),  magenta con  y
-    (quita el halo rosa), y del atlas,  /  con  (alto de
+3. **En `tools/sprites.config.js`**: `walkSheet` (la hoja de Gemini) con `layout: 'walk5'` (se corta
+   sola; `walkFacing`: hacia dónde miran las filas de lado), `walkBg` magenta con `pockets: true` y
+   `despill` (quita el halo rosa), y del atlas, `anims.attack` / `anims.hurt` con `sideRef` (alto de
    una pose de pie en el atlas, para que las agachadas no salgan enormes).
 
 Para elegir los fotogramas de una hoja nueva:
