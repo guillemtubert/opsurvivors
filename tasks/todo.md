@@ -101,10 +101,10 @@ Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ni
 
 Atlas de Treasure Cruise (Spriters Resource, con el navegador del usuario). Descargas múltiples bloqueadas
 por Chrome: hay que permitirlas en el sitio, o bajarlos a mano.
-- [ ] Atlas (IDs de página en Spriters): baroque 216304 · enelsoldier (Massacre Soldier) 216162 · cp9agent (Kaku) 216349
+- [x] Atlas descargados (14, en su carpeta como Atlas_<id>.png): baroque 216304 · enelsoldier (Massacre Soldier) 216162 · cp9agent (Kaku) 216349
       · zombie (General Zombie) 216055 · pacifista (PX) 263209 · fishman (Karate Fishman) 472627 · toysoldier 533758
       · chess 216407 · gifter 216611 · mars 488148 · jupiter 483314 · venus 483310 · mercury 488141 · saturn 269888
-      Guardar cada uno como assets/ref/characters/<id>/Atlas_<id>.png (carpetas ya creadas).
+      (hecho) Guardar cada uno como assets/ref/characters/<id>/Atlas_<id>.png (carpetas ya creadas).
 - [ ] Marinas: Zephyr 216428, Ain 216430, T-Bone 262845 (East Blue y Guerra en la Cumbre).
 - [ ] Jefes de la lista: Jack 275627, Kuzan 279744 (ya descargado en Descargas: #1192).
 
