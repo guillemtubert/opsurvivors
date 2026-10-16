@@ -83,12 +83,8 @@ G.Islands = (() => {
       { id: 'onigashima', name: 'Onigashima',       sub: 'La isla de Kaido',     biome: 13, boss: 'kaido', chests: 6 }
     ] },
     { id: 'final', name: 'Saga Final', enemies: ['seraphim'], ship: 'sunny', islands: [
-      { id: 'egghead',  name: 'Egghead',          sub: 'La isla del futuro',        biome: 14, boss: 'saturn' },
-      { id: 'elbaph',   name: 'Elbaph',           sub: 'El bosque de los gigantes', biome: 15, boss: 'loki' },
-      { id: 'elbaph1',  name: 'Elbaph',           sub: 'Los Caballeros Sagrados',   biome: 15, boss: ['sommers', 'killingham'] },
-      { id: 'elbaph2',  name: 'Elbaph',           sub: 'Los Caballeros Sagrados',   biome: 15, boss: 'gunko' },
-      { id: 'elbaph3',  name: 'Elbaph',           sub: 'Los Caballeros Sagrados',   biome: 15, boss: 'shamrock' },
-      { id: 'throne',   name: 'El Trono Vacío',   sub: 'Mary Geoise',               biome: 16, boss: 'imu', chests: 6 }
+      { id: 'egghead', name: 'Egghead',  sub: 'Los cinco ancianos',         biome: 14, boss: ['saturn', 'mars', 'jupiter', 'venus', 'mercury'] },
+      { id: 'elbaph',  name: 'Elbaph',   sub: 'Imu, el ocupante del trono', biome: 15, boss: 'imu', chests: 6 }
     ] }
   ];
 

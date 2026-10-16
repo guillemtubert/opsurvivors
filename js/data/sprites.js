@@ -1282,6 +1282,10 @@ G.SPRITES = {
     killingham:  Object.assign(swap('sommers', { h: '#c8b0e0', c: '#6a4a9a' }), { scale: 3 }),
     gunko:       Object.assign(swap('sommers', { h: '#e8a040', c: '#c83a3a' }), { scale: 3 }),
     shamrock:    Object.assign(swap('sommers', { h: '#1a1a2a', c: '#1a4a2a', y: '#9ad04a' }), { scale: 3 }),
+    mars:        Object.assign(swap('saturn', { t: '#f2f2f2', T: '#c8c8d8', h: '#e04a3a' }), { scale: 3 }),
+    jupiter:     Object.assign(swap('saturn', { t: '#3a6ad8', T: '#2a4a98', h: '#f2d063' }), { scale: 3 }),
+    venus:       Object.assign(swap('saturn', { t: '#f4c0d0', T: '#d890a8', h: '#ff8ac0' }), { scale: 3 }),
+    mercury:     Object.assign(swap('saturn', { t: '#4a8a4a', T: '#2a5a2a', h: '#9ad04a' }), { scale: 3 }),
     seraphim:    swap('marine', { c: '#f4f1ea', b: '#ffd23f', B: '#c9a23a', s: '#5a3a2a', S: '#3a2418' })
   });
 })();

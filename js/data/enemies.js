@@ -84,6 +84,10 @@ G.Enemies = (() => {
     { id: 'killingham', name: 'Killingham',    title: 'Caballero Sagrado',      sprite: 'killingham', hp: 1500, spd: 70, dmg: 28, xp: 220 },
     { id: 'gunko',     name: 'Gunko',          title: 'Caballera Sagrada',      sprite: 'gunko',     hp: 3200, spd: 74,  dmg: 32, xp: 440 },
     { id: 'shamrock',  name: 'Shamrock',       title: 'Jefe de los Caballeros Sagrados', sprite: 'shamrock', hp: 3800, spd: 78, dmg: 34, xp: 520 },
+    { id: 'mars',     name: 'Mars',     title: 'Gorosei',  sprite: 'mars',     hp: 1800, spd: 58, dmg: 28, xp: 260 },
+    { id: 'jupiter',  name: 'Jupiter',  title: 'Gorosei',  sprite: 'jupiter',  hp: 1800, spd: 58, dmg: 28, xp: 260 },
+    { id: 'venus',    name: 'Venus',    title: 'Gorosei',  sprite: 'venus',    hp: 1800, spd: 58, dmg: 28, xp: 260 },
+    { id: 'mercury',  name: 'Mercury',  title: 'Gorosei',  sprite: 'mercury',  hp: 1800, spd: 58, dmg: 28, xp: 260 },
     { id: 'moria',     name: 'Gecko Moria',    title: 'Shichibukai',            sprite: 'moria',     hp: 4000, spd: 48, dmg: 36, xp: 500 },
     // Sin isla todavía
     { id: 'imu',       name: 'Imu',            title: 'Ocupante del Trono Vacío', sprite: 'imu',     hp: 4500, spd: 55, dmg: 38, xp: 600, hover: true }
