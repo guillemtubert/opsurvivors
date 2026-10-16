@@ -24,5 +24,11 @@ G.CUSTOM_SPRITES = Object.assign(G.CUSTOM_SPRITES || {}, {
   jupiter: {"file":"assets/chars/jupiter.png","fw":50,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3]},"fps":{"idle":1,"walk":7},"body":[2,0,46,46]},
   venus: {"file":"assets/chars/venus.png","fw":52,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4]},"fps":{"idle":1,"walk":7},"body":[5,1,47,46]},
   mercury: {"file":"assets/chars/mercury.png","fw":54,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2]},"fps":{"idle":1,"walk":7},"body":[7,1,47,46]},
-  saturn: {"file":"assets/chars/saturn.png","fw":64,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4]},"fps":{"idle":1,"walk":7},"body":[17,0,47,46]}
+  saturn: {"file":"assets/chars/saturn.png","fw":64,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4]},"fps":{"idle":1,"walk":7},"body":[17,0,47,46]},
+  enelsoldier: {"file":"assets/chars/enelsoldier.png","fw":122,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[41,0,39,46]},
+  cp9agent: {"file":"assets/chars/cp9agent.png","fw":64,"fh":54,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[16,8,42,46]},
+  zombie: {"file":"assets/chars/zombie.png","fw":48,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4,5],"attack":[6]},"fps":{"idle":1,"walk":7,"attack":6},"body":[10,0,29,46]},
+  pacifista: {"file":"assets/chars/pacifista.png","fw":64,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[17,0,30,46]},
+  gifter: {"file":"assets/chars/gifter.png","fw":46,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4,5],"attack":[6]},"fps":{"idle":1,"walk":7,"attack":6},"body":[11,0,31,46]},
+  mars: {"file":"assets/chars/mars.png","fw":68,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[14,0,48,46]}
 });

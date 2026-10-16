@@ -40,7 +40,18 @@ function background(img) {
   return '#' + [0, 1, 2].map(c => img.data[c].toString(16).padStart(2, '0')).join('');
 }
 
+/** Poses elegidas a mano (coordenadas del atlas): tienen prioridad sobre la detección automática. */
+const MANUAL = {
+  enelsoldier: { bg: '#ebebeb', walk: [[20, 85, 145, 170], [208, 85, 150, 170], [405, 85, 145, 170], [598, 85, 147, 170]], attack: [[280, 300, 300, 135]] },
+  zombie:      { bg: '#ebebeb', walk: [[45, 55, 115, 180], [240, 55, 140, 180], [420, 55, 120, 180], [50, 885, 120, 170], [240, 885, 120, 170]], attack: [[25, 310, 165, 170]] },
+  pacifista:   { bg: '#ebebeb', walk: [[15, 55, 135, 215], [175, 55, 135, 215], [335, 55, 135, 215], [495, 55, 135, 215]], attack: [[210, 310, 230, 215]] },
+  gifter:      { bg: '#ebebeb', walk: [[25, 75, 100, 150], [150, 75, 100, 150], [280, 75, 110, 150], [410, 85, 150, 140], [600, 85, 150, 140]], attack: [[40, 715, 120, 150]] },
+  mars:        { bg: '#ebebeb', walk: [[35, 5, 275, 260], [345, 5, 270, 260], [645, 5, 270, 260], [35, 285, 280, 240]], attack: [[5, 1035, 350, 215]] },
+  cp9agent:    { bg: '#ebebeb', walk: [[50, 70, 130, 155], [240, 70, 130, 155], [430, 65, 135, 170], [620, 65, 115, 170]], attack: [[220, 890, 170, 185]] }
+};
+
 function frames(id) {
+  if (MANUAL[id]) return { bg: MANUAL[id].bg || null, walk: MANUAL[id].walk, attack: MANUAL[id].attack };
   const img0 = decode(fs.readFileSync(path.join(ROOT, REF, ENEMIES[id])));
   const bg = background(img0);
   const img = bg ? P.removeFlatBg(img0, bg, 30, 2, 1, false) : img0;
