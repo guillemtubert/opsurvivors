@@ -124,3 +124,12 @@ Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis
   (AI Studio → clave → configurar facturación) y poner un tope de gasto. Coste estimado: unos 2-12 € para todo el juego
   (Flash ~0,04 € por imagen; Pro más caro). Después `node tools/gemini-8d.js <id>` por cada personaje.
 - Pendiente de la generación: enemigos (33) y ancianos (Mars, Jupiter, Venus, Mercury) y jefes nuevos.
+
+## Estado de los enemigos (con las poses de su atlas)
+- [x] Con poses automáticas (tools/auto-enemy.js → tools/enemy.config.js): baroque (8), fishman (8), toysoldier, chess, jupiter, venus, mercury, saturn.
+- [ ] Revisar a ojo los de pocos pasos (toysoldier, chess, mercury: 2 pasos).
+- [ ] Sin pasos detectados (siguen con dibujo provisional): enelsoldier, cp9agent, zombie, pacifista, gifter, mars.
+      Revisar sus atlas a mano o elegir fotogramas con tools/contact.js.
+- [ ] Tercer enemigo de Alabasta, Dressrosa, Whole Cake y Wano: sin atlas (el usado es el de la saga).
+- [ ] Seraphim (Final): sin atlas en la lista.
+- [ ] Ataques de los enemigos nuevos: comprobar en el juego que no sobrecargan la pantalla.
