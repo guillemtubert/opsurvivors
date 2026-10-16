@@ -444,5 +444,16 @@ module.exports = {
         attack: [[400, 790, 290, 220]]
       }
     },
+  kaidodragon: {
+      sheet: REF + 'kaidodragon/Atlas_3887.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[393, 8, 331, 238]],
+        walk: [[393, 8, 331, 238], [8, 8, 362, 238]],
+        attack: [[0, 2056, 250, 240]]
+      }
+    },
   }
 };

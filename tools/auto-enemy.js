@@ -32,6 +32,7 @@ const ENEMIES = {
   mercury:    'mercury/Atlas_mercury.png',
   saturn:     'saturn/Atlas_saturn.png',
   enel:       'enel/Atlas_3244.png',
+  kaidodragon:'kaidodragon/Atlas_3887.png',
   navyhalberd:'marine/Atlas_0181.png',
   navypistol: 'marine/Atlas_0182.png',
   navyknuckle:'marine/Atlas_0184.png'
@@ -49,6 +50,7 @@ function background(img) {
 
 /** Poses elegidas a mano (coordenadas del atlas): tienen prioridad sobre la detección automática. */
 const MANUAL = {
+  kaidodragon: { bg: '#ebebeb', walk: [[393, 8, 331, 238], [8, 8, 362, 238]], attack: [[0, 2056, 250, 240]] },
   enel: { bg: '#ebebeb', walk: [[10, 515, 175, 215], [195, 515, 170, 215], [380, 515, 170, 215]], attack: [[400, 790, 290, 220]] },
   navyhalberd: { bg: '#ebebeb', walk: [[75, 25, 120, 185], [330, 25, 120, 185], [585, 25, 120, 185]], attack: [[20, 830, 225, 175]] },
   navypistol:  { bg: '#ebebeb', walk: [[45, 30, 130, 175], [240, 30, 130, 175], [430, 30, 130, 175]], attack: [[240, 835, 140, 170]] },

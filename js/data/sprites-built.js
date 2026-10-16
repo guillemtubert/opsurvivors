@@ -56,5 +56,6 @@ G.CUSTOM_SPRITES = Object.assign(G.CUSTOM_SPRITES || {}, {
   kaido: {"file":"assets/chars/kaido.png","fw":56,"fh":48,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[9,2,45,46]},
   navyhalberd: {"file":"assets/chars/navyhalberd.png","fw":58,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[16,0,32,46]},
   navypistol: {"file":"assets/chars/navypistol.png","fw":36,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[5,0,29,46]},
-  navyknuckle: {"file":"assets/chars/navyknuckle.png","fw":36,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[5,1,28,46]}
+  navyknuckle: {"file":"assets/chars/navyknuckle.png","fw":36,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[5,1,28,46]},
+  kaidodragon: {"file":"assets/chars/kaidodragon.png","fw":74,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2],"attack":[3]},"fps":{"idle":1,"walk":7,"attack":6},"body":[5,0,63,46]}
 });
