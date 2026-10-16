@@ -150,3 +150,12 @@ Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis
 - [ ] Kaido (forma de dragón, kaidodragon): usa temporalmente las poses humanas. Falta su atlas de dragón.
 - [ ] Imu: sigue con su atlas de Treasure Cruise (no tiene hoja de andar propia).
 - [ ] Seraphim, Loki, Gunko, Sommers, Killingham y Shamrock: sin atlas en ninguna lista.
+
+## Animación (revisión de coherencia)
+- [x] Pies a la misma línea en todos los pasos (build-sprites: alineado por la última fila con píxeles).
+- [x] Fotogramas repetidos sustituidos: Franky, Oars, Enel Soldier, PX-1.
+- [x] Pasos de andar: todos tienen 2 o más (la revisión automática: tools/walkcheck en scratchpad, no en el repo).
+- [ ] Marina (derecha/izquierda) y Enel Soldier (derecha, arriba-derecha, arriba-izquierda, izquierda): solo 1 paso
+      de andar en esa dirección; el juego les pone rebote. Subsanar con más fotogramas de lado en su hoja.
+- [ ] Kaido dragón: usa poses humanas (falta su atlas).
+- [ ] Imu: pendiente (decisión del usuario).
