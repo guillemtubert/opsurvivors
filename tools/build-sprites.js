@@ -176,9 +176,15 @@ function build(id, cfg, K) {
   // Celda común: pies abajo y centrados en el punto de apoyo de cada fotograma.
   const anchors = done.map((d, i) => P.anchor(d).x - order[i].dx);
   const half = Math.max(...done.map((d, i) => Math.max(anchors[i], d.w - anchors[i])));
-  const fw = half * 2, fh = Math.max(...done.map(d => d.h));
-  const strip = P.blank(fw * done.length, fh);
-  done.forEach((d, i) => P.blit(strip, d, i * fw + half - anchors[i], fh - d.h));
+  // Línea de pies común: la última fila con píxeles de cada fotograma (no la base del recorte,
+  // que cambia según la caja elegida). Así los pasos de andar no bailan de arriba abajo.
+  const feetRow = d => { for (let y = d.h - 1; y >= 0; y--) { let n = 0; for (let x = 0; x < d.w; x++) if (d.data[(y * d.w + x) * 4 + 3] && ++n >= 2) return y; } return d.h - 1; };
+  const fr = done.map(feetRow);
+  const G = Math.max(0, ...done.map((d, i) => d.h - 1 - fr[i]));
+  const fh = Math.max(...done.map((d, i) => 1 + G + fr[i]));
+  const strip = P.blank(half * 2 * done.length, fh);
+  done.forEach((d, i) => P.blit(strip, d, i * half * 2 + half - anchors[i], fh - 1 - G - fr[i]));
+  const fw = half * 2;
 
   const file = 'assets/chars/' + id + '.png';
   fs.mkdirSync(path.join(ROOT, 'assets/chars'), { recursive: true });
