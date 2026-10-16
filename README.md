@@ -139,6 +139,11 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | | Rusukaina | Rayleigh | Cortes en cuadrícula · Haki del Rey (aturde si estás cerca) |
 | Isla Gyojin | Sabaody | Pacifista PX-1 | Ursus Shock: burbuja que flota y estalla · Pad Hō: zarpazos de aire |
 | | Isla Gyojin | Hody Jones | Muros de agua con un hueco · esteroides a media vida |
+| Dressrosa | Punk Hazard | Caesar Clown | Shinokuni: limo que se divide al matarlo · Gastanet: nubes de gas que luego estallan todas |
+| | Dressrosa | Doflamingo | Birdcage: jaula de hilos que encoge · Parasite: hilos que invierten los controles |
+| Whole Cake | Zou | Jack | Barrido con la trompa a su alrededor · forma de mamut a media vida |
+| | Isla Cacao | Katakuri | Lanzas de mochi y puño gigante apuntados a donde vas a estar |
+| | Tottoland | Big Mom (huida) | Soul Pocus: te roba vida si estás cerca · ataques de hambre · Prometheus se parte en cuatro |
 | Final | El Trono Vacío | Imu (jefe final) | Látigo negro que gira · anillos de espinas con un hueco |
 
 Efectos que pueden poner los jefes al jugador (`player.affect`): aturdido, piedra, controles al

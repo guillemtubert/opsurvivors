@@ -109,6 +109,16 @@ G.FX = (() => {
       ctx.globalAlpha = 0.25 + 0.35 * k;
       ctx.fillStyle = m.col;
       if (m.kind === 'smoke' || m.kind === 'hidden') continue;   // smoke va por encima (drawOver); hidden no se dibuja
+      if (m.kind === 'cage') {
+        ctx.globalAlpha = 0.85;
+        ctx.strokeStyle = '#f4f1ea'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.ellipse(m.x, m.y, m.r, m.r * 0.7, 0, 0, 6.283); ctx.stroke();
+        for (let i = 0; i < 24; i++) {
+          const a = i / 24 * 6.283, x = m.x + Math.cos(a) * m.r, y = m.y + Math.sin(a) * m.r * 0.7;
+          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y - 40); ctx.stroke();
+        }
+        continue;
+      }
       if (m.kind === 'spring') {
         // Muelle en el suelo: espiral de metal.
         ctx.globalAlpha = 1;

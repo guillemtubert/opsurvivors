@@ -35,6 +35,12 @@
  *   rayleigh   cortes en cuadrícula por toda la zona · Haki del Rey (aturde si estás cerca)
  *   px1        Ursus Shock: burbuja de aire que flota y estalla · Pad Hō: zarpazos de aire
  *   hody       muros de agua que cruzan la isla (con un hueco) · esteroides: más rápido a media vida
+ *   caesar     Shinokuni: limo que se divide al golpearlo · Gastanet: suelta nubes de gas y luego las enciende todas
+ *   doflamingo Birdcage: la jaula de hilos encoge alrededor · Parasite: hilos que te invierten los controles
+ *   jack       barrido con la trompa a su alrededor · a media vida se convierte en mamut (más grande, te arrolla)
+ *   katakuri   Haki de observación: lanzas de mochi y un puño gigante apuntados a donde VAS a estar
+ *   bigmom     (huida) Soul Pocus: te roba la vida si estás cerca · ataques de hambre (mucho más rápida) ·
+ *              Prometheus: bola de fuego que se parte en cuatro al caer
  *   mr3        Candle Lock: jaula de cera con una salida · charcos de cera que frenan
  *   wapol      Baku Baku: te aspira y muerde · salto que aplasta
  *   crocodile  Desert Spada: grietas de arena que avanzan · Sables: tornado que te sigue
@@ -783,6 +789,160 @@ G.Bosses = (() => {
           m.a = vert ? Math.PI / 2 : 0; m.len = len; m.w = 22;
         }
         G.Audio.sfx('boom');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    // ---------------- Dressrosa y Whole Cake ----------------
+
+    caesar(e, k) {
+      // Flota a media distancia.
+      const keep = k.d < 170 ? -1 : k.d > 250 ? 1 : 0;
+      // Shinokuni: un limo que se divide en dos cada vez que lo matas.
+      if (ready(e, k, 't1', 7, 9, 500)) {
+        e.atkAt = k.now;
+        const p = besidePlayer(k.pl, 130);
+        if (p) {
+          G.FX.burst(p[0], p[1], '#9a6ad0', 14, 140);
+          G.EnemyMgr.add(new G.Enemy(G.Enemies.BY_ID.slime, { x: p[0], y: p[1], dmgK: 1 + G.Game.time / 300 }));
+          G.HUD.banner('¡Shinokuni!', 'Se divide al golpearlo', '#9a6ad0');
+        }
+      }
+      // Gastanet: suelta nubes de gas que flotan; al rato, chasquea y estallan todas.
+      if (ready(e, k, 't2', 6, 7, 500)) {
+        const clouds = [];
+        for (let i = 0; i < 5; i++) {
+          const x = k.pl.x + G.U.rand(-120, 120), y = k.pl.y + G.U.rand(-90, 90);
+          const vx = G.U.rand(-20, 20), vy = G.U.rand(-15, 15);
+          clouds.push(zone(x, y, 32, '#8ac060', 3.2, (m, dt) => { m.x += vx * dt; m.y += vy * dt; }));
+        }
+        e.ai.boomAt = k.now + 3.0; e.ai.clouds = clouds;
+        G.FX.text(e.x, e.y - 60, '¡Gastanet!', '#8ac060', true);
+      }
+      if (e.ai.boomAt && k.now >= e.ai.boomAt) {
+        e.ai.boomAt = 0; e.atkAt = k.now;
+        for (const m of e.ai.clouds) {
+          G.FX.ring(m.x, m.y, 6, 48, '#ffb040', 0.3, 5); G.FX.burst(m.x, m.y, '#ff8a2a', 12, 160);
+          if (near(k.pl, m.x, m.y, 36)) k.pl.hurt(e.dmg * 0.8, k.now);
+          m.life = 0;
+        }
+        G.Audio.sfx('boom'); G.Camera.kick(0.4);
+      }
+      return { mx: k.nx * keep, my: k.ny * keep };
+    },
+
+    doflamingo(e, k) {
+      // Birdcage: una jaula de hilos que encoge; fuera de ella, los hilos cortan.
+      if (ready(e, k, 't1', 16, 18, 600)) {
+        const cx = k.pl.x, cy = k.pl.y, R0 = 340, R1 = 120, T = 10;
+        let hitT = -9;
+        const m = zone(cx, cy, R0, '#f4f1ea', T, mm => {
+          mm.r = R1 + (R0 - R1) * (mm.life / T);
+          const t = G.Game.now;
+          if (t - hitT > 0.5 && !k.pl.dead && G.U.dist(k.pl.x, k.pl.y, cx, cy) > mm.r) { hitT = t; k.pl.hurt(e.dmg * 0.4, t); }
+        }, 'cage');
+        G.HUD.banner('¡Birdcage!', 'Quédate dentro de la jaula', '#ff6bb0');
+      }
+      // Parasite: hilos hacia ti; si te pillan, controles al revés.
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          for (const da of [-0.2, 0, 0.2]) {
+            const a = e.ai.aim + da, x1 = e.x + Math.cos(a) * 300, y1 = e.y + Math.sin(a) * 300;
+            G.FX.beam(e.x, e.y - 14, x1, y1 - 14, 2, '#f4f1ea', 0.25);
+            if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 6 + k.pl.r) { k.pl.affect('invert', 3); k.pl.hurt(e.dmg * 0.4, k.now); }
+          }
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't2', 3.6, 4.4, 360)) {
+        e.state = 'aim'; e.stateT = 0.6; e.ai.aim = Math.atan2(k.dy, k.dx);
+        for (const da of [-0.2, 0, 0.2]) warnLine(e.x, e.y, e.ai.aim + da, 300, 4, '#ff6bb0', 0.6);
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    jack(e, k) {
+      // A media vida: forma de mamut (una vez). Más grande y más lento; si te toca, te arrolla.
+      if (!e.ai.mammoth && e.hp < e.maxHp * 0.5) {
+        e.ai.mammoth = true; e.scale *= 1.6; e.r *= 1.6; e.spd *= 0.8; e.dmg *= 1.3;
+        G.HUD.banner('¡Forma de mamut!', '', '#c8a070');
+        G.FX.burst(e.x, e.y - 30, '#c8a070', 24, 200); G.Camera.kick(0.6);
+      }
+      if (e.ai.mammoth && !k.pl.dead && k.d < e.r + k.pl.r + 4 && !k.pl.shove) k.pl.push(k.nx * 360, k.ny * 360, 0.35);
+      // Barrido con la trompa a su alrededor (casi una vuelta entera).
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const R = e.r + 70;
+          G.FX.slash(e.x, e.y, e.ai.aim, 5.2, R, '#c8a070', 0.3, 'slash3');
+          G.Audio.sfx('punch');
+          if (k.d < R + k.pl.r) { k.pl.hurt(e.dmg, k.now); k.pl.push(k.nx * 300, k.ny * 300, 0.3); }
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 3.0, 3.8, 260)) {
+        e.state = 'aim'; e.stateT = 0.7; e.ai.aim = Math.atan2(k.dy, k.dx);
+        warn(e.x, e.y, e.r + 70, '#c8a070', 0.7);
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    katakuri(e, k) {
+      // Ve el futuro: apunta a donde vas a estar dentro de t segundos.
+      const future = t => [k.pl.x + k.pl.mvx * k.pl.spd * t, k.pl.y + k.pl.mvy * k.pl.spd * t];
+      // Lanzas de mochi: tres, a donde estarás al llegar.
+      if (ready(e, k, 't1', 2.4, 3.0, 440)) {
+        e.atkAt = k.now;
+        for (let i = 0; i < 3; i++) {
+          const sp = 280, [fx, fy] = future(k.d / sp * (0.8 + i * 0.2));
+          shot(e, Math.atan2(fy - e.y, fx - e.x), sp, e.dmg * 0.5, { vis: 'knife', r: 7, color: '#f4e8d0' });
+        }
+        G.Audio.sfx('slash');
+      }
+      // Puño de mochi gigante desde el suelo, donde estarás dentro de 1 s.
+      if (ready(e, k, 't2', 5.0, 6.0, 500)) {
+        const [fx, fy] = future(1.0);
+        warn(fx, fy, 50, '#f4e8d0', 1.0, () => {
+          G.FX.ring(fx, fy, 8, 64, '#f4e8d0', 0.35, 8); G.FX.burst(fx, fy, '#e8dcc0', 16, 180);
+          G.Audio.sfx('boom'); G.Camera.kick(0.4);
+          if (near(k.pl, fx, fy, 50)) k.pl.hurt(e.dmg * 1.4, G.Game.now);
+        });
+        G.FX.text(e.x, e.y - 60, 'Veo tu futuro', '#f4e8d0', true);
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    bigmom(e, k) {
+      // Soul Pocus: cerca de ella, la vida se te va.
+      if (!e.ai.aura) e.ai.aura = zone(e.x, e.y, 130, '#c86bff', 1e9, m => { m.x = e.x; m.y = e.y; if (e.dead) m.life = 0; });
+      e.ai.drain = (e.ai.drain || 0) - k.dt;
+      if (e.ai.drain <= 0 && k.d < 130 && !k.pl.dead) { e.ai.drain = 0.5; k.pl.hurt(e.dmg * 0.25, k.now); G.FX.puff(k.pl.x, k.pl.y - 20, '#c86bff', 2); }
+      // Ataques de hambre: unos segundos mucho más rápida.
+      if (e.state === 'hungry') {
+        if (Math.random() < 0.5) G.FX.puff(e.x, e.y, '#ff9ec4', 1);
+        if ((e.stateT -= k.dt) <= 0) e.state = 'walk';
+        return { mx: k.nx, my: k.ny, spd: 2.0 };
+      }
+      if (ready(e, k, 't1', 9, 11, 700)) {
+        e.state = 'hungry'; e.stateT = 3.5;
+        G.HUD.banner('¡CROQUEMBOUCHE!', 'Big Mom tiene hambre: ¡corre!', '#ff6bb0');
+      }
+      // Prometheus: bola de fuego que cae donde estás y se parte en cuatro.
+      if (ready(e, k, 't2', 3.0, 3.6, 600)) {
+        const tx = k.pl.x, ty = k.pl.y;
+        shot(e, Math.atan2(ty - e.y, tx - e.x), 220, e.dmg * 0.6, {
+          vis: 'firefist', r: 10, life: Math.min(2, Math.hypot(tx - e.x, ty - e.y) / 220),
+          land: (x, y) => {
+            G.FX.burst(x, y, '#ff8a2a', 12, 160); G.Audio.sfx('boom');
+            for (let i = 0; i < 4; i++) {
+              const a = i / 4 * 6.283 + 0.785;
+              G.Projectiles.spawn({ foe: true, x, y, vx: Math.cos(a) * 160, vy: Math.sin(a) * 160, dmg: e.dmg * 0.4, r: 6, life: 1.4, color: '#ff8a2a', vis: 'ebullet' });
+            }
+          }
+        });
       }
       return { mx: k.nx, my: k.ny };
     },

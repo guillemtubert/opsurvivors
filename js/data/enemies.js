@@ -12,6 +12,7 @@
  * empiezan igual de fuertes, porque cada saga se juega desde nivel 1.
  * `from` = segundo de dificultad en que empieza a salir (ver Spawner); `w` = peso en la bolsa.
  * invincible: true  jefe de una isla de huida: no se le puede vencer
+ * split: n         al morir se divide en dos más pequeños, n veces (el limo de Caesar)
  * La vida y el daño crecen con el tiempo (ver Spawner).
  */
 G.Enemies = (() => {
@@ -29,6 +30,8 @@ G.Enemies = (() => {
     { id: 'toysoldier',  name: 'Soldado de juguete', sprite: 'toysoldier', from: 0,  w: 10, hp: 15, spd: 80, dmg: 6, xp: 3, behavior: 'chase' },
     { id: 'chess',       name: 'Chess Soldier',     sprite: 'chess',       from: 0,  w: 10, hp: 22, spd: 70, dmg: 7, xp: 4, behavior: 'chase' },
     { id: 'gifter',      name: 'Gifter',            sprite: 'gifter',      from: 0,  w: 10, hp: 32, spd: 66, dmg: 8, xp: 4, behavior: 'tank' },
+    // Invocados por jefes (no salen solos).
+    { id: 'slime',       name: 'Shinokuni',         sprite: 'slime',       from: 0,  w: 0,  hp: 60, spd: 62, dmg: 8, xp: 2, behavior: 'chase', split: 2 },
     { id: 'seraphim',    name: 'Seraphim',          sprite: 'seraphim',    from: 0,  w: 10, hp: 24, spd: 70, dmg: 7, xp: 4, behavior: 'ranged', shot: 8 }
   ];
 
@@ -67,6 +70,11 @@ G.Enemies = (() => {
     { id: 'rayleigh',  name: 'Silvers Rayleigh', title: 'El Rey Oscuro',        sprite: 'rayleigh',  hp: 2600, spd: 90,  dmg: 30, xp: 360 },
     { id: 'px1',       name: 'Pacifista PX-1', title: 'Arma humana',            sprite: 'px1',       hp: 1500, spd: 52,  dmg: 26, xp: 220 },
     { id: 'hody',      name: 'Hody Jones',     title: 'Nuevos Piratas Gyojin',  sprite: 'hody',      hp: 2400, spd: 70,  dmg: 30, xp: 340 },
+    { id: 'caesar',    name: 'Caesar Clown',   title: 'El Maestro del Gas',     sprite: 'caesar',    hp: 1600, spd: 64,  dmg: 26, xp: 240, hover: true },
+    { id: 'doflamingo', name: 'Donquixote Doflamingo', title: 'El Demonio Celestial', sprite: 'doflamingo', hp: 2600, spd: 78, dmg: 32, xp: 380 },
+    { id: 'jack',      name: 'Jack',           title: 'La Sequía',              sprite: 'jack',      hp: 1600, spd: 66,  dmg: 28, xp: 240 },
+    { id: 'katakuri',  name: 'Charlotte Katakuri', title: 'El Comandante Dulce', sprite: 'katakuri', hp: 2600, spd: 80,  dmg: 32, xp: 380 },
+    { id: 'bigmom',    name: 'Big Mom',        title: 'Una de los Cuatro Emperadores', sprite: 'bigmom', hp: 9999, spd: 70, dmg: 32, xp: 0, invincible: true },
     { id: 'moria',     name: 'Gecko Moria',    title: 'Shichibukai',            sprite: 'moria',     hp: 4000, spd: 48, dmg: 36, xp: 500 },
     // Sin isla todavía
     { id: 'imu',       name: 'Imu',            title: 'Ocupante del Trono Vacío', sprite: 'imu',     hp: 4500, spd: 55, dmg: 38, xp: 600, hover: true }

@@ -175,6 +175,14 @@ G.Enemy = class Enemy {
     G.FX.puff(this.x, this.y, '#d8d0c0', 3);
     G.Pickups.dropEnemy(this);
     G.Game.onKill(this);
+    // Se divide en dos más pequeños (limo de Caesar).
+    if (this.def.split > 0) {
+      const child = Object.assign({}, this.def, { hp: this.def.hp * 0.5, split: this.def.split - 1 });
+      for (const d of [-1, 1]) {
+        const c = G.EnemyMgr.add(new G.Enemy(child, { x: this.x + d * 14, y: this.y, dmgK: this.dmg / this.def.dmg }));
+        c.scale = this.scale * 0.75; c.r = this.r * 0.75;
+      }
+    }
   }
 
   draw(ctx, now) {
