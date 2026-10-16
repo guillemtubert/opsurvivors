@@ -86,13 +86,19 @@ module.exports = {
       }
     },
 
-    // Hecho para el juego: 8 direcciones con 3-4 pasos cada una, fondo negro.
+    // Sanji: andar generado con Gemini a partir del atlas #4156 «Puzzled Aloha» (tools/gemini-8d.js,
+    // 5 filas × 4 pasos sobre magenta, mirando a la izquierda) y poses de ataque y daño del atlas.
     sanji: {
-      sheet: REF + 'sanji/Sanji8D.png',
-      bgFlat: { color: '#000000', thr: 14, r: 3, fringe: 1 },
-      height: 44, colors: 24,
-      fps: { idle: 1, walk: 8 },
-      layout: 'rows4x2'
+      walkSheet: REF + 'sanji/SanjiWalk.png',
+      walkBg: { color: '#ff00ff', thr: 70, r: 1, fringe: 2, pockets: true, despill: 3 },      // ningún personaje lleva este magenta: fuera también los huecos
+      layout: 'walk5', walkFacing: 'left',
+      sheet: REF + 'sanji/#4156 - Sanji - Puzzled Aloha.png',      // fondo transparente
+      height: 46, sideHeight: 46, sideRef: 198, colors: 24,      // sideRef: Sanji de pie en el atlas
+      fps: { idle: 1, walk: 8, attack: 7, hurt: 1 },
+      anims: {
+        attack: [{ f: [423, 225, 183, 113], solo: true }, { f: [3, 224, 190, 117], solo: true }],   // patada en carrera, patada voladora
+        hurt: [{ f: [874, 325, 126, 116], solo: true }]
+      }
     },
 
     // Su atlas guarda la cabeza (capucha) y la túnica por separado.

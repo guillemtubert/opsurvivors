@@ -38,7 +38,9 @@ function sheetOf(cfg) {
   const key = cfg.sheet + '#sinfondo';
   if (!cache.has(key)) {
     const o = cfg.bgFlat;
-    cache.set(key, P.removeFlatBg(load(cfg.sheet), o.color || '#000000', o.thr || 14, o.r || 3, o.fringe === undefined ? 1 : o.fringe, o.pockets === 'auto' ? 'auto' : !!o.pockets));
+    let im = P.removeFlatBg(load(cfg.sheet), o.color || '#000000', o.thr || 14, o.r || 3, o.fringe === undefined ? 1 : o.fringe, o.pockets === 'auto' ? 'auto' : !!o.pockets);
+    if (o.despill) im = P.despill(im, o.color, o.despill);
+    cache.set(key, im);
   }
   return cache.get(key);
 }
@@ -104,9 +106,34 @@ function layoutRows4x2(cfg) {
   return out;
 }
 
+/**
+ * Distribución 'walk5' (la que se le pide a Gemini con tools/gemini-8d.js): 5 filas
+ * (abajo, diagonal abajo, de lado, diagonal arriba, arriba) × 4 pasos. Las tres filas
+ * del medio miran a un lado (walkFacing: 'left' o 'right'); el otro lado sale en espejo.
+ * Se cortan solas: cada fila es una franja y en ella se toman las 4 figuras más grandes.
+ */
+function layoutWalk5(cfg) {
+  const im = sheetOf(Object.assign({}, cfg, { sheet: cfg.walkSheet || cfg.sheet, bgFlat: cfg.walkBg || cfg.bgFlat }));
+  const bandH = im.h / 5, L = (cfg.walkFacing || 'left') === 'left';
+  const rows = [['down'], [L ? 'down-left' : 'down-right'], [L ? 'left' : 'right'], [L ? 'up-left' : 'up-right'], ['up']];
+  const out = {};
+  for (let r = 0; r < 5; r++) {
+    const y0 = Math.round(r * bandH);
+    const boxes = P.components(P.crop(im, 0, y0, im.w, Math.round(bandH)), 6, cfg.minPx || 800)
+      .sort((a, b) => b.n - a.n).slice(0, 4)               // las 4 figuras más grandes
+      .map(b => [b.x, b.y + y0, b.w, b.h]).sort((a, b) => a[0] - b[0]);
+    if (boxes.length < 2) throw new Error('walk5: la fila ' + (r + 1) + ' tiene ' + boxes.length + ' figuras');
+    out[rows[r][0]] = boxes;
+  }
+  const mirror = L ? { 'down-right': 'down-left', right: 'left', 'up-right': 'up-left' } : { 'down-left': 'down-right', left: 'right', 'up-left': 'up-right' };
+  for (const [d, m] of Object.entries(mirror)) out[d] = { mirror: m };
+  return out;
+}
+
 function build(id, cfg, K) {
   const order = [];                          // [{ anim, src, dx, dir }]
   if (cfg.layout === 'rows4x2') cfg = Object.assign({}, cfg, { dirs8: layoutRows4x2(cfg) });
+  if (cfg.layout === 'walk5') cfg = Object.assign({}, cfg, { dirs8: layoutWalk5(cfg) });
   if (cfg.dirs8) {
     // 8 direcciones: los pasos de cada una, en orden. { mirror: 'right' } = los de otra, en espejo.
     const srcs = {};
@@ -132,7 +159,8 @@ function build(id, cfg, K) {
   // Escala: la común (con su talla) o, si la hoja es de otra resolución, su alto propio.
   // (Con 8 direcciones y poses de otra hoja, cada hoja lleva su escala: sideHeight.)
   const k = cfg.height ? order[0].src.h / (cfg.height - 2) : K / (cfg.size || 1);
-  const kSide = cfg.sideHeight && order.find(o => o.side) ? order.find(o => o.side).src.h / (cfg.sideHeight - 2) : k;
+  // sideRef: alto en el atlas de una pose de pie (así las poses agachadas no salen enormes).
+  const kSide = cfg.sideHeight && order.find(o => o.side) ? (cfg.sideRef || order.find(o => o.side).src.h) / (cfg.sideHeight - 2) : k;
   // Sin motas sueltas (restos del fondo que quedan como puntos al reducir).
   const small = order.map(o => P.dropSpecks(P.downscale(o.src, o.side ? kSide : k, 0.5, cfg.accent || null)));
   const pal = P.medianCut(P.colorsOf(small), cfg.colors || 16);

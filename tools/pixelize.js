@@ -100,6 +100,27 @@
     return out;
   }
 
+  /**
+   * Quita el halo del fondo en el borde de la figura: los píxeles junto a lo transparente
+   * que tiran al color del fondo (el rosa que deja un fondo magenta). passes: anillos.
+   */
+  function despill(img, color, passes = 2) {
+    const { w, h } = img, data = Uint8Array.from(img.data), [R, Gc, B] = rgbOf(color);
+    const m = (R + Gc + B) / 3, ch = [R - m, Gc - m, B - m], len = Math.hypot(...ch) || 1;
+    const spill = i => { const a = (data[i] + data[i + 1] + data[i + 2]) / 3; return ((data[i] - a) * ch[0] + (data[i + 1] - a) * ch[1] + (data[i + 2] - a) * ch[2]) / len > 35; };
+    for (let k = 0; k < passes; k++) {
+      const kill = [];
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const i = (y * w + x) * 4;
+        if (data[i + 3] < 128 || !spill(i)) continue;
+        const edge = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => { const X = x + dx, Y = y + dy; return X < 0 || Y < 0 || X >= w || Y >= h || data[(Y * w + X) * 4 + 3] < 128; });
+        if (edge) kill.push(i);
+      }
+      for (const i of kill) data[i + 3] = 0;
+    }
+    return { w, h, data };
+  }
+
   function crop(img, x, y, w, h) {
     const out = blank(w, h);
     for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
@@ -142,7 +163,7 @@
       if (n >= minPx) out.push({ x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1, n });
       if (out.length > 4000) break;
     }
-    let merged = true;
+    let merged = gap >= 0;                    // gap < 0: no junta los trozos cercanos
     while (merged) {
       merged = false;
       for (let i = 0; i < out.length && !merged; i++) for (let j = i + 1; j < out.length; j++) {
@@ -373,5 +394,5 @@
     return out;
   }
 
-  return { blank, rgbOf, removeBg, removeFlatBg, crop, trim, components, largestOnly, dropSpecks, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
+  return { blank, rgbOf, removeBg, removeFlatBg, despill, crop, trim, components, largestOnly, dropSpecks, downscale, colorsOf, medianCut, nearest, quantize, outline, anchor, blit, flipX };
 });

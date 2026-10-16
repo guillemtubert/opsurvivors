@@ -1,6 +1,7 @@
 /* ============ contact.js — hoja de contactos numerada de una hoja de sprites ============
  *
- *   node tools/contact.js <hoja.png> <salida.png> [fondo=#ffffff] [umbral=30]
+ *   node tools/contact.js <hoja.png> <salida.png> [fondo=#ffffff] [umbral=30] [junta=6]
+ *   (junta: distancia a la que se juntan los trozos de una figura; -1 = no juntar, para atlas apretados)
  *
  * Quita el fondo liso, separa cada figura (componentes conexos) y las dibuja en
  * una cuadrícula con su número encima, en orden de lectura (filas de arriba
@@ -11,11 +12,11 @@ const fs = require('fs');
 const { decode, encode } = require('./png');
 const P = require('./pixelize');
 
-const [, , src, dst, bg = '#ffffff', thr = '30'] = process.argv;
+const [, , src, dst, bg = '#ffffff', thr = '30', gapArg = '6'] = process.argv;
 if (!src || !dst) { console.log('Uso: node tools/contact.js <hoja.png> <salida.png> [fondo] [umbral]'); process.exit(1); }
 
 const img = P.removeFlatBg(decode(fs.readFileSync(src)), bg, +thr, 2, 1, false);
-let boxes = P.components(img, 6, 200);
+let boxes = P.components(img, +gapArg, 200);
 const hs = boxes.map(b => b.h).sort((a, b) => a - b), med = hs[hs.length >> 1];
 boxes = boxes.filter(b => b.h > med * 0.45);
 
