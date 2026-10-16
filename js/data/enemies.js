@@ -60,6 +60,13 @@ G.Enemies = (() => {
     { id: 'garp',      name: 'Monkey D. Garp', title: 'El Héroe de la Marina',  sprite: 'garp',      hp: 9999, spd: 100, dmg: 30, xp: 0, invincible: true },
     { id: 'perona',    name: 'Perona',         title: 'La Princesa Fantasma',   sprite: 'perona',    hp: 1500, spd: 64, dmg: 22, xp: 220, hover: true },
     { id: 'oars',      name: 'Oars',           title: 'El Gigante Zombi',       sprite: 'oars',      hp: 2400, spd: 40, dmg: 34, xp: 320 },
+    { id: 'kizaru',    name: 'Kizaru',         title: 'Almirante de la Marina', sprite: 'kizaru',    hp: 9999, spd: 70,  dmg: 26, xp: 0, invincible: true },
+    { id: 'hancock',   name: 'Boa Hancock',    title: 'La Emperatriz Pirata',   sprite: 'hancock',   hp: 1600, spd: 72,  dmg: 26, xp: 240 },
+    { id: 'magellan',  name: 'Magellan',       title: 'Alcaide de Impel Down',  sprite: 'magellan',  hp: 9999, spd: 66,  dmg: 26, xp: 0, invincible: true },
+    { id: 'akainu',    name: 'Akainu',         title: 'Almirante de la Marina', sprite: 'akainu',    hp: 9999, spd: 74,  dmg: 30, xp: 0, invincible: true },
+    { id: 'rayleigh',  name: 'Silvers Rayleigh', title: 'El Rey Oscuro',        sprite: 'rayleigh',  hp: 2600, spd: 90,  dmg: 30, xp: 360 },
+    { id: 'px1',       name: 'Pacifista PX-1', title: 'Arma humana',            sprite: 'px1',       hp: 1500, spd: 52,  dmg: 26, xp: 220 },
+    { id: 'hody',      name: 'Hody Jones',     title: 'Nuevos Piratas Gyojin',  sprite: 'hody',      hp: 2400, spd: 70,  dmg: 30, xp: 340 },
     { id: 'moria',     name: 'Gecko Moria',    title: 'Shichibukai',            sprite: 'moria',     hp: 4000, spd: 48, dmg: 36, xp: 500 },
     // Sin isla todavía
     { id: 'imu',       name: 'Imu',            title: 'Ocupante del Trono Vacío', sprite: 'imu',     hp: 4500, spd: 55, dmg: 38, xp: 600, hover: true }

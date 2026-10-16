@@ -159,6 +159,7 @@ G.Player = class Player {
     if (this.fx.stun > 0 || this.fx.stone > 0) ax = ay = 0;
     if (this.fx.invert > 0) { ax = -ax; ay = -ay; }
     this.walking = !!(ax || ay);
+    this.mvx = 0; this.mvy = 0;            // hacia dónde va (para la mirada de Hancock)
     if (this.walking) {
       const s = this.spd, ox = this.x, oy = this.y;
       this.x += ax * s * dt; this.y += ay * s * dt;
@@ -173,6 +174,7 @@ G.Player = class Player {
       [this.x, this.y] = G.World.resolve(this.x, this.y, this.r * 0.8);
       // Los pasos avanzan con lo andado de verdad; polvo en cada zancada.
       this.walkDist += Math.hypot(this.x - ox, this.y - oy) / G.PX;
+      this.mvx = ax; this.mvy = ay;
       const n = Math.floor(G.Pix.stepPhase(G.Pix.sprite(this.sprite), this.walkDist));
       if (n !== this.stepN) {
         this.stepN = n;

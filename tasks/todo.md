@@ -8,7 +8,7 @@ Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ni
 - [x] Fase 1 — Smoker (Loguetown, huida), Mr. 9 y Miss Wednesday (Reverse Mountain), Mr. 5 y Miss Valentine (Whisky Peak)
 - [x] Fase 2 — Bellamy, Foxy, Franky, Garp (huida), Perona, Oars
 - [ ] Dibujo del Thousand Sunny (de momento sale el Merry)
-- [ ] Fase 3 — Kizaru (huida), Hancock, Magellan (huida), Akainu (huida), Rayleigh, PX-1, Hody
+- [x] Fase 3 — Kizaru (huida), Hancock, Magellan (huida), Akainu (huida), Rayleigh, PX-1, Hody
 - [ ] Fase 4 — Caesar, Doflamingo, Jack, Katakuri, Big Mom (huida)
 - [ ] Fase 5 — Queen, King, Kaido (dos fases), San Saturn, Loki, Sommers y Killingham, Gunko, Shamrock (comprobar en la wiki)
 - [ ] Biomas propios: canales, selva, prisión, manglar, coral, fuego/hielo, juguetes, dulces, Japón, futurista, bosque gigante

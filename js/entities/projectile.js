@@ -7,6 +7,7 @@
  *     orbit    { owner, r, w }: gira alrededor de owner mientras viva (cuchillas de Miss Wednesday)
  *     land     función(x, y) al caer al suelo o al darte (mocos-bomba de Mr. 5)
  *     hit      función(pl) al darte, además del daño (fantasmas de Perona: sin ataques)
+ *     wave     { amp, freq }: avanza en zigzag (hidras de Magellan)
  * Un enemigo con reflect (espejo de Foxy) devuelve tus disparos: pasan a ser suyos.
  */
 G.Projectiles = (() => {
@@ -58,6 +59,12 @@ G.Projectiles = (() => {
           p.bounce--;
         }
         p.x += p.vx * dt; p.y += p.vy * dt;
+      } else if (p.wave) {
+        // Zigzag: avanza en línea recta y se aparta a los lados con una onda.
+        if (p.bx === undefined) { p.bx = p.x; p.by = p.y; }
+        p.bx += p.vx * dt; p.by += p.vy * dt;
+        const [nx, ny] = G.U.norm(p.vx, p.vy), o = Math.sin(p.age * p.wave.freq) * p.wave.amp;
+        p.x = p.bx - ny * o; p.y = p.by + nx * o;
       } else { p.x += p.vx * dt; p.y += p.vy * dt; }
       if (p.foe && p.land && p.life <= 0) { p.land(p.x, p.y); p.land = null; }
 
@@ -132,6 +139,33 @@ G.Projectiles = (() => {
           ctx.fillStyle = '#1a1220'; ctx.beginPath(); ctx.arc(Math.round(p.x), Math.round(p.y - r), r + 2, 0, 6.283); ctx.fill();
           ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(Math.round(p.x), Math.round(p.y - r), r, 0, 6.283); ctx.fill();
           ctx.fillStyle = '#6a6a7a'; ctx.fillRect(Math.round(p.x - r * 0.5), Math.round(p.y - r * 1.5), Math.max(2, r * 0.4), Math.max(2, r * 0.4));
+          break;
+        }
+        case 'heart': case 'snake': case 'paw': case 'bubble': {
+          const P = 2, bx = Math.round(p.x / P) * P, by = Math.round(y / P) * P;
+          const px = (x, yy, w, h) => ctx.fillRect(bx + x * P, by + yy * P, w * P, h * P);
+          if (p.vis === 'heart') {
+            ctx.fillStyle = '#1a1220'; px(-4, -3, 3, 3); px(1, -3, 3, 3); px(-4, -1, 8, 3); px(-3, 2, 6, 1); px(-1, 3, 2, 1);
+            ctx.fillStyle = p.color; px(-3, -2, 2, 2); px(1, -2, 2, 2); px(-3, -1, 6, 2); px(-2, 1, 4, 1);
+          } else if (p.vis === 'snake') {
+            ctx.fillStyle = '#1a1220'; px(-4, -3, 8, 6);
+            ctx.fillStyle = p.color; px(-3, -2, 6, 4);
+            ctx.fillStyle = '#ffe14d'; px(1, -1, 1, 1);
+          } else if (p.vis === 'paw') {
+            // Zarpa de aire: almohadilla y cuatro dedos.
+            ctx.globalAlpha = 0.8;
+            ctx.fillStyle = '#1a1220'; px(-5, -2, 10, 7); px(-6, -6, 3, 3); px(-2, -7, 3, 3); px(2, -7, 3, 3); px(5, -5, 3, 3);
+            ctx.fillStyle = '#e8f4ff'; px(-4, -1, 8, 5); px(-5, -5, 2, 2); px(-1, -6, 2, 2); px(3, -6, 2, 2); px(6, -4, 1, 2);
+            ctx.globalAlpha = 1;
+          } else {
+            // Burbuja de aire comprimido: crece un poco y parpadea antes de estallar.
+            const r = p.r * (1 + (p.age / 3.2) * 0.3);
+            ctx.globalAlpha = 0.35 + (p.life < 0.8 && Math.floor(p.age * 10) % 2 ? 0.3 : 0);
+            ctx.fillStyle = '#c8e8ff'; ctx.beginPath(); ctx.arc(p.x, y, r, 0, 6.283); ctx.fill();
+            ctx.globalAlpha = 0.9; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.arc(p.x, y, r, 0, 6.283); ctx.stroke();
+            ctx.globalAlpha = 1;
+          }
           break;
         }
         case 'ghost': {

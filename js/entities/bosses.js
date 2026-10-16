@@ -27,6 +27,14 @@
  *   garp       (huida) lanza balas de cañón a mano, que caen y ruedan · un meteoro enorme de vez en cuando
  *   perona     fantasmas negativos (te dejan sin ataques) · fantasmas que estallan
  *   oars       gigante: pisotón con onda que se expande · barrido con el brazo
+ *   kizaru     (huida) Yasakani no Magatama: lluvia de luz alrededor · patada a la velocidad de la luz delante de ti
+ *   hancock    Mero Mero Mellow: si vas hacia ella cuando dispara, te petrifica · Pistol Kiss
+ *   magellan   (huida) deja un rastro de veneno · hidras que avanzan en zigzag
+ *   akainu     (huida) puños de magma que caen y dejan charcos que crecen · Dai Funka en línea ·
+ *              los terremotos de Barbablanca te ayudan
+ *   rayleigh   cortes en cuadrícula por toda la zona · Haki del Rey (aturde si estás cerca)
+ *   px1        Ursus Shock: burbuja de aire que flota y estalla · Pad Hō: zarpazos de aire
+ *   hody       muros de agua que cruzan la isla (con un hueco) · esteroides: más rápido a media vida
  *   mr3        Candle Lock: jaula de cera con una salida · charcos de cera que frenan
  *   wapol      Baku Baku: te aspira y muerde · salto que aplasta
  *   crocodile  Desert Spada: grietas de arena que avanzan · Sables: tornado que te sigue
@@ -564,6 +572,217 @@ G.Bosses = (() => {
           e.state = 'stomp'; e.stateT = 0.8;
           warn(e.x, e.y, 60, '#d8c8b0', 0.8);
         }
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    // ---------------- Guerra en la Cumbre e Isla Gyojin ----------------
+
+    kizaru(e, k) {
+      // Patada de luz: aparece delante de hacia donde vas y golpea.
+      if (e.state === 'kick') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          G.FX.ring(e.x, e.y, 6, 54, '#ffe14d', 0.25, 5); G.FX.burst(e.x, e.y, '#fff6b0', 12, 200); G.Audio.sfx('thunder');
+          if (near(k.pl, e.x, e.y, 46)) k.pl.hurt(e.dmg, k.now);
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 3.2, 4.2, 500)) {
+        const [mx, my] = (k.pl.mvx || k.pl.mvy) ? G.U.norm(k.pl.mvx, k.pl.mvy) : [-k.nx, -k.ny];
+        const x = k.pl.x + mx * 90, y = k.pl.y + my * 90;
+        if (onLand(x, y)) {
+          G.FX.bolt(e.x, e.y - 20, x, y - 20, '#ffe14d', 0.15);
+          e.x = x; e.y = y; e.state = 'kick'; e.stateT = 0.4;
+          warn(x, y, 46, '#ffe14d', 0.4);
+        }
+      }
+      // Yasakani no Magatama: muchos rayos de luz pequeños alrededor de ti.
+      if (ready(e, k, 't2', 5, 6.5, 600)) {
+        for (let i = 0; i < 14; i++) {
+          const x = k.pl.x + G.U.rand(-110, 110), y = k.pl.y + G.U.rand(-85, 85);
+          warn(x, y, 12, '#ffe14d', 0.4 + i * 0.06, () => {
+            G.FX.bolt(x, y - 120, x, y, '#fff6b0', 0.1);
+            if (near(k.pl, x, y, 12)) k.pl.hurt(e.dmg * 0.5, G.Game.now);
+          });
+        }
+        G.Audio.sfx('thunder');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    hancock(e, k) {
+      // Mero Mero Mellow: corazón en abanico; si vas hacia ella, te quedas de piedra.
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const a = e.ai.aim;
+          G.FX.slash(e.x, e.y, a, 1.2, 260, '#ff6bb0', 0.35, 'slash3');
+          const toward = k.pl.mvx * -k.nx + k.pl.mvy * -k.ny > 0.3;     // se acerca a ella
+          if (k.d < 260 + k.pl.r && angDiff(Math.atan2(k.dy, k.dx), a) < 0.6) {
+            if (toward) { k.pl.affect('stone', 2.5); k.pl.hurt(e.dmg * 0.6, k.now); }
+            else G.FX.text(k.pl.x, k.pl.y - 44, '¡A salvo!', '#ff9ec4');
+          }
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 4.0, 5.0, 420)) {
+        e.state = 'aim'; e.stateT = 0.9; e.ai.aim = Math.atan2(k.dy, k.dx);
+        for (let i = -2; i <= 2; i++) warnLine(e.x, e.y, e.ai.aim + i * 0.28, 260, 8, '#ff6bb0', 0.9);
+        G.HUD.banner('Mero Mero Mellow', 'No vayas hacia ella', '#ff6bb0');
+      }
+      // Pistol Kiss: corazones rápidos de uno en uno.
+      if (ready(e, k, 't2', 1.6, 2.2, 420)) {
+        shot(e, Math.atan2(k.dy, k.dx), 320, e.dmg * 0.5, { vis: 'heart', r: 7, color: '#ff6bb0' });
+        G.Audio.sfx('shoot');
+      }
+      return { mx: k.nx * 0.7, my: k.ny * 0.7 };
+    },
+
+    magellan(e, k) {
+      // Rastro de veneno por donde pasa.
+      e.ai.trail = (e.ai.trail || 0) - k.dt;
+      if (e.ai.trail <= 0) {
+        e.ai.trail = 0.35;
+        zone(e.x, e.y, 26, '#8a3ac0', 7, hurtZone(k.pl, e.dmg * 0.3));
+      }
+      // Hidras: tres serpientes de veneno que avanzan en zigzag.
+      if (ready(e, k, 't1', 3.0, 3.8, 480)) {
+        e.atkAt = k.now;
+        const a0 = Math.atan2(k.dy, k.dx);
+        for (let i = -1; i <= 1; i++) shot(e, a0 + i * 0.3, 150, e.dmg * 0.7, { vis: 'snake', r: 9, life: 4, color: '#a04ad8', wave: { amp: 26, freq: 7 } });
+        G.Audio.sfx('slash');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    akainu(e, k) {
+      // Terremotos de Barbablanca: cada poco, limpian a los enemigos y lo apartan a él.
+      e.ai.quake = (e.ai.quake === undefined ? 18 : e.ai.quake) - k.dt;
+      if (e.ai.quake <= 0) {
+        e.ai.quake = 20;
+        G.HUD.banner('¡El terremoto de Barbablanca!', 'Te abre camino', '#9ad0ff');
+        G.Camera.kick(1);
+        for (const o of G.EnemyMgr.query(k.pl.x, k.pl.y, 360)) if (!o.boss && !o.dead) o.damage(9999, k.now);
+        e.kx -= k.nx * 700; e.ky -= k.ny * 700;
+        G.FX.ring(k.pl.x, k.pl.y, 20, 360, '#e8f4ff', 0.6, 8);
+      }
+      // Dai Funka: una columna de magma en línea que se queda ardiendo un momento.
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const a = e.ai.aim;
+          for (let i = 1; i <= 8; i++) {
+            const x = e.x + Math.cos(a) * i * 36, y = e.y + Math.sin(a) * i * 36;
+            zone(x, y, 22, '#ff5a1a', 1.2, hurtZone(k.pl, e.dmg * 0.6));
+            G.FX.burst(x, y, '#ff8a2a', 4, 120);
+          }
+          G.Audio.sfx('boom');
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 3.6, 4.4, 400)) {
+        e.state = 'aim'; e.stateT = 0.7; e.ai.aim = Math.atan2(k.dy, k.dx);
+        warnLine(e.x, e.y, e.ai.aim, 290, 40, '#ff5a1a', 0.7);
+      }
+      // Ryusei Kazan: puños de magma caen y dejan un charco de lava que crece.
+      if (ready(e, k, 't2', 2.2, 2.8, 600)) {
+        const x = k.pl.x + G.U.rand(-60, 60), y = k.pl.y + G.U.rand(-45, 45);
+        warn(x, y, 30, '#ff5a1a', 1.0, () => {
+          G.FX.burst(x, y, '#ff8a2a', 12, 160); G.Audio.sfx('boom');
+          if (near(k.pl, x, y, 30)) k.pl.hurt(e.dmg * 0.8, G.Game.now);
+          zone(x, y, 16, '#c83a1a', 5, hurtZone(k.pl, e.dmg * 0.3, (m, dt) => { m.r = Math.min(54, m.r + 9 * dt); }));
+        });
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    rayleigh(e, k) {
+      // Cortes en cuadrícula: líneas horizontales y verticales sobre la zona donde estás.
+      if (ready(e, k, 't1', 4.2, 5.0, 460)) {
+        e.atkAt = k.now;
+        const cx = k.pl.x, cy = k.pl.y, L = 320, off = G.U.rand(-20, 20);
+        const lines = [];
+        for (const d of [-80, 0, 80]) {
+          lines.push([cx - L / 2, cy + d + off, 0]);            // horizontales
+          lines.push([cx + d + off, cy - L / 2, Math.PI / 2]);   // verticales
+        }
+        for (const [x0, y0, a] of lines) warnLine(x0, y0, a, L, 10, '#c8e0ff', 0.9, () => {
+          const x1 = x0 + Math.cos(a) * L, y1 = y0 + Math.sin(a) * L;
+          G.FX.beam(x0, y0 + G.LIFT, x1, y1 + G.LIFT, 3, '#ffffff', 0.15);
+          if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, x0, y0, x1, y1) < 5 + k.pl.r) k.pl.hurt(e.dmg * 0.6, G.Game.now);
+        });
+        G.Audio.sfx('slash');
+      }
+      // Haki del Rey: una ola que tumba a los enemigos normales y te aturde si estás cerca.
+      if (ready(e, k, 't2', 8, 10, 500)) {
+        G.FX.ring(e.x, e.y, 10, 200, '#1a1220', 0.5, 10);
+        G.FX.ring(e.x, e.y, 10, 190, '#c86bff', 0.5, 4);
+        G.Camera.kick(0.5);
+        for (const o of G.EnemyMgr.query(e.x, e.y, 200)) if (!o.boss && !o.dead && G.U.dist(o.x, o.y, e.x, e.y) < 200) o.damage(9999, k.now);
+        if (k.d < 160) k.pl.affect('stun', 1.2);
+        G.HUD.banner('Haki del Rey', '', '#c86bff');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    px1(e, k) {
+      // Ursus Shock: burbuja de aire comprimido que flota hacia ti y estalla.
+      if (ready(e, k, 't1', 6, 7, 500)) {
+        e.atkAt = k.now;
+        shot(e, Math.atan2(k.dy, k.dx), 45, 0, {
+          vis: 'bubble', r: 26, life: 3.2, homing: 0.8, keep: true,
+          land: (x, y) => {
+            G.FX.ring(x, y, 10, 110, '#c8e8ff', 0.4, 8); G.FX.burst(x, y, '#e8f4ff', 20, 220);
+            G.Audio.sfx('boom'); G.Camera.kick(0.7);
+            if (near(k.pl, x, y, 95)) k.pl.hurt(e.dmg * 1.6, G.Game.now);
+          },
+          hit: () => {}
+        });
+        G.HUD.banner('Ursus Shock', '¡Aléjate de la burbuja!', '#c8e8ff');
+      }
+      // Pad Hō: dos zarpazos de aire grandes y rápidos.
+      if (ready(e, k, 't2', 2.4, 3.0, 460)) {
+        const a0 = Math.atan2(k.dy, k.dx);
+        for (const da of [-0.18, 0.18]) shot(e, a0 + da, 260, e.dmg * 0.6, { vis: 'paw', r: 14, life: 2 });
+        G.Audio.sfx('punch');
+      }
+      return { mx: k.nx * 0.8, my: k.ny * 0.8 };
+    },
+
+    hody(e, k) {
+      // Esteroides: a media vida, más rápido y más fuerte (una vez).
+      if (!e.ai.rage && e.hp < e.maxHp * 0.5) {
+        e.ai.rage = true; e.spd *= 1.4; e.dmg *= 1.3;
+        G.HUD.banner('¡Esteroides!', 'Hody se vuelve loco', '#ff5f6d');
+        G.FX.burst(e.x, e.y - 20, '#ff5f6d', 20, 200);
+      }
+      // Muros de agua: cruzan la zona de lado a lado, con un hueco por donde pasar.
+      if (ready(e, k, 't1', 4.5, 5.5, 500)) {
+        e.atkAt = k.now;
+        const vert = Math.random() < 0.5, dir = Math.random() < 0.5 ? 1 : -1;
+        const L = 360, gap = G.U.rand(-90, 90), speed = 150, T = 2.6;
+        const sx = vert ? k.pl.x - dir * 200 : k.pl.x, sy = vert ? k.pl.y : k.pl.y - dir * 160;
+        let hitT = -9;
+        // Dos tramos con el hueco en medio; avanzan perpendiculares a sí mismos.
+        for (const [a0, a1] of [[-L / 2, gap - 34], [gap + 34, L / 2]]) {
+          const len = a1 - a0;
+          const m = zone(0, 0, 0, '#3a8ad8', T, (mm, dt) => {
+            const tr = (T - mm.life) * speed * dir;
+            if (vert) { mm.x = sx + tr; mm.y = sy + a0; } else { mm.x = sx + a0; mm.y = sy + tr; }
+            const x1 = mm.x + Math.cos(mm.a) * len, y1 = mm.y + Math.sin(mm.a) * len;
+            if (Math.random() < 0.3) G.FX.puff(mm.x + Math.cos(mm.a) * len * Math.random(), mm.y + Math.sin(mm.a) * len * Math.random(), '#bfe4ff', 1);
+            const t = G.Game.now;
+            if (t - hitT > 0.6 && !k.pl.dead && G.segDist(k.pl.x, k.pl.y, mm.x, mm.y, x1, y1) < 12 + k.pl.r) {
+              hitT = t; k.pl.hurt(e.dmg * 0.7, t); k.pl.push((vert ? dir : 0) * 240, (vert ? 0 : dir) * 240, 0.3);
+            }
+          }, 'line');
+          m.a = vert ? Math.PI / 2 : 0; m.len = len; m.w = 22;
+        }
+        G.Audio.sfx('boom');
       }
       return { mx: k.nx, my: k.ny };
     },

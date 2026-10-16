@@ -132,6 +132,13 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | Thriller Bark | Mansión | Perona | Fantasmas negativos (sin ataques) · fantasmas que estallan |
 | | Congelador | Oars | Pisotón con onda que se expande · barrido con el brazo |
 | | Mástil | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
+| Guerra en la Cumbre | Sabaody | Kizaru (huida) | Lluvia de luz alrededor · patada de luz delante de hacia donde vas |
+| | Amazon Lily | Boa Hancock | Mero Mero Mellow: si vas hacia ella, te petrifica · Pistol Kiss |
+| | Impel Down | Magellan (huida) | Rastro de veneno · hidras que avanzan en zigzag |
+| | Marineford | Akainu (huida) | Puños de magma con charcos que crecen · Dai Funka en línea · terremotos de Barbablanca a tu favor |
+| | Rusukaina | Rayleigh | Cortes en cuadrícula · Haki del Rey (aturde si estás cerca) |
+| Isla Gyojin | Sabaody | Pacifista PX-1 | Ursus Shock: burbuja que flota y estalla · Pad Hō: zarpazos de aire |
+| | Isla Gyojin | Hody Jones | Muros de agua con un hueco · esteroides a media vida |
 | Final | El Trono Vacío | Imu (jefe final) | Látigo negro que gira · anillos de espinas con un hueco |
 
 Efectos que pueden poner los jefes al jugador (`player.affect`): aturdido, piedra, controles al
