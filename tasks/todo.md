@@ -134,3 +134,13 @@ Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis
 - [ ] Tercer enemigo de Alabasta, Dressrosa, Whole Cake y Wano: sin atlas (el usado es el de la saga).
 - [ ] Seraphim (Final): sin atlas en la lista.
 - [ ] Ataques de los enemigos nuevos: comprobar en el juego que no sobrecargan la pantalla.
+
+## Estado final de enemigos (sesión de enemigos)
+- [x] Massacre Soldier, Kaku, General Zombie, PX-1, Gifter, Mars: poses elegidas a mano (tools/auto-enemy.js, MANUAL).
+- [x] Toy Soldier, Chess, Mercury: más poses.
+- [x] Variantes (escopeta, carga, lanza, a distancia...): comparten el sprite de su saga con su propio comportamiento.
+      Pendiente: darles aspecto propio cuando haya más atlas.
+- [x] Los 33 enemigos cargan sin errores en el juego.
+- [ ] Seraphim (Final): sin atlas en la lista: sigue con dibujo provisional.
+- [ ] Gifter: el atlas mezcla un pájaro y una mantis; revisar si conviene otro.
+- [ ] Ataques de los enemigos nuevos en partida: revisar que no saturen la pantalla.
