@@ -218,7 +218,10 @@ G.Props = (() => {
 
   // Objetos sacados de pixel art ya hecho (tools/build-props.js): un píxel del PNG
   // es un píxel de arte del juego. ox/oy = punto de apoyo (la línea de flotación).
-  const FILES = { merry: { file: 'assets/props/merry.png', ox: 55, oy: 114 } };
+  const FILES = {
+    merry: { file: 'assets/props/merry.png', ox: 55, oy: 114 },
+    sunny: { file: 'assets/props/sunny.png', ox: 57, oy: 149 }          // desde Post-Enies Lobby
+  };
   const loaded = {};
 
   function preload() {

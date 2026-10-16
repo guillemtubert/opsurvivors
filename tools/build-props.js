@@ -11,6 +11,7 @@
  * píxel del PNG = un píxel de arte del juego.
  *
  *   assets/ref/props/<original>   original (NO se sube: ver .gitignore)
+ *   opciones: bg (colores de fondo) · tol · crop [x0, y0, x1, y1] · flip (espejo) · zoom (más grande)
  *   assets/props/<id>.png         lo que usa el juego (world/props.js)
  */
 const fs = require('fs'), path = require('path');
@@ -21,7 +22,10 @@ const OUTLINE = [26, 18, 32];             // el de core/paint.js
 
 const PROPS = {
   // Going Merry de perfil, proa a la derecha: fuera el cielo y el mar (la espuma se queda).
-  merry: { src: 'assets/ref/props/going-merry.png', bg: ['#0a84d1', '#1dbcd9'], tol: 40 }
+  merry: { src: 'assets/ref/props/going-merry.png', bg: ['#0a84d1', '#1dbcd9'], tol: 40 },
+  // Thousand Sunny (ThousandSunny1, convertida del .jpeg): fondo azul liso. Se corta por la línea
+  // del agua (lo de debajo es suelo y un trozo blanco) y se voltea, que mira a la izquierda.
+  sunny: { src: 'assets/ref/props/thousand-sunny.png', bg: ['#9ebdfe'], tol: 40, crop: [0, 0, 414, 433], flip: true, zoom: 1.5 }
 };
 
 const hex = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
@@ -48,16 +52,24 @@ function build(id) {
   const cfg = PROPS[id];
   const src = path.join(ROOT, cfg.src);
   if (!fs.existsSync(src)) throw new Error('No existe: ' + cfg.src + ' (los originales se quedan en local)');
-  const img = decode(fs.readFileSync(src));
-  const { p, phase, k } = pitch(img);
+  let img = decode(fs.readFileSync(src));
+  // crop [x0, y0, x1, y1]: sólo esa parte del original.
+  if (cfg.crop) {
+    const [x0, y0, x1, y1] = cfg.crop, w = x1 - x0, h = y1 - y0, d = new Uint8Array(w * h * 4);
+    for (let y = 0; y < h; y++) d.set(img.data.subarray(((y0 + y) * img.w + x0) * 4, ((y0 + y) * img.w + x1) * 4), y * w * 4);
+    img = { w, h, data: d };
+  }
+  // zoom: sale más grande (cada píxel del original ocupa más de uno; mejor 1.5 o 2 que valores raros).
+  const det = pitch(img), k = det.k, p = det.p / (cfg.zoom || 1), phase = det.phase % p;
   const n = Math.floor((img.w - phase) / p), m = Math.floor((img.h - phase) / p);
   const bg = cfg.bg.map(hex);
   const out = new Uint8Array(n * m * 4);
   for (let j = 0; j < m; j++) for (let i = 0; i < n; i++) {
     // Color más repetido en el interior de la celda (sin el borde suavizado).
     const votes = new Map();
-    for (let y = Math.ceil(phase + j * p + 1.5); y < phase + (j + 1) * p - 1.5; y++) {
-      for (let x = Math.ceil(phase + i * p + 1.5); x < phase + (i + 1) * p - 1.5; x++) {
+    const mg = Math.min(1.5, p * 0.2);     // margen dentro de la celda (menos si la celda es pequeña)
+    for (let y = Math.ceil(phase + j * p + mg); y < phase + (j + 1) * p - mg; y++) {
+      for (let x = Math.ceil(phase + i * p + mg); x < phase + (i + 1) * p - mg; x++) {
         const q = (y * img.w + x) * 4, key = (img.data[q] >> 3) << 10 | (img.data[q + 1] >> 3) << 5 | (img.data[q + 2] >> 3);
         const v = votes.get(key) || { n: 0, q };
         v.n++; votes.set(key, v);
@@ -85,6 +97,11 @@ function build(id) {
     if (!solid(q) && ((x > 0 && solid(q - 1)) || (x < W - 1 && solid(q + 1)) || (y > 0 && solid(q - W)) || (y < H - 1 && solid(q + W)))) add.push(q);
   }
   for (const q of add) { res.set(OUTLINE, q * 4); res[q * 4 + 3] = 255; }
+  // flip: en espejo (los barcos del juego miran a la derecha).
+  if (cfg.flip) for (let y = 0; y < H; y++) for (let x = 0; x < W >> 1; x++) {
+    const a = (y * W + x) * 4, b = (y * W + W - 1 - x) * 4;
+    for (let c = 0; c < 4; c++) { const t = res[a + c]; res[a + c] = res[b + c]; res[b + c] = t; }
+  }
 
   const file = path.join(ROOT, 'assets/props', id + '.png');
   fs.mkdirSync(path.dirname(file), { recursive: true });

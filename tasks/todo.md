@@ -7,7 +7,7 @@ Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ni
       las 11 sagas con su enemigo provisional y su barco (Sunny desde Post-Enies Lobby; usa el Merry hasta tener su dibujo)
 - [x] Fase 1 — Smoker (Loguetown, huida), Mr. 9 y Miss Wednesday (Reverse Mountain), Mr. 5 y Miss Valentine (Whisky Peak)
 - [x] Fase 2 — Bellamy, Foxy, Franky, Garp (huida), Perona, Oars
-- [ ] Dibujo del Thousand Sunny (de momento sale el Merry)
+- [x] Thousand Sunny (tools/build-props.js: ThousandSunny1, cortado por la línea del agua, en espejo y a 1,5×)
 - [x] Fase 3 — Kizaru (huida), Hancock, Magellan (huida), Akainu (huida), Rayleigh, PX-1, Hody
 - [x] Fase 4 — Caesar, Doflamingo, Jack, Katakuri, Big Mom (huida)
 - [ ] Fase 5 — Queen, King, Kaido (dos fases), San Saturn, Loki, Sommers y Killingham, Gunko, Shamrock (comprobar en la wiki)
