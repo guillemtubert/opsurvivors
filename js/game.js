@@ -81,6 +81,7 @@ G.Game = (() => {
     pl.addMove(crew.start);
     G.HUD.show(true);
     G.HUD.moves(pl);
+    G.HUD.items(pl);
     enterIsland(G.Islands.startIndex());
     state = 'playing';
   }
@@ -110,6 +111,8 @@ G.Game = (() => {
   function nextIsland() {
     const i = G.Island.index + 1;
     pl.islands++;
+    // Has escapado: el trofeo del jefe de la huida es tuyo.
+    if (G.Island.def.escape) for (const id of G.Islands.bossIds(G.Island.def)) G.Items.giveTrophy(pl, id);
     if (i >= G.Islands.JOURNEY.length) { endRun(false, true); return; }
     G.Audio.sfx('confirm');
     flashT = 0.6;
@@ -141,20 +144,22 @@ G.Game = (() => {
     if (e.boss) {
       pl.bosses++;
       G.Island.onBossKilled(e);
+      G.Items.giveTrophy(pl, e.def.id);
       G.Audio.sfx('chest');
       G.Audio.music('sea');
       G.Camera.kick(0.8);
     }
   }
 
-  /** Cofre: berries y una carta. El del jefe (big) da más. */
+  /** Cofre: berries y, el de la isla, un objeto al azar; el del jefe (big), una carta. */
   function openChest(big = true) {
     const bonus = big ? 150 + pl.bosses * 100 : 40 + G.Island.index * 20;
     pl.coins += bonus;
     G.Audio.sfx('chest');
     G.FX.text(pl.x, pl.y - 40, '+' + bonus + ' ฿', '#ffd23f', true);
     G.FX.burst(pl.x, pl.y - 16, '#ffd23f', 40, 220);
-    showLevelUp('¡Cofre del tesoro!');
+    if (big) showLevelUp('¡Cofre del tesoro!');
+    else G.Items.giveRandom(pl);
   }
 
   function showLevelUp(title) {
@@ -261,6 +266,7 @@ G.Game = (() => {
 
     pl.update(dt, now);
     G.Combat.tick(dt, pl, now);
+    G.Items.tick(dt, pl, now);
     G.Combat.update(dt, now);
     G.Spawner.update(dt, pl, G.Island.difficulty, G.Island.busterT());
     G.Island.update(dt, pl, now);

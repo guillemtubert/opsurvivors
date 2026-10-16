@@ -89,7 +89,8 @@ js/
             island (cofres, Den Den Mushi, muelle y Going Merry, Buster Call),
             props (árboles, palmeras, rocas, barriles pintados a escala de los personajes)
   entities/ fx, projectile, enemy (+ gestor y rejilla espacial), bosses (los ataques de cada jefe), pickup, player
-  systems/  combat (las técnicas), spawner (oleadas, Buster Call y jefe), levelup (cartas)
+  systems/  combat (las técnicas), spawner (oleadas, Buster Call y jefe), levelup (cartas),
+            items (objetos y trofeos de los jefes)
   ui/       icons, minimap, hud, ui (pantallas)
   game.js   flujo y bucle principal
   main.js   arranque
@@ -109,6 +110,11 @@ Post-Enies Lobby). Una isla se activa sola en cuanto existen todos sus jefes. Ho
 Cada isla tiene su bioma (`G.World.BIOMES`, 17): colores del suelo, el agua y los caminos, y sus
 objetos grandes (`b.tree` / `b.palm`, uno o una lista). Punk Hazard está partida: la mitad oeste es
 fuego y la este, hielo (`halves`).
+
+**Objetos** (`js/systems/items.js`, como en Megabonk): cada cofre de isla da uno al azar según su
+rareza (común, raro, épico, legendario) y se acumulan todo el viaje. Cada jefe, al caer o al
+escapar de él, deja su **trofeo**: un objeto único que además se guarda en tu colección (el puerto
+muestra cuántos tienes). Los objetos se ven bajo la vida, con su número de copias.
 
 Tipos de isla: **jefe** (Den Den Mushi), **dúo** (dos jefes a la vez, una barra con la vida de los
 dos) y **huida** (`escape`: el jefe es invencible, aparece a los 12 s y hay que llegar al barco).

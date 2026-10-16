@@ -57,7 +57,8 @@ G.Enemy = class Enemy {
     const d = Math.hypot(dx, dy) || 1;
     const nx = dx / d, ny = dy / d;
     let mx = 0, my = 0;
-    const slow = this.boss ? 1 : [1, 0.6, 0.45][G.World.waterAt(this.x, this.y)];
+    const slow = this.boss ? 1 : [1, 0.6, 0.45][G.World.waterAt(this.x, this.y)] *
+      (pl.slowAura && d < pl.slowAura ? 0.6 : 1);        // puro de Smoker: van más lentos cerca de ti
     let spd = this.spd * slow;
 
     // Jefes: cada uno con sus ataques (entities/bosses.js).
@@ -144,6 +145,7 @@ G.Enemy = class Enemy {
   /** @param src  proyectil o técnica (para empuje, quemadura...) */
   damage(amount, now, src = null, col = null) {
     if (this.dead || this.hidden) return;
+    if (this.boss && src && src.owner) amount *= src.owner.bossDmg || 1;     // objetos de daño a jefes
     if (G.Game.god) amount = Math.max(amount, this.hp);
     else if (this.immune || this.def.invincible) {
       if (now - this.hurtAt > 0.4) { this.hurtAt = now; G.FX.text(this.x, this.y - this.r * 2, '0', '#c8d0e0'); }

@@ -2,7 +2,7 @@
 (() => {
   const NEED = ['U', 'Save', 'Pix', 'Paint', 'Camera', 'Input', 'Audio', 'SPRITES', 'Moves', 'Crew', 'Enemies', 'Upgrades',
                 'Islands', 'Props', 'World', 'Island', 'FX', 'Projectiles', 'Enemy', 'EnemyMgr', 'Bosses', 'Hazards', 'Pickups', 'Player',
-                'Combat', 'Spawner', 'LevelUp', 'Icons', 'Minimap', 'HUD', 'UI', 'Game'];
+                'Combat', 'Spawner', 'LevelUp', 'Items', 'Icons', 'Minimap', 'HUD', 'UI', 'Game'];
 
   function boot() {
     const miss = NEED.filter(k => !window.G || !G[k]);

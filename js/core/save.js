@@ -6,6 +6,7 @@
  *   upg         nivel de cada mejora permanente
  *   best        mejor tiempo (segundos) por tripulante
  *   bestIsland  la isla más lejana del viaje a la que has llegado (índice)
+ *   trophies    jefes de los que tienes el trofeo (colección)
  *   stats       totales (kills, runs, jefes)
  *   settings    sonido, sacudidas, números de daño
  */
@@ -18,6 +19,7 @@ G.Save = (() => {
     upg: {},
     best: {},
     bestIsland: 0,
+    trophies: [],
     stats: { kills: 0, runs: 0, bosses: 0, time: 0 },
     settings: { music: 0.5, sfx: 0.7, shake: true, dmgNums: true }
   });

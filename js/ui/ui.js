@@ -95,7 +95,9 @@ G.UI = (() => {
   function journey() {
     const J = G.Islands.JOURNEY, best = Math.min(G.Save.data.bestIsland || 0, J.length);
     const at = best >= J.length ? 'has llegado al final' : best ? 'hasta ' + J[best].def.name + ' (' + J[best].saga.name.replace('Saga de ', '') + ')' : 'aún no has zarpado';
-    $('menu-saga').innerHTML = '<div class="saga-name"><b>El viaje · ' + J.length + ' islas</b><small>Récord: ' + at + (best ? ' · isla ' + Math.min(best + 1, J.length) : '') + '</small></div>';
+    const tro = (G.Save.data.trophies || []).length;
+    $('menu-saga').innerHTML = '<div class="saga-name"><b>El viaje · ' + J.length + ' islas</b><small>Récord: ' + at + (best ? ' · isla ' + Math.min(best + 1, J.length) : '') +
+      ' · Trofeos: ' + tro + '/' + G.Items.TROPHIES.length + '</small></div>';
   }
 
   /** Cartel de "SE BUSCA" con el retrato pixel art. */

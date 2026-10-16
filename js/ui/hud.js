@@ -108,8 +108,18 @@ G.HUD = (() => {
     bannerT = setTimeout(() => el.banner.classList.add('hidden'), 3200);
   }
 
+  /** Objetos que llevas: icono y número de copias (trofeos con el retrato del jefe). */
+  function items(pl) {
+    const box = document.getElementById('hud-items');
+    if (!box) return;
+    box.innerHTML = Object.entries(pl.items).map(([id, n]) => {
+      const it = G.Items.BY_ID[id], col = G.Items.RARITY[it.rarity].color;
+      return '<span class="it" style="--c:' + col + '" title="' + it.name + ': ' + it.desc + '">' + G.Items.icon(id, 16) + (n > 1 ? '<i>' + n + '</i>' : '') + '</span>';
+    }).join('');
+  }
+
   /** Botón DIOS encendido o apagado. */
   function god(on) { el.god.classList.toggle('on', on); }
 
-  return { init, show, update, moves, banner, action, god };
+  return { init, show, update, moves, banner, action, god, items };
 })();

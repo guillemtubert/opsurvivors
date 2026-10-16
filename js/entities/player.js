@@ -20,6 +20,12 @@ G.Player = class Player {
     this.goldMul = perks.goldMul || 1;
     this.crit = 0.05;
     this.rerolls = 1 + (perks.rerolls || 0);
+    // Objetos (systems/items.js): copias de cada uno y temporizadores de sus efectos.
+    this.items = {}; this.itemT = {};
+    this.bossDmg = 1;        // daño a los jefes
+    this.revives = 0;        // vidas extra (Vivre Card)
+    this.thorns = 0;         // daño al que te golpea
+    this.slowAura = 0;       // radio en el que los enemigos van más lentos
 
     this.maxHp = crew.hp + (perks.hp || 0);
     this.hp = this.maxHp;
@@ -113,7 +119,16 @@ G.Player = class Player {
     G.Camera.kick(0.35);
     G.Audio.sfx('hurt');
     G.FX.text(this.x, this.y - 30, '-' + Math.round(d), '#ff5f6d', true);
+    // Espinas: los de alrededor reciben daño.
+    if (this.thorns > 0) for (const e of G.EnemyMgr.query(this.x, this.y, 70)) if (!e.dead && G.U.dist(e.x, e.y, this.x, this.y) < 70) e.damage(this.thorns * this.atk, now, null, '#3a7a3a');
     if (this.hp <= 0) {
+      // Vida extra: vuelves con la mitad.
+      if (this.revives > 0) {
+        this.revives--; this.hp = this.maxHp * 0.5; this.invuln = 2;
+        G.HUD.banner('¡Vuelves a levantarte!', 'Quedan ' + this.revives + ' vidas extra', '#ffd23f');
+        G.FX.burst(this.x, this.y - 16, '#ffd23f', 30, 200);
+        return;
+      }
       this.hp = 0;
       this.dead = true;
       G.FX.burst(this.x, this.y - 16, '#ffffff', 30, 200);
