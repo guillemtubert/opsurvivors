@@ -30,7 +30,10 @@ const ENEMIES = {
   jupiter:    'jupiter/Atlas_jupiter.png',
   venus:      'venus/Atlas_venus.png',
   mercury:    'mercury/Atlas_mercury.png',
-  saturn:     'saturn/Atlas_saturn.png'
+  saturn:     'saturn/Atlas_saturn.png',
+  navyhalberd:'marine/Atlas_0181.png',
+  navypistol: 'marine/Atlas_0182.png',
+  navyknuckle:'marine/Atlas_0184.png'
 };
 
 /** Atlas de un enemigo o jefe: assets/ref/characters/<id>/Atlas_<id>.png (salvo que esté en ENEMIES). */
@@ -45,6 +48,9 @@ function background(img) {
 
 /** Poses elegidas a mano (coordenadas del atlas): tienen prioridad sobre la detección automática. */
 const MANUAL = {
+  navyhalberd: { bg: '#ebebeb', walk: [[75, 25, 120, 185], [330, 25, 120, 185], [585, 25, 120, 185]], attack: [[20, 830, 225, 175]] },
+  navypistol:  { bg: '#ebebeb', walk: [[45, 30, 130, 175], [240, 30, 130, 175], [430, 30, 130, 175]], attack: [[240, 835, 140, 170]] },
+  navyknuckle: { bg: '#ebebeb', walk: [[40, 30, 120, 175], [235, 30, 115, 175], [430, 30, 120, 175]], attack: [[20, 825, 130, 180]] },
   pacifista: { bg: '#ebebeb', walk: [[15, 55, 135, 215], [175, 55, 135, 215], [335, 55, 135, 215]], attack: [[210, 310, 230, 215]] },
   kaido: { bg: '#ebebeb', walk: [[300, 5, 210, 210], [510, 5, 210, 215], [300, 245, 210, 210], [510, 245, 210, 210]], attack: [[110, 600, 215, 200]] },
   queen: { bg: '#ebebeb', walk: [[10, 55, 240, 245], [260, 55, 240, 245], [495, 55, 240, 245], [725, 55, 240, 245]], attack: [[5, 1085, 250, 215]] },

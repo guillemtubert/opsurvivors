@@ -24,8 +24,8 @@ G.Enemies = (() => {
     // behavior: chase (va a por ti) · dash (carga cada pocos segundos) · ranged (dispara) ·
     //           cone (escopeta: 5 proyectiles en abanico) · tank (lento, mucha vida)
     { id: 'marine',      name: 'Marina con espada',   sprite: 'marine',      from: 0,  w: 10, hp: 18,  spd: 73, dmg: 6, xp: 3, behavior: 'dash' },
-    { id: 'marinegun',   name: 'Marina con escopeta', sprite: 'marine',      from: 0,  w: 8,  hp: 20,  spd: 62, dmg: 6, xp: 3, behavior: 'cone', shot: 7 },
-    { id: 'rifle',       name: 'Marina tirador',      sprite: 'rifle',       from: 0,  w: 6,  hp: 16,  spd: 65, dmg: 5, xp: 4, behavior: 'ranged', shot: 9 },
+    { id: 'marinegun',   name: 'Marina con alabarda', sprite: 'navyhalberd', from: 0,  w: 8,  hp: 20,  spd: 62, dmg: 6, xp: 3, behavior: 'cone', shot: 7 },
+    { id: 'rifle',       name: 'Marina tirador',      sprite: 'navypistol',  from: 0,  w: 6,  hp: 16,  spd: 65, dmg: 5, xp: 4, behavior: 'ranged', shot: 9 },
     { id: 'baroque',     name: 'Agente de Baroque',   sprite: 'baroque',     from: 0,  w: 10, hp: 22,  spd: 78, dmg: 6, xp: 3, behavior: 'chase' },
     { id: 'baroquegun',  name: 'Baroque con pistola', sprite: 'baroque',     from: 0,  w: 8,  hp: 22,  spd: 66, dmg: 6, xp: 4, behavior: 'cone', shot: 7 },
     { id: 'baroqueshield', name: 'Baroque con escudo', sprite: 'baroque',     from: 0, w: 6, hp: 60, spd: 52, dmg: 8, xp: 6, behavior: 'tank' },
@@ -39,8 +39,8 @@ G.Enemies = (() => {
     { id: 'zombieaxe',   name: 'Zombi con hacha',     sprite: 'zombie',      from: 0,  w: 8,  hp: 28,  spd: 66, dmg: 8, xp: 4, behavior: 'dash' },
     { id: 'zombievomit', name: 'Zombi que vomita',    sprite: 'zombie',      from: 0,  w: 6,  hp: 26,  spd: 58, dmg: 6, xp: 4, behavior: 'cone', shot: 6 },
     { id: 'pacifista',   name: 'Pacifista',           sprite: 'pacifista',   from: 40, w: 4,  hp: 80,  spd: 55, dmg: 12, xp: 12, behavior: 'beamer' },
-    { id: 'marinegun2',  name: 'Marina con escopeta', sprite: 'marine',      from: 40, w: 4,  hp: 20,  spd: 62, dmg: 6, xp: 3, behavior: 'cone', shot: 7 },
-    { id: 'marine2',     name: 'Marina con espada',   sprite: 'marine',      from: 40, w: 4,  hp: 18,  spd: 73, dmg: 6, xp: 3, behavior: 'dash' },
+    { id: 'marinegun2',  name: 'Marina con alabarda', sprite: 'navyhalberd', from: 40, w: 4,  hp: 20,  spd: 62, dmg: 6, xp: 3, behavior: 'cone', shot: 7 },
+    { id: 'marine2',     name: 'Marina con puños',    sprite: 'navyknuckle', from: 40, w: 4,  hp: 18,  spd: 73, dmg: 6, xp: 3, behavior: 'dash' },
     { id: 'fishman',     name: 'Hombre-pez con puños', sprite: 'fishman',    from: 0,  w: 10, hp: 28,  spd: 68, dmg: 7, xp: 4, behavior: 'chase' },
     { id: 'fishsword',   name: 'Hombre-pez con espada', sprite: 'fishsword', from: 0,  w: 8,  hp: 26,  spd: 72, dmg: 7, xp: 4, behavior: 'dash' },
     { id: 'fishspear',   name: 'Hombre-pez con lanza', sprite: 'fishspear',  from: 0,  w: 6,  hp: 24,  spd: 64, dmg: 7, xp: 4, behavior: 'ranged', shot: 8 },

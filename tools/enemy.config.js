@@ -400,5 +400,38 @@ module.exports = {
         attack: [[110, 600, 215, 200]]
       }
     },
+  navyhalberd: {
+      sheet: REF + 'marine/Atlas_0181.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[75, 25, 120, 185]],
+        walk: [[75, 25, 120, 185], [330, 25, 120, 185], [585, 25, 120, 185]],
+        attack: [[20, 830, 225, 175]]
+      }
+    },
+  navypistol: {
+      sheet: REF + 'marine/Atlas_0182.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[45, 30, 130, 175]],
+        walk: [[45, 30, 130, 175], [240, 30, 130, 175], [430, 30, 130, 175]],
+        attack: [[240, 835, 140, 170]]
+      }
+    },
+  navyknuckle: {
+      sheet: REF + 'marine/Atlas_0184.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[40, 30, 120, 175]],
+        walk: [[40, 30, 120, 175], [235, 30, 115, 175], [430, 30, 120, 175]],
+        attack: [[20, 825, 130, 180]]
+      }
+    },
   }
 };
