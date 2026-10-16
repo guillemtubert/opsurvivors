@@ -30,5 +30,21 @@ G.CUSTOM_SPRITES = Object.assign(G.CUSTOM_SPRITES || {}, {
   zombie: {"file":"assets/chars/zombie.png","fw":48,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4,5],"attack":[6]},"fps":{"idle":1,"walk":7,"attack":6},"body":[10,0,29,46]},
   pacifista: {"file":"assets/chars/pacifista.png","fw":64,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[17,0,30,46]},
   gifter: {"file":"assets/chars/gifter.png","fw":46,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4,5],"attack":[6]},"fps":{"idle":1,"walk":7,"attack":6},"body":[11,0,31,46]},
-  mars: {"file":"assets/chars/mars.png","fw":68,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[14,0,48,46]}
+  mars: {"file":"assets/chars/mars.png","fw":68,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[14,0,48,46]},
+  smoker: {"file":"assets/chars/smoker.png","fw":114,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[37,0,40,46]},
+  mr9: {"file":"assets/chars/mr9.png","fw":46,"fh":50,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[7,4,32,46]},
+  wednesday: {"file":"assets/chars/wednesday.png","fw":42,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[7,0,26,46]},
+  mr5: {"file":"assets/chars/mr5.png","fw":36,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[9,0,21,46]},
+  valentine: {"file":"assets/chars/valentine.png","fw":56,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[14,0,27,46]},
+  bellamy: {"file":"assets/chars/bellamy.png","fw":60,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[19,0,22,46]},
+  foxy: {"file":"assets/chars/foxy.png","fw":46,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[4,0,40,46]},
+  franky: {"file":"assets/chars/franky.png","fw":46,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[1,1,38,46]},
+  garp: {"file":"assets/chars/garp.png","fw":48,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[12,1,25,46]},
+  perona: {"file":"assets/chars/perona.png","fw":36,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[6,0,23,46]},
+  oars: {"file":"assets/chars/oars.png","fw":70,"fh":48,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[15,2,40,46]},
+  kizaru: {"file":"assets/chars/kizaru.png","fw":68,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[17,0,32,46]},
+  hancock: {"file":"assets/chars/hancock.png","fw":46,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[11,0,25,46]},
+  magellan: {"file":"assets/chars/magellan.png","fw":50,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[8,1,31,46]},
+  akainu: {"file":"assets/chars/akainu.png","fw":72,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[22,0,29,46]},
+  rayleigh: {"file":"assets/chars/rayleigh.png","fw":62,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[19,0,26,46]}
 });

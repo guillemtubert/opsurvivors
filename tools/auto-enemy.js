@@ -33,6 +33,9 @@ const ENEMIES = {
   saturn:     'saturn/Atlas_saturn.png'
 };
 
+/** Atlas de un enemigo o jefe: assets/ref/characters/<id>/Atlas_<id>.png (salvo que esté en ENEMIES). */
+const atlasOf = id => ENEMIES[id] || id + "/Atlas_" + id + ".png";
+
 /** Fondo del atlas: transparente (alfa 0 en la esquina) o un color liso. */
 function background(img) {
   const i = 0;
@@ -42,6 +45,22 @@ function background(img) {
 
 /** Poses elegidas a mano (coordenadas del atlas): tienen prioridad sobre la detección automática. */
 const MANUAL = {
+  rayleigh: { bg: '#ebebeb', walk: [[45, 70, 105, 190], [230, 70, 105, 190], [415, 70, 120, 190], [605, 70, 120, 190]], attack: [[540, 935, 195, 140]] },
+  akainu: { bg: '#ebebeb', walk: [[10, 65, 125, 205], [140, 65, 125, 205], [270, 65, 125, 205], [410, 65, 125, 205]], attack: [[590, 300, 230, 130]] },
+  magellan: { bg: '#ebebeb', walk: [[10, 55, 150, 225], [170, 55, 150, 225], [330, 55, 150, 225], [490, 60, 170, 215]], attack: [[690, 65, 210, 210]] },
+  hancock: { bg: '#ebebeb', walk: [[15, 55, 100, 190], [145, 55, 100, 190], [270, 55, 100, 190], [400, 55, 100, 190]], attack: [[495, 265, 140, 185]] },
+  kizaru: { bg: '#ebebeb', walk: [[20, 65, 135, 200], [180, 65, 135, 200], [335, 65, 135, 200], [500, 65, 135, 200]], attack: [[630, 610, 270, 190]] },
+  oars: { bg: '#ebebeb', walk: [[20, 65, 225, 260], [275, 65, 225, 260], [530, 65, 225, 260], [785, 65, 225, 260]], attack: [[10, 345, 310, 270]] },
+  perona: { bg: '#ebebeb', walk: [[15, 75, 100, 205], [140, 75, 100, 205], [265, 75, 100, 205], [400, 75, 100, 205]], attack: [[30, 315, 150, 170]] },
+  garp: { bg: '#ebebeb', walk: [[30, 90, 130, 230], [225, 90, 130, 230], [420, 90, 130, 230], [620, 90, 130, 230]], attack: [[410, 375, 205, 180]] },
+  franky: { bg: '#ebebeb', walk: [[20, 55, 165, 200], [210, 55, 165, 200], [405, 55, 165, 200], [598, 55, 165, 200]], attack: [[180, 855, 165, 200]] },
+  foxy: { bg: '#ebebeb', walk: [[15, 55, 170, 190], [190, 55, 170, 190], [390, 55, 170, 190], [585, 55, 175, 190]], attack: [[180, 280, 135, 185]] },
+  bellamy: { bg: '#ebebeb', walk: [[20, 60, 95, 200], [145, 60, 95, 200], [265, 60, 150, 200], [425, 60, 160, 200]], attack: [[30, 315, 190, 185]] },
+  valentine: { bg: '#ebebeb', walk: [[40, 55, 110, 200], [230, 55, 110, 200], [420, 55, 120, 200]], attack: [[500, 810, 150, 230]] },
+  mr5: { bg: '#ebebeb', walk: [[30, 75, 80, 180], [155, 75, 80, 180], [285, 75, 80, 180], [412, 75, 80, 180]], attack: [[305, 310, 130, 175]] },
+  wednesday: { bg: '#ebebeb', walk: [[40, 55, 110, 205], [230, 55, 110, 205], [420, 55, 110, 205]], attack: [[15, 855, 150, 200]] },
+  mr9: { bg: '#ebebeb', walk: [[45, 75, 125, 180], [200, 75, 120, 180], [360, 75, 120, 180]], attack: [[290, 850, 150, 200]] },
+  smoker: { bg: '#ebebeb', walk: [[15, 80, 160, 180], [205, 80, 160, 180], [400, 80, 150, 180]], attack: [[700, 885, 330, 175]] },
   enelsoldier: { bg: '#ebebeb', walk: [[20, 85, 145, 170], [208, 85, 150, 170], [405, 85, 145, 170], [598, 85, 147, 170]], attack: [[280, 300, 300, 135]] },
   zombie:      { bg: '#ebebeb', walk: [[45, 55, 115, 180], [240, 55, 140, 180], [420, 55, 120, 180], [50, 885, 120, 170], [240, 885, 120, 170]], attack: [[25, 310, 165, 170]] },
   pacifista:   { bg: '#ebebeb', walk: [[15, 55, 135, 215], [175, 55, 135, 215], [335, 55, 135, 215], [495, 55, 135, 215]], attack: [[210, 310, 230, 215]] },
@@ -55,7 +74,7 @@ const MANUAL = {
 
 function frames(id) {
   if (MANUAL[id]) return { bg: MANUAL[id].bg || null, walk: MANUAL[id].walk, attack: MANUAL[id].attack };
-  const img0 = decode(fs.readFileSync(path.join(ROOT, REF, ENEMIES[id])));
+  const img0 = decode(fs.readFileSync(path.join(ROOT, REF, atlasOf(id))));
   const bg = background(img0);
   const img = bg ? P.removeFlatBg(img0, bg, 30, 2, 1, false) : img0;
   // Figuras de cuerpo entero: las de altura cercana a la mayor (los efectos son más pequeños o anchos).
@@ -69,21 +88,23 @@ function frames(id) {
 }
 
 function write(ids) {
-  const out = [];
+  const blocksFile = path.join(__dirname, 'enemy-blocks.json');
+  const blocks = fs.existsSync(blocksFile) ? JSON.parse(fs.readFileSync(blocksFile, 'utf8')) : {};
   for (const id of ids) {
     const f = frames(id);
     if (f.walk.length < 2) { console.log(id + ': menos de 2 pasos (se queda como estaba)'); continue; }
-    const bgLine = f.bg ? `      bgFlat: { color: '${f.bg}', thr: 30, r: 2, fringe: 1 },\n` : '';
-    out.push(`  ${id}: {\n      sheet: REF + '${ENEMIES[id]}',\n${bgLine}      height: 46, colors: 24,\n` +
+    const bgLine = f.bg ? `      bgFlat: { color: '${f.bg}', thr: 12, r: 2, fringe: 1 },\n` : '';
+    blocks[id] = `  ${id}: {\n      sheet: REF + '${path.posix.join(...atlasOf(id).split('/'))}',\n${bgLine}      height: 46, colors: 24,\n` +
       `      fps: { idle: 1, walk: 7${f.attack.length ? ', attack: 6' : ''} },\n` +
       `      anims: {\n        idle: [[${f.walk[0].join(', ')}]],\n` +
       `        walk: [${f.walk.map(b => '[' + b.join(', ') + ']').join(', ')}]` +
-      (f.attack.length ? `,\n        attack: [[${f.attack[0].join(', ')}]]` : '') + `\n      }\n    },\n`);
+      (f.attack.length ? `,\n        attack: [[${f.attack[0].join(', ')}]]` : '') + `\n      }\n    },\n`;
     console.log(id + ': ' + f.walk.length + ' pasos' + (f.attack.length ? ', 1 ataque' : ''));
   }
+  fs.writeFileSync(blocksFile, JSON.stringify(blocks, null, 1));
   const file = path.join(__dirname, 'enemy.config.js');
-  fs.writeFileSync(file, `/* Generado por tools/auto-enemy.js. No editar a mano: se vuelve a generar. */\nconst REF = 'assets/ref/characters/';\n\nmodule.exports = {\n  chars: {\n${out.join('')}  }\n};\n`);
-  console.log('escrito', path.relative(ROOT, file));
+  fs.writeFileSync(file, `/* Generado por tools/auto-enemy.js (no editar a mano). */\nconst REF = 'assets/ref/characters/';\n\nmodule.exports = {\n  chars: {\n${Object.values(blocks).join('')}  }\n};\n`);
+  console.log('escrito', path.relative(ROOT, file), Object.keys(blocks).length, 'enemigos');
 }
 
 const only = process.argv[2];
