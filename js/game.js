@@ -96,6 +96,8 @@ G.Game = (() => {
     G.Island.setup(def, i, seed);
     G.Minimap.build();
     pl.x = 0; pl.y = 0;
+    for (const k in pl.fx) pl.fx[k] = 0;      // los efectos de un jefe no pasan a la isla siguiente
+    pl.shove = null; pl.slowT = 0;
     G.Camera.x = 0; G.Camera.y = 0; G.Camera.shake = 0;
     G.HUD.banner(def.name, def.sub, '#ffd23f');
     G.Audio.music('sea');

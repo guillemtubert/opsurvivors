@@ -108,7 +108,16 @@ G.FX = (() => {
       const k = m.steady ? 1 : 1 - m.life / m.max;
       ctx.globalAlpha = 0.25 + 0.35 * k;
       ctx.fillStyle = m.col;
-      if (m.kind === 'smoke') continue;          // va por encima (drawOver)
+      if (m.kind === 'smoke' || m.kind === 'hidden') continue;   // smoke va por encima (drawOver); hidden no se dibuja
+      if (m.kind === 'spring') {
+        // Muelle en el suelo: espiral de metal.
+        ctx.globalAlpha = 1;
+        for (let i = 0; i < 4; i++) {
+          ctx.fillStyle = '#1a1220'; ctx.fillRect(Math.round(m.x - 9), Math.round(m.y - 2 - i * 4), 18, 4);
+          ctx.fillStyle = i % 2 ? '#c8c8d8' : '#9a9aae'; ctx.fillRect(Math.round(m.x - 7), Math.round(m.y - 1 - i * 4), 14, 2);
+        }
+        continue;
+      }
       if (m.kind === 'pillar') {
         // Pilar de cera: columna con brillo.
         ctx.globalAlpha = 1;

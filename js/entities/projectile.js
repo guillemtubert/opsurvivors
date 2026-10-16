@@ -5,7 +5,9 @@
  *     back     segundos de ida; luego vuelve a `owner` (mano de Buggy). keep: no se rompe al darte
  *     bounce   rebotes en la costa y en árboles o rocas (bates de Mr. 9)
  *     orbit    { owner, r, w }: gira alrededor de owner mientras viva (cuchillas de Miss Wednesday)
- *     land     función(x, y) al caer al suelo sin darte (mocos-bomba de Mr. 5)
+ *     land     función(x, y) al caer al suelo o al darte (mocos-bomba de Mr. 5)
+ *     hit      función(pl) al darte, además del daño (fantasmas de Perona: sin ataques)
+ * Un enemigo con reflect (espejo de Foxy) devuelve tus disparos: pasan a ser suyos.
  */
 G.Projectiles = (() => {
   let list = [];
@@ -61,7 +63,8 @@ G.Projectiles = (() => {
 
       if (p.foe) {
         if (!pl.dead && G.U.dist2(p.x, p.y, pl.x, pl.y) < (p.r + pl.r) ** 2) {
-          pl.hurt(p.dmg, now);
+          if (p.dmg > 0) pl.hurt(p.dmg, now);
+          if (p.hit) p.hit(pl);
           if (!p.keep) { p.life = 0; if (p.land) { p.land(p.x, p.y); p.land = null; } }
         }
         continue;
@@ -71,6 +74,12 @@ G.Projectiles = (() => {
       for (const e of G.EnemyMgr.query(p.x, p.y, p.r + 30)) {
         if (e.dead || p.hits.has(e)) continue;
         if (G.U.dist2(p.x, p.y, e.x, e.y) > (p.r + e.r) ** 2) continue;
+        if (e.reflect) {
+          // Espejo: vuelve hacia ti, con el daño del que lo sostiene.
+          p.foe = true; p.vx = -p.vx; p.vy = -p.vy; p.dmg = Math.min(p.dmg, e.dmg * 0.5); p.color = '#ff9ec4'; p.homing = 0;
+          G.FX.burst(p.x, p.y, '#ff9ec4', 5, 100);
+          break;
+        }
         p.hits.add(e);
         if (p.splash) { explode(p, now); p.life = 0; break; }
         e.damage(p.dmg, now, p);
@@ -115,6 +124,25 @@ G.Projectiles = (() => {
           ctx.strokeStyle = p.color; ctx.lineWidth = 4;
           ctx.beginPath(); ctx.arc(p.x - Math.cos(a) * p.r * 0.6, y - Math.sin(a) * p.r * 0.6, p.r, a - 1.1, a + 1.1); ctx.stroke();
           ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.stroke();
+          break;
+        }
+        case 'ball': {
+          // Bala de cañón: bola oscura con brillo (la sombra la pone el aviso al caer).
+          const r = Math.round(p.r);
+          ctx.fillStyle = '#1a1220'; ctx.beginPath(); ctx.arc(Math.round(p.x), Math.round(p.y - r), r + 2, 0, 6.283); ctx.fill();
+          ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(Math.round(p.x), Math.round(p.y - r), r, 0, 6.283); ctx.fill();
+          ctx.fillStyle = '#6a6a7a'; ctx.fillRect(Math.round(p.x - r * 0.5), Math.round(p.y - r * 1.5), Math.max(2, r * 0.4), Math.max(2, r * 0.4));
+          break;
+        }
+        case 'ghost': {
+          // Fantasma de Perona: sábana con ojos; los que estallan, rosados.
+          const P = 2, bx = Math.round(p.x / P) * P, by = Math.round((y + Math.sin(p.age * 6) * 3) / P) * P;
+          const px = (x, yy, w, h) => ctx.fillRect(bx + x * P, by + yy * P, w * P, h * P);
+          ctx.globalAlpha = 0.85;
+          ctx.fillStyle = '#1a1220'; px(-4, -5, 8, 10);
+          ctx.fillStyle = p.ghost === 'boom' ? '#ffb8d8' : '#f4f1ff'; px(-3, -4, 6, 8);
+          ctx.fillStyle = '#1a1220'; px(-2, -2, 1, 2); px(1, -2, 1, 2);
+          ctx.globalAlpha = 1;
           break;
         }
         case 'club': {

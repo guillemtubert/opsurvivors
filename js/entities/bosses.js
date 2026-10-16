@@ -21,6 +21,12 @@
  *   wednesday  cuchillas que giran a su alrededor y a veces se abren
  *   mr5        mocos-bomba que estallan donde caen
  *   valentine  sube, su sombra te persigue y cae encima con 10.000 kg
+ *   bellamy    rebota como una bola de pinball por la isla · muelles en el suelo que te lanzan
+ *   foxy       rayo Noro Noro que te deja parado · espejo que te devuelve tus disparos
+ *   franky     Coup de Vent: cañón de aire que te manda lejos · ráfaga de ametralladora que te sigue
+ *   garp       (huida) lanza balas de cañón a mano, que caen y ruedan · un meteoro enorme de vez en cuando
+ *   perona     fantasmas negativos (te dejan sin ataques) · fantasmas que estallan
+ *   oars       gigante: pisotón con onda que se expande · barrido con el brazo
  *   mr3        Candle Lock: jaula de cera con una salida · charcos de cera que frenan
  *   wapol      Baku Baku: te aspira y muerde · salto que aplasta
  *   crocodile  Desert Spada: grietas de arena que avanzan · Sables: tornado que te sigue
@@ -354,6 +360,210 @@ G.Bosses = (() => {
       if (ready(e, k, 't1', 4.0, 5.0, 420)) {
         e.state = 'up'; e.stateT = 2.4; e.hidden = true;
         e.ai.shadow = G.FX.mark(k.pl.x, k.pl.y, 50, '#ff3a3a', 2.4);
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    // ---------------- Islas del Cielo, Water 7 y Thriller Bark ----------------
+
+    bellamy(e, k) {
+      // Spring Hopper: rebota como una bola de pinball (en la costa y en árboles y rocas).
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'pinball'; e.stateT = 1.8; }
+        return STOP;
+      }
+      if (e.state === 'pinball') {
+        e.pose = true;
+        const sp = e.spd * 4.5, nx = e.x + e.ai.vx * sp * k.dt, ny = e.y + e.ai.vy * sp * k.dt;
+        const blocked = (x, y) => G.World.waterAt(x, y) === 2 || !G.World.isFree(x, y, 10);
+        if (blocked(nx, ny)) {
+          if (blocked(nx, e.y)) e.ai.vx = -e.ai.vx;
+          if (blocked(e.x, ny)) e.ai.vy = -e.ai.vy;
+          G.FX.burst(e.x, e.y, '#c8c8d8', 6, 120); G.Audio.sfx('punch');
+        }
+        if (Math.random() < 0.4) G.FX.puff(e.x, e.y, '#c9b28a', 1);
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'walk'; e.pose = false; }
+        return { mx: e.ai.vx, my: e.ai.vy, spd: 4.5 };
+      }
+      e.pose = false;
+      if (ready(e, k, 't1', 4.0, 5.0, 380)) {
+        e.state = 'aim'; e.stateT = 0.5;
+        const a = Math.atan2(k.dy, k.dx) + G.U.rand(-0.3, 0.3);
+        e.ai.vx = Math.cos(a); e.ai.vy = Math.sin(a);
+        warnLine(e.x, e.y, a, 200, e.r * 2, '#ff3a3a', 0.5);
+      }
+      // Muelles en el suelo: si pisas uno, te lanza lejos.
+      if (ready(e, k, 't2', 5.5, 6.5, 500)) {
+        for (let i = 0; i < 4; i++) {
+          const p = besidePlayer(k.pl, G.U.rand(50, 110));
+          if (!p) continue;
+          let used = false;
+          zone(p[0], p[1], 12, '#c8c8d8', 9, m => {
+            if (used || !near(k.pl, m.x, m.y, m.r)) return;
+            used = true; m.life = 0;
+            const [ux, uy] = G.U.norm(k.pl.x - m.x || 1, k.pl.y - m.y);
+            k.pl.hurt(e.dmg * 0.4, G.Game.now); k.pl.push(ux * 380, uy * 380, 0.45);
+            G.FX.burst(m.x, m.y, '#e8e8f0', 8, 140); G.Audio.sfx('punch');
+          }, 'spring');
+        }
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    foxy(e, k) {
+      // Espejo Noro Noro: mientras lo sostiene, tus disparos vuelven hacia ti.
+      if (e.state === 'mirror') {
+        e.pose = true; e.reflect = true;
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'walk'; e.reflect = false; e.pose = false; }
+        return STOP;
+      }
+      // Rayo Noro Noro: si te da, te quedas casi parado.
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const a = e.ai.aim, x1 = e.x + Math.cos(a) * 340, y1 = e.y + Math.sin(a) * 340;
+          G.FX.beam(e.x, e.y - 10, x1, y1 - 10, 12, '#ff9ec4', 0.35);
+          if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 16 + k.pl.r) {
+            k.pl.hurt(e.dmg * 0.4, k.now); k.pl.affect('stun', 2.2);
+          }
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 3.2, 4.0, 380)) {
+        e.state = 'aim'; e.stateT = 0.7; e.ai.aim = Math.atan2(k.dy, k.dx);
+        warnLine(e.x, e.y, e.ai.aim, 340, 32, '#ff9ec4', 0.7);
+      }
+      if (ready(e, k, 't2', 7, 9, 500)) {
+        e.state = 'mirror'; e.stateT = 2.2;
+        G.FX.text(e.x, e.y - 60, '¡Espejo Noro Noro!', '#ff9ec4', true);
+      }
+      return { mx: k.nx * 0.8, my: k.ny * 0.8 };
+    },
+
+    franky(e, k) {
+      // Coup de Vent: carga y suelta un cañonazo de aire que te manda lejos.
+      if (e.state === 'aim') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const a = e.ai.aim, x1 = e.x + Math.cos(a) * 320, y1 = e.y + Math.sin(a) * 320;
+          G.FX.beam(e.x, e.y - 12, x1, y1 - 12, 40, '#e8f4ff', 0.3);
+          G.Audio.sfx('boom'); G.Camera.kick(0.3);
+          if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 34 + k.pl.r) {
+            k.pl.hurt(e.dmg, k.now); k.pl.push(Math.cos(a) * 520, Math.sin(a) * 520, 0.45);
+          }
+        }
+        return STOP;
+      }
+      // Weapons Left: ráfaga de ametralladora que gira hacia ti poco a poco.
+      if (e.state === 'gun') {
+        e.pose = true;
+        const want = Math.atan2(k.dy, k.dx);
+        e.ai.gunA += Math.max(-1.3 * k.dt, Math.min(1.3 * k.dt, Math.atan2(Math.sin(want - e.ai.gunA), Math.cos(want - e.ai.gunA))));
+        if ((e.ai.fire -= k.dt) <= 0) {
+          e.ai.fire = 0.08;
+          shot(e, e.ai.gunA + G.U.rand(-0.05, 0.05), 300, e.dmg * 0.18, { r: 4, color: '#ffe14d', life: 1.6 });
+          if (Math.random() < 0.3) G.Audio.sfx('shoot');
+        }
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'walk'; e.pose = false; }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 3.6, 4.4, 380)) {
+        e.atkAt = k.now;
+        if (turn(e) % 2) {
+          e.state = 'aim'; e.stateT = 1.0; e.ai.aim = Math.atan2(k.dy, k.dx);
+          warnLine(e.x, e.y, e.ai.aim, 320, 70, '#9ad0ff', 1.0);
+        } else {
+          e.state = 'gun'; e.stateT = 1.8; e.ai.fire = 0.3;
+          e.ai.gunA = Math.atan2(k.dy, k.dx) + (Math.random() < 0.5 ? -0.9 : 0.9);
+        }
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    garp(e, k) {
+      // Balas de cañón lanzadas a mano: caen donde estabas y luego ruedan.
+      if (ready(e, k, 't1', 1.3, 1.7, 600)) {
+        e.atkAt = k.now;
+        const big = turn(e) % 6 === 0;
+        const n = big ? 1 : 2;
+        for (let i = 0; i < n; i++) {
+          const tx = k.pl.x + (i ? G.U.rand(-80, 80) : G.U.rand(-20, 20)), ty = k.pl.y + (i ? G.U.rand(-60, 60) : G.U.rand(-15, 15));
+          const R = big ? 46 : 18;
+          warn(tx, ty, R, '#3a3a46', big ? 1.4 : 0.9, () => {
+            G.FX.ring(tx, ty, 6, R * 1.6, '#c8b090', 0.3, 5); G.Audio.sfx('boom'); G.Camera.kick(big ? 0.5 : 0.15);
+            if (near(k.pl, tx, ty, R)) k.pl.hurt(e.dmg * (big ? 1.5 : 0.7), G.Game.now);
+            // Sigue rodando, alejándose de Garp.
+            const [ux, uy] = G.U.norm(tx - e.x, ty - e.y);
+            G.Projectiles.spawn({ foe: true, x: tx, y: ty, vx: ux * (big ? 90 : 150), vy: uy * (big ? 90 : 150),
+              dmg: e.dmg * (big ? 1 : 0.5), r: R * 0.7, life: big ? 4 : 2.5, color: '#2a2a36', vis: 'ball', bounce: 2, keep: big });
+          });
+        }
+        if (big) G.HUD.banner('¡Meteoro!', '', '#ff8a5a');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    perona(e, k) {
+      // Flota a distancia y suelta fantasmas.
+      const keep = k.d < 180 ? -1 : k.d > 260 ? 1 : 0;
+      if (ready(e, k, 't1', 3.0, 3.6, 480)) {
+        e.atkAt = k.now;
+        const boom = turn(e) % 3 === 0;
+        for (let i = 0; i < (boom ? 3 : 4); i++) {
+          const a = Math.atan2(k.dy, k.dx) + (i - 1.5) * 0.6;
+          shot(e, a, boom ? 95 : 60, boom ? e.dmg * 0.6 : 0, boom
+            ? { vis: 'ghost', ghost: 'boom', r: 9, life: 6, homing: 1.0,
+                land: (x, y) => { G.FX.ring(x, y, 6, 46, '#ff9ec4', 0.3, 5); G.FX.burst(x, y, '#ff9ec4', 10, 140); G.Audio.sfx('boom');
+                                  if (near(k.pl, x, y, 40)) k.pl.hurt(e.dmg * 0.6, G.Game.now); } }
+            : { vis: 'ghost', r: 10, life: 7, homing: 0.6, hit: pl => pl.affect('silence', 2.5) });
+        }
+        G.Audio.sfx('select');
+      }
+      return { mx: k.nx * keep, my: k.ny * keep };
+    },
+
+    oars(e, k) {
+      // Pisotón: una onda que se expande; te da si la pilla al pasar.
+      if (e.state === 'stomp') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          const x = e.x, y = e.y, R0 = 20, R1 = 300, T = 1.3;
+          G.FX.ring(x, y, R0, R1, '#d8c8b0', T, 8);
+          G.Audio.sfx('boom'); G.Camera.kick(0.6);
+          let hit = false;
+          zone(x, y, R0, '#d8c8b0', T, m => {
+            const R = R0 + (R1 - R0) * (1 - m.life / m.max);
+            if (!hit && Math.abs(G.U.dist(k.pl.x, k.pl.y, x, y) - R * 0.85) < 16 + k.pl.r) { hit = true; k.pl.hurt(e.dmg, G.Game.now); }
+          }, 'hidden');
+        }
+        return STOP;
+      }
+      // Barrido con el brazo: un cuarto de vuelta rápido delante de él.
+      if (e.state === 'sweep') {
+        e.pose = true;
+        e.stateT -= k.dt;
+        if (e.stateT < 0.45) {
+          const a = e.ai.a0 + (1 - e.stateT / 0.45) * 1.8, L = 230;
+          const x1 = e.x + Math.cos(a) * L, y1 = e.y + Math.sin(a) * L * 0.8;
+          G.FX.beam(e.x, e.y - 30, x1, y1 - 10, 14, '#8a7a9a', 0.06);
+          if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 14 + k.pl.r) k.pl.hurt(e.dmg * 1.2, k.now);
+        }
+        if (e.stateT <= 0) { e.state = 'walk'; e.pose = false; }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 3.4, 4.2, 420)) {
+        if (k.d < 220 && turn(e) % 2) {
+          e.state = 'sweep'; e.stateT = 1.25; e.ai.a0 = Math.atan2(k.dy, k.dx) - 0.9;
+          warnLine(e.x, e.y, e.ai.a0, 230, 14, '#ff3a3a', 0.8);
+          warnLine(e.x, e.y, e.ai.a0 + 1.8, 230, 14, '#ff3a3a', 0.8);
+        } else {
+          e.state = 'stomp'; e.stateT = 0.8;
+          warn(e.x, e.y, 60, '#d8c8b0', 0.8);
+        }
       }
       return { mx: k.nx, my: k.ny };
     },

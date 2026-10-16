@@ -52,8 +52,14 @@ G.Enemies = (() => {
     { id: 'wapol',     name: 'Wapol',          title: 'Baku Baku',              sprite: 'wapol',     hp: 2600, spd: 55, dmg: 30, xp: 340 },
     { id: 'crocodile', name: 'Crocodile',      title: 'Señor 0',                sprite: 'crocodile', hp: 3500, spd: 64, dmg: 32, xp: 440 },
     // Del cielo a Thriller Bark
+    { id: 'bellamy',   name: 'Bellamy',        title: 'La Hiena',               sprite: 'bellamy',   hp: 1500, spd: 80, dmg: 26, xp: 220 },
     { id: 'enel',      name: 'Enel',           title: 'El Dios de Skypiea',     sprite: 'enel',      hp: 2200, spd: 68, dmg: 32, xp: 300 },
+    { id: 'foxy',      name: 'Foxy',           title: 'El Zorro Plateado',      sprite: 'foxy',      hp: 1500, spd: 60, dmg: 24, xp: 220 },
+    { id: 'franky',    name: 'Franky',         title: 'El Cyborg',              sprite: 'franky',    hp: 2200, spd: 66, dmg: 30, xp: 300 },
     { id: 'lucci',     name: 'Rob Lucci',      title: 'CP9',                    sprite: 'lucci',     hp: 3100, spd: 77, dmg: 34, xp: 400 },
+    { id: 'garp',      name: 'Monkey D. Garp', title: 'El Héroe de la Marina',  sprite: 'garp',      hp: 9999, spd: 100, dmg: 30, xp: 0, invincible: true },
+    { id: 'perona',    name: 'Perona',         title: 'La Princesa Fantasma',   sprite: 'perona',    hp: 1500, spd: 64, dmg: 22, xp: 220, hover: true },
+    { id: 'oars',      name: 'Oars',           title: 'El Gigante Zombi',       sprite: 'oars',      hp: 2400, spd: 40, dmg: 34, xp: 320 },
     { id: 'moria',     name: 'Gecko Moria',    title: 'Shichibukai',            sprite: 'moria',     hp: 4000, spd: 48, dmg: 36, xp: 500 },
     // Sin isla todavía
     { id: 'imu',       name: 'Imu',            title: 'Ocupante del Trono Vacío', sprite: 'imu',     hp: 4500, spd: 55, dmg: 38, xp: 600, hover: true }

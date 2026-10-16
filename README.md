@@ -123,9 +123,15 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | | Little Garden | Mr. 3 | Candle Lock: jaula de cera con una salida · charcos que frenan |
 | | Drum | Wapol | Baku Baku: te aspira y muerde · salto que aplasta |
 | | Alabasta | Crocodile | Desert Spada: grietas que avanzan · Sables: tornado que te sigue |
-| Islas del Cielo | Skypiea | Enel | Sango: rayos que te persiguen · Raigo: zona enorme |
-| Water 7 | Enies Lobby | Lucci | Rankyaku · Tekkai (inmune) · Rokuogan (estallido si estás cerca) |
-| Thriller Bark | Mástil | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
+| Islas del Cielo | Jaya | Bellamy | Rebota como una bola de pinball · muelles en el suelo que te lanzan |
+| | Skypiea | Enel | Sango: rayos que te persiguen · Raigo: zona enorme |
+| Water 7 | Long Ring Long Land | Foxy | Rayo Noro Noro (te deja parado) · espejo que te devuelve tus disparos |
+| | Water 7 | Franky | Coup de Vent: te manda lejos · ráfaga de ametralladora que te sigue |
+| | Enies Lobby | Lucci | Rankyaku · Tekkai (inmune) · Rokuogan (estallido si estás cerca) |
+| | Post-Enies Lobby | Garp (huida) | Balas de cañón lanzadas a mano que caen y ruedan · meteoro enorme |
+| Thriller Bark | Mansión | Perona | Fantasmas negativos (sin ataques) · fantasmas que estallan |
+| | Congelador | Oars | Pisotón con onda que se expande · barrido con el brazo |
+| | Mástil | Moria | Brick Bat: murciélagos que te persiguen · levanta zombis |
 | Final | El Trono Vacío | Imu (jefe final) | Látigo negro que gira · anillos de espinas con un hueco |
 
 Efectos que pueden poner los jefes al jugador (`player.affect`): aturdido, piedra, controles al
