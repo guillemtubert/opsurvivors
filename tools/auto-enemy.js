@@ -32,6 +32,7 @@ const ENEMIES = {
   mercury:    'mercury/Atlas_mercury.png',
   saturn:     'saturn/Atlas_saturn.png',
   enel:       'enel/Atlas_3244.png',
+  wapol:      'wapol/Atlas_0326.png',
   kaidodragon:'kaidodragon/Atlas_3887.png',
   navyhalberd:'marine/Atlas_0181.png',
   navypistol: 'marine/Atlas_0182.png',
@@ -50,6 +51,7 @@ function background(img) {
 
 /** Poses elegidas a mano (coordenadas del atlas): tienen prioridad sobre la detección automática. */
 const MANUAL = {
+  wapol: { bg: '#ebebeb', walk: [[10, 55, 165, 190], [205, 55, 165, 190], [395, 55, 165, 190]], attack: [[265, 805, 280, 240]] },
   kaidodragon: { bg: '#ebebeb', walk: [[393, 8, 331, 238], [8, 8, 362, 238]], attack: [[0, 2056, 250, 240]] },
   enel: { bg: '#ebebeb', walk: [[10, 515, 175, 215], [195, 515, 170, 215], [380, 515, 170, 215]], attack: [[400, 790, 290, 220]] },
   navyhalberd: { bg: '#ebebeb', walk: [[75, 25, 120, 185], [330, 25, 120, 185], [585, 25, 120, 185]], attack: [[20, 830, 225, 175]] },
@@ -86,6 +88,9 @@ const MANUAL = {
   toysoldier:  { bg: '#ebebeb', walk: [[20, 55, 90, 200], [150, 55, 95, 200], [275, 55, 90, 200], [780, 55, 100, 200]], attack: [[390, 135, 190, 120]] },
   chess:       { bg: '#ebebeb', walk: [[15, 55, 200, 160], [240, 55, 200, 160], [465, 55, 205, 160]], attack: [[285, 460, 190, 180]] },
   mercury:     { bg: '#ebebeb', walk: [[8, 8, 341, 293], [341, 8, 341, 293], [681, 8, 317, 293], [349, 309, 317, 277]], attack: [[1038, 1030, 380, 301]] },
+  jupiter: { bg: '#ebebeb', walk: [[8, 250, 215, 230], [420, 250, 190, 230], [590, 250, 205, 230], [805, 250, 215, 230]], attack: [[640, 0, 260, 250]] },
+  venus: { bg: '#ebebeb', walk: [[8, 0, 305, 300], [335, 0, 250, 300], [615, 0, 250, 300]], attack: [[1038, 0, 470, 295]] },
+  saturn: { bg: '#ebebeb', walk: [[8, 282, 255, 258], [270, 282, 255, 258], [531, 282, 255, 258], [785, 282, 250, 258]], attack: [[1030, 0, 370, 275]] },
   cp9agent:    { bg: '#ebebeb', walk: [[50, 70, 130, 155], [240, 70, 130, 155], [430, 65, 135, 170], [620, 65, 115, 170]], attack: [[220, 890, 170, 185]] }
 };
 

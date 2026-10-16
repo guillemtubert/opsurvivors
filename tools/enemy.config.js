@@ -111,20 +111,24 @@ module.exports = {
     },
   jupiter: {
       sheet: REF + 'jupiter/Atlas_jupiter.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
       height: 46, colors: 24,
-      fps: { idle: 1, walk: 7 },
+      fps: { idle: 1, walk: 7, attack: 6 },
       anims: {
-        idle: [[6, 1034, 1018, 1015]],
-        walk: [[6, 1034, 1018, 1015], [6, 6, 1018, 993], [6, 2062, 1004, 936]]
+        idle: [[8, 250, 215, 230]],
+        walk: [[8, 250, 215, 230], [420, 250, 190, 230], [590, 250, 205, 230], [805, 250, 215, 230]],
+        attack: [[640, 0, 260, 250]]
       }
     },
   venus: {
       sheet: REF + 'venus/Atlas_venus.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
       height: 46, colors: 24,
-      fps: { idle: 1, walk: 7 },
+      fps: { idle: 1, walk: 7, attack: 6 },
       anims: {
-        idle: [[6, 1035, 1009, 987]],
-        walk: [[6, 1035, 1009, 987], [6, 9, 1018, 985], [1034, 1034, 1017, 1013], [1034, 6, 1010, 991]]
+        idle: [[8, 0, 305, 300]],
+        walk: [[8, 0, 305, 300], [335, 0, 250, 300], [615, 0, 250, 300]],
+        attack: [[1038, 0, 470, 295]]
       }
     },
   mercury: {
@@ -140,11 +144,13 @@ module.exports = {
     },
   saturn: {
       sheet: REF + 'saturn/Atlas_saturn.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
       height: 46, colors: 24,
-      fps: { idle: 1, walk: 7 },
+      fps: { idle: 1, walk: 7, attack: 6 },
       anims: {
-        idle: [[6, 1034, 1018, 1002]],
-        walk: [[6, 1034, 1018, 1002], [6, 6, 1019, 936], [1034, 6, 1017, 1003], [1034, 1034, 1011, 973]]
+        idle: [[8, 282, 255, 258]],
+        walk: [[8, 282, 255, 258], [270, 282, 255, 258], [531, 282, 255, 258], [785, 282, 250, 258]],
+        attack: [[1030, 0, 370, 275]]
       }
     },
   smoker: {
@@ -453,6 +459,17 @@ module.exports = {
         idle: [[393, 8, 331, 238]],
         walk: [[393, 8, 331, 238], [8, 8, 362, 238]],
         attack: [[0, 2056, 250, 240]]
+      }
+    },
+  wapol: {
+      sheet: REF + 'wapol/Atlas_0326.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[10, 55, 165, 190]],
+        walk: [[10, 55, 165, 190], [205, 55, 165, 190], [395, 55, 165, 190]],
+        attack: [[265, 805, 280, 240]]
       }
     },
   }
