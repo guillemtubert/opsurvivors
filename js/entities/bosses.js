@@ -1082,6 +1082,76 @@ G.Bosses = (() => {
       return { mx: k.nx * 0.8, my: k.ny * 0.8 };
     },
 
+    // ---------------- Los ancianos (Egghead, junto a Saturn) ----------------
+
+    mars(e, k) {
+      // St. Marcus Mars: un abanico de fuego, y a veces una cortina de llamas que se queda.
+      if (ready(e, k, 't1', 3.2, 4.0, 420)) {
+        e.atkAt = k.now;
+        const a0 = Math.atan2(k.dy, k.dx);
+        for (let i = -3; i <= 3; i++) shot(e, a0 + i * 0.13, 200, e.dmg * 0.45, { vis: 'ebullet', color: '#ff6a2a' });
+        G.Audio.sfx('shoot');
+      }
+      if (ready(e, k, 't2', 6, 7, 500)) {
+        const a = Math.atan2(k.dy, k.dx) + Math.PI / 2, x = k.pl.x, y = k.pl.y;
+        for (let i = -3; i <= 3; i++) {
+          const fx = x + Math.cos(a) * i * 34, fy = y + Math.sin(a) * i * 34;
+          zone(fx, fy, 16, '#ff5a1a', 3, hurtZone(k.pl, e.dmg * 0.4));
+        }
+        G.HUD.banner('¡Llamas!', '', '#ff6a2a');
+      }
+      return { mx: k.nx * 0.6, my: k.ny * 0.6 };
+    },
+
+    jupiter(e, k) {
+      // St. Ethanbaron Nusjuro: un empujón que aparta a todo lo de alrededor, y un golpe de aire.
+      if (ready(e, k, 't1', 5, 6, 300)) {
+        G.FX.ring(e.x, e.y, 10, 160, '#c8e8ff', 0.4, 6);
+        for (const o of G.EnemyMgr.query(e.x, e.y, 160)) if (!o.boss && !o.dead) { o.kx += (o.x - e.x) * 2; o.ky += (o.y - e.y) * 2; }
+        if (k.d < 160 && !k.pl.dead) k.pl.push(k.pl.x - e.x, k.pl.y - e.y, 0.5);
+        G.Audio.sfx('punch'); G.Camera.kick(0.4);
+      }
+      if (ready(e, k, 't2', 2.6, 3.2, 400)) {
+        const a = Math.atan2(k.dy, k.dx);
+        shot(e, a, 260, e.dmg * 0.7, { vis: 'paw', r: 12, life: 2, color: '#c8e8ff' });
+      }
+      return { mx: k.nx * 0.7, my: k.ny * 0.7 };
+    },
+
+    venus(e, k) {
+      // St. Shepherd Ju Peter: púas que brotan del suelo en tu zona y se quedan un momento.
+      if (ready(e, k, 't1', 3.6, 4.4, 450)) {
+        e.atkAt = k.now;
+        for (let i = 0; i < 6; i++) {
+          const x = k.pl.x + G.U.rand(-110, 110), y = k.pl.y + G.U.rand(-90, 90);
+          warn(x, y, 14, '#8a5a3a', 0.6 + i * 0.1, () => {
+            zone(x, y, 12, '#c8a070', 1.8, hurtZone(k.pl, e.dmg * 0.5), 'spring');
+          });
+        }
+      }
+      if (ready(e, k, 't2', 5, 6, 400)) {
+        for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283; shot(e, a, 130, e.dmg * 0.4, { r: 6, color: '#8a5a3a' }); }
+      }
+      return { mx: k.nx * 0.5, my: k.ny * 0.5 };
+    },
+
+    mercury(e, k) {
+      // St. Topman Warcury: una carga pesada con aviso, y al final de la carga, aturde a los de cerca.
+      if (e.state === 'charge') {
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.atkAt = k.now;
+          G.FX.ring(e.x, e.y, 10, 90, '#9ad04a', 0.35, 6); G.Camera.kick(0.5);
+          if (k.d < 90 + k.pl.r) { k.pl.hurt(e.dmg * 1.2, k.now); k.pl.affect('stun', 1.2); }
+        }
+        return { mx: e.ai.dx, my: e.ai.dy, spd: 4 };
+      }
+      if (ready(e, k, 't1', 4.4, 5.2, 420)) {
+        e.state = 'charge'; e.stateT = 0.7; e.ai.dx = k.nx; e.ai.dy = k.ny;
+        warnLine(e.x, e.y, Math.atan2(k.ny, k.nx), 240, 22, '#9ad04a', 0.7);
+      }
+      return { mx: k.nx * 0.5, my: k.ny * 0.5 };
+    },
+
     // ---------------- Saga Final ----------------
 
     saturn(e, k) {

@@ -114,4 +114,5 @@ Whole Cake y Wano; Seraphim (no encontrado).
 
 Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis: se hace por la web):
 - [ ] Cada personaje: atlas → hoja de andar 5×4 → sprites.config.js (walk5, despill, pockets, sideRef) → comprobar en juego.
-- [ ] Ancianos: Mars, Jupiter, Venus, Mercury (sin ataques propios aún; Saturn ya tiene los suyos en bosses.js).
+- [x] Ataques de Mars, Jupiter, Venus y Mercury (bosses.js). Pendiente: sus hojas de andar (Gemini).
+- [x] Tres enemigos por saga con ataques distintos (dash, cone, ranged, tank). Pendiente: sus hojas (Gemini).
