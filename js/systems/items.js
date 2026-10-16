@@ -172,9 +172,11 @@ G.Items = (() => {
     G.HUD.items(pl);
   }
 
-  /** Objeto al azar según la rareza (cofres de las islas). */
-  function giveRandom(pl) {
-    const pool = ITEMS.slice(), total = pool.reduce((a, i) => a + RARITY[i.rarity].w, 0);
+  /** Objeto al azar según la rareza (cofres de las islas); min: rareza mínima ('rare', 'epic'...). */
+  function giveRandom(pl, min = null) {
+    const order = ['common', 'rare', 'epic', 'legendary'];
+    const pool = min ? ITEMS.filter(i => order.indexOf(i.rarity) >= order.indexOf(min)) : ITEMS.slice();
+    const total = pool.reduce((a, i) => a + RARITY[i.rarity].w, 0);
     let x = Math.random() * total;
     for (const it of pool) { x -= RARITY[it.rarity].w; if (x <= 0) return give(pl, it.id); }
     give(pl, pool[0].id);

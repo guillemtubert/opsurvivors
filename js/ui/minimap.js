@@ -60,10 +60,12 @@ G.Minimap = (() => {
       const [a, b] = toMap(p.dock.x0, p.dock.y0), [c, d] = toMap(p.dock.x1, p.dock.y1);
       ctx.fillRect(a, b, Math.max(2, c - a), Math.max(2, d - b));
       dot(p.dock.shipX, p.dock.shipY, open ? '#ffd23f' : '#c9a46a', 3);
-      for (const c of p.chests) if (!c.open) dot(c.x, c.y, '#ffd23f');
+      if (!p.fog) for (const c of p.chests) if (!c.open) dot(c.x, c.y, '#ffd23f');
+      if (p.merchant) dot(p.merchant.x, p.merchant.y, '#5fe0c0', 3);
+      if (p.cursed && !p.cursed.open && !p.fog) dot(p.cursed.x, p.cursed.y, '#c86bff', 3);
       if (p.boss === 'idle' && !p.snail.none) dot(p.snail.x, p.snail.y, '#ff9ec4', 3);
     }
-    if (Math.floor(now * 4) % 2) for (const b of G.EnemyMgr.bosses()) dot(b.x, b.y, '#ff3a4a', 3);
+    if (Math.floor(now * 4) % 2 && !(p && p.fog)) for (const b of G.EnemyMgr.bosses()) dot(b.x, b.y, '#ff3a4a', 3);
     dot(pl.x, pl.y, '#ffffff', 2);
   }
 

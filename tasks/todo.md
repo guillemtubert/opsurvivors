@@ -1,3 +1,12 @@
+# Que no se haga pesado
+
+- [x] El viaje entero en una sola partida (si caes, vuelta a Shells Town); dificultad por isla y jefes más fuertes en cada saga
+- [x] Ritmo: Buster Call a los 2:00, Den Den Mushi más cerca del centro, huidas a los 8 s
+- [x] Objetos al estilo Megabonk en los cofres (4 rarezas) y un trofeo por jefe, con colección
+- [x] Imprevistos: noche, niebla, tormenta, mercader, cofre maldito
+- [ ] Rescate (un aliado atrapado que te ayuda si lo liberas)
+- [ ] Equilibrar jugando: daño de jefes, vida y frecuencia de objetos
+
 # Toda la historia (por fases)
 
 Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ningún jefe repite ataques.

@@ -81,5 +81,15 @@ G.Spawner = (() => {
     }
   }
 
-  return { reset, update, summon, landPoint, dmgNow };
+  /** Oleada de n enemigos alrededor de ti (élites si elite). */
+  function surge(pl, n, elite = false) {
+    const t = G.Island.difficulty;
+    for (let i = 0; i < n; i++) {
+      const p = landPoint(pl, i / n * 6.283);
+      if (p) G.EnemyMgr.add(new G.Enemy(pickDef(t), { x: p[0], y: p[1], hpK: hpK(t), dmgK: dmgK(t), elite }));
+    }
+    G.HUD.banner('¡Una oleada maldita!', '', '#c86bff');
+  }
+
+  return { reset, update, summon, landPoint, dmgNow, surge };
 })();

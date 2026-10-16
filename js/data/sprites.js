@@ -1278,6 +1278,7 @@ G.SPRITES = {
     chess:       swap('marine', { c: '#e8e0f0', b: '#2a2a3a', B: '#1a1a26' }),
     gifter:      swap('pirate', { r: '#4a3a2a', R: '#2a2018', h: '#c83a3a', c: '#6a2a2a' }),
     px1:         Object.assign(swap('pacifista', {}), { scale: 3 }),
+    merchant:    Object.assign(swap('pirate', { r: '#2a9a8a', R: '#1a6a5a', h: '#f2d063', c: '#8a3ac0' }), { scale: 2 }),
     killingham:  Object.assign(swap('sommers', { h: '#c8b0e0', c: '#6a4a9a' }), { scale: 3 }),
     gunko:       Object.assign(swap('sommers', { h: '#e8a040', c: '#c83a3a' }), { scale: 3 }),
     shamrock:    Object.assign(swap('sommers', { h: '#1a1a2a', c: '#1a4a2a', y: '#9ad04a' }), { scale: 3 }),

@@ -116,6 +116,10 @@ rareza (común, raro, épico, legendario) y se acumulan todo el viaje. Cada jefe
 escapar de él, deja su **trofeo**: un objeto único que además se guarda en tu colección (el puerto
 muestra cuántos tienes). Los objetos se ven bajo la vida, con su número de copias.
 
+**Imprevistos**: más o menos la mitad de las islas trae uno al azar (se anuncia al llegar): noche,
+niebla (el minimapa no enseña al jefe ni los cofres), tormenta (ráfagas que os empujan a todos),
+mercader (vende objetos por berries) o cofre maldito (un objeto épico o mejor y una oleada de élites).
+
 Tipos de isla: **jefe** (Den Den Mushi), **dúo** (dos jefes a la vez, una barra con la vida de los
 dos) y **huida** (`escape`: el jefe es invencible, aparece a los 12 s y hay que llegar al barco).
 

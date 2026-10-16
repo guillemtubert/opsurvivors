@@ -8,6 +8,13 @@
  * ESCAPE_AT segundos y te persigue. El barco está abierto desde el principio.
  * Dúo: def.boss es una lista; el barco se abre cuando caen todos.
  *
+ * Imprevistos (uno al azar en algunas islas, nunca en la primera):
+ *   night    noche: sólo ves alrededor de ti
+ *   fog      niebla: ves menos y el minimapa no enseña al jefe
+ *   storm    tormenta: lluvia y ráfagas de viento que os empujan a todos
+ *   merchant un mercader vende objetos a cambio de berries
+ *   cursed   cofre maldito: un objeto bueno, pero sale una oleada de élites
+ *
  * Los cofres son opcionales: si no los coges, sigues más débil. Todo se
  * coloca con la semilla de la isla: cofres repartidos alrededor del centro,
  * el Den Den Mushi a media distancia y el muelle en la costa sur o norte.
@@ -15,6 +22,14 @@
 G.Island = (() => {
   const OPEN_R = 46, USE_R = 74;
   let def = null, idx = 0, t = 0, warned = false, saga = null, sagaIdx = 0;
+  let event = null, merchant = null, cursed = null, gustT = 0, wind = [1, 0], rain = [];
+  const EVENTS = {
+    night:    { name: 'Noche',         desc: 'Sólo ves lo que tienes cerca' },
+    fog:      { name: 'Niebla',        desc: 'Se ve poco y el minimapa no ayuda' },
+    storm:    { name: 'Tormenta',      desc: 'Las ráfagas de viento os empujan' },
+    merchant: { name: 'Mercader',      desc: 'Vende objetos a cambio de berries' },
+    cursed:   { name: 'Cofre maldito', desc: 'Un buen objeto… y una oleada de élites' }
+  };
   let chests = [], snail = null, dock = null;
   let boss = 'idle';                   // idle · called · dead
   let action = null;                   // { label, fn, off } lo que se puede hacer donde estás
@@ -25,15 +40,19 @@ G.Island = (() => {
     return art[name];                   // null si su PNG no cargó: no se dibuja
   }
 
-  function clear() { def = null; chests = []; snail = null; dock = null; action = null; }
+  function clear() { def = null; chests = []; snail = null; dock = null; action = null; event = null; merchant = null; cursed = null; }
 
   // ---------------- colocación ----------------
 
   function setup(d, i, seed, sg, si) {
     def = d; idx = i; t = 0; warned = false; boss = 'idle'; action = null; saga = sg; sagaIdx = si;
-    chests = []; snail = null;
+    chests = []; snail = null; merchant = null; cursed = null; rain = []; gustT = 6;
     let n = 0;
     const rnd = () => G.U.hash(n++, 7, seed);
+    // Imprevisto: más o menos la mitad de las islas, nunca la primera.
+    const r = rnd(), keys = Object.keys(EVENTS);
+    event = i > 0 && r < 0.5 ? keys[Math.floor(r / 0.5 * keys.length)] : null;
+    const wa = rnd() * 6.283; wind = [Math.cos(wa), Math.sin(wa)];
     const R = G.World.radius;
     const land = (x, y) => G.World.waterAt(x, y) === 0;
     const far = (x, y, pts, min) => pts.every(p => G.U.dist2(x, y, p.x, p.y) > min * min);
@@ -63,6 +82,17 @@ G.Island = (() => {
     if (!snail.none) { taken.push(snail); G.World.reserve(snail.x, snail.y, 2); }
 
     // Cofres: repartidos en sectores alrededor del centro.
+    // Mercader y cofre maldito: en tierra libre, lejos de lo demás.
+    const spot = min => {
+      for (let k = 0; k < 150; k++) {
+        const a = rnd() * 6.283, r = R * (0.2 + rnd() * 0.45), x = Math.cos(a) * r, y = Math.sin(a) * r;
+        if (land(x, y) && far(x, y, taken, min)) { const p = { x, y }; taken.push(p); G.World.reserve(x, y, 2); return p; }
+      }
+      return null;
+    };
+    if (event === 'merchant') merchant = Object.assign(spot(R * 0.2) || { x: R * 0.15, y: R * 0.15 }, { bought: 0 });
+    if (event === 'cursed') cursed = Object.assign(spot(R * 0.2) || { x: -R * 0.15, y: R * 0.15 }, { open: false });
+
     const nChests = d.chests || 5;
     for (let c = 0; c < nChests; c++) {
       for (let k = 0; k < 120; k++) {
@@ -107,9 +137,36 @@ G.Island = (() => {
       G.Camera.kick(0.6);
     }
 
+    // Cofre maldito: al tocarlo, objeto bueno y oleada de élites.
+    if (cursed && !cursed.open && G.U.dist2(cursed.x, cursed.y, pl.x, pl.y) < OPEN_R * OPEN_R) {
+      cursed.open = true;
+      G.FX.burst(cursed.x, cursed.y - 20, '#c86bff', 40, 200);
+      G.Items.giveRandom(pl, 'epic');
+      G.Spawner.surge(pl, 14, true);
+      G.Audio.sfx('boss');
+    }
+    // Cofre maldito: humo morado a su alrededor, para que se distinga.
+    if (cursed && !cursed.open && Math.random() < 0.3) G.FX.puff(cursed.x + G.U.rand(-16, 16), cursed.y - G.U.rand(0, 30), '#8a3ac0', 1);
+    // Tormenta: lluvia y, cada poco, una ráfaga de viento que empuja a todos.
+    if (event === 'storm') {
+      if ((gustT -= dt) <= 0) {
+        gustT = G.U.rand(6, 9);
+        const a = Math.atan2(wind[1], wind[0]) + G.U.rand(-0.6, 0.6); wind = [Math.cos(a), Math.sin(a)];
+        pl.push(wind[0] * 260, wind[1] * 260, 0.7);
+        for (const e of G.EnemyMgr.list) if (!e.boss) { e.kx += wind[0] * 380; e.ky += wind[1] * 380; }
+        G.FX.text(pl.x, pl.y - 50, '¡Ráfaga!', '#bfe4ff', true);
+        G.Camera.kick(0.2);
+      }
+    }
+
     // Qué se puede hacer donde estás.
     action = null;
-    if (boss === 'idle' && !snail.none && G.U.dist2(snail.x, snail.y, pl.x, pl.y) < USE_R * USE_R) {
+    if (merchant && G.U.dist2(merchant.x, merchant.y, pl.x, pl.y) < USE_R * USE_R) {
+      const price = merchantPrice();
+      action = pl.coins >= price
+        ? { label: 'Comprar objeto · ' + price + ' ฿', fn: () => { pl.coins -= price; merchant.bought++; G.Audio.sfx('coin'); G.Items.giveRandom(pl, merchant.bought > 1 ? 'rare' : null); } }
+        : { label: 'Objeto · ' + price + ' ฿ (no te llega)', off: true };
+    } else if (boss === 'idle' && !snail.none && G.U.dist2(snail.x, snail.y, pl.x, pl.y) < USE_R * USE_R) {
       action = { label: 'Llamar a ' + bossName(), fn: summon };
     } else if (G.U.dist2(dock.endX, dock.endY, pl.x, pl.y) < USE_R * USE_R * 1.4) {
       action = boss === 'dead' || def.escape ? { label: 'Zarpar', fn: () => G.Game.nextIsland() }
@@ -120,6 +177,32 @@ G.Island = (() => {
   }
 
   function act() { if (action && !action.off) action.fn(); }
+
+  /** Precio del mercader: sube con cada compra y con lo lejos que vas. */
+  const merchantPrice = () => Math.round((120 + idx * 15) * (1 + merchant.bought * 0.6));
+
+  /** Noche, niebla y lluvia: por encima de todo (en el lienzo del mundo). */
+  function drawEvent(ctx, pl, now) {
+    if (!def || !event) return;
+    const cam = G.Camera, L = cam.left(), T = cam.top(), W = cam.w, H = cam.h;
+    if (event === 'night' || event === 'fog') {
+      const night = event === 'night';
+      const g = ctx.createRadialGradient(pl.x, pl.y - 20, night ? 70 : 140, pl.x, pl.y - 20, night ? 230 : 380);
+      g.addColorStop(0, night ? 'rgba(8,10,30,0)' : 'rgba(220,226,234,0)');
+      g.addColorStop(1, night ? 'rgba(8,10,30,0.88)' : 'rgba(220,226,234,0.85)');
+      ctx.fillStyle = g; ctx.fillRect(L, T, W, H);
+    }
+    if (event === 'storm') {
+      ctx.fillStyle = 'rgba(20,30,50,0.25)'; ctx.fillRect(L, T, W, H);
+      while (rain.length < 160) rain.push({ x: L + Math.random() * W, y: T + Math.random() * H });
+      ctx.fillStyle = 'rgba(210,228,255,0.75)';
+      for (const d of rain) {
+        d.y += 18; d.x += wind[0] * 8;
+        if (d.y > T + H || d.x < L || d.x > L + W) { d.y = T - 10; d.x = L + Math.random() * W; }
+        ctx.fillRect(Math.round(d.x / 2) * 2, Math.round(d.y / 2) * 2, 2, 16);
+      }
+    }
+  }
 
   function summon() {
     const pl = G.Game.player;
@@ -208,16 +291,23 @@ G.Island = (() => {
     put(G.Props.has(ship) ? ship : 'merry', dock.shipX, dock.shipY, { bob: true, noShadow: true });
     if (!snail.none) put('denden', snail.x, snail.y, { glow: boss === 'idle' ? '#ff9ec4' : null, bob: boss === 'idle' });
     for (const c of chests) put(c.open ? 'chestOpen' : 'chest', c.x, c.y, { glow: c.open ? null : '#ffd23f' });
+    if (cursed) put(cursed.open ? 'chestOpen' : 'chest', cursed.x, cursed.y, { glow: cursed.open ? null : '#c86bff' });
+    if (merchant && G.Camera.sees(merchant.x, merchant.y, 120)) list.push({ y: merchant.y, draw(ctx) {
+      const s = G.Pix.sprite('merchant'), sc = (s.scale || 1) * P, w = s.w * sc, h = s.h * sc;
+      ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(merchant.x, merchant.y, 14, 5, 0, 0, 6.283); ctx.fill();
+      ctx.drawImage(s.frames[0], Math.round((merchant.x - w / 2) / P) * P, Math.round((merchant.y - h) / P) * P, w, h);
+    } });
   }
 
   /** Puntos para el minimapa. */
   function pois() {
     if (!def) return null;
-    return { chests, snail, boss, dock, escape: !!def.escape };
+    return { chests, snail, boss, dock, escape: !!def.escape, merchant, cursed, fog: event === 'fog' };
   }
 
   return {
-    setup, clear, update, act, collect, onBossKilled, busterT, goal, pois,
+    setup, clear, update, act, collect, onBossKilled, busterT, goal, pois, drawEvent,
+    get event() { return event && EVENTS[event]; },
     get def() { return def; }, get index() { return idx; }, get time() { return t; },
     get saga() { return saga; }, get sagaIndex() { return sagaIdx; },
     /** Segundos de dificultad: crece con cada isla del viaje y, dentro de la isla, con el tiempo. */

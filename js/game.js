@@ -102,8 +102,9 @@ G.Game = (() => {
     pl.shove = null; pl.slowT = 0;
     G.Camera.x = 0; G.Camera.y = 0; G.Camera.shake = 0;
     // Al empezar una saga, su nombre; si no, el de la isla.
-    if (newSaga) G.HUD.banner(saga.name, def.name + ' · ' + def.sub, '#ffd23f');
-    else G.HUD.banner(def.name, def.sub, '#ffd23f');
+    const ev = G.Island.event, extra = ev ? ' · Imprevisto: ' + ev.name : '';
+    if (newSaga) G.HUD.banner(saga.name, def.name + ' · ' + def.sub + extra, '#ffd23f');
+    else G.HUD.banner(def.name, def.sub + extra, '#ffd23f');
     G.Audio.music('sea');
   }
 
@@ -309,6 +310,7 @@ G.Game = (() => {
       G.Combat.draw(lctx, pl, now);
       G.Projectiles.draw(lctx);
       G.FX.drawOver(lctx);
+      G.Island.drawEvent(lctx, pl, now);
     } else {
       const list = [];
       G.World.collectProps(list, now);
