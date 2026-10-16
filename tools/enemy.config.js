@@ -323,5 +323,82 @@ module.exports = {
         attack: [[540, 935, 195, 140]]
       }
     },
+  hody: {
+      sheet: REF + 'hody/Atlas_hody.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[15, 55, 110, 200]],
+        walk: [[15, 55, 110, 200], [145, 55, 115, 200], [280, 55, 125, 200], [400, 55, 115, 200]],
+        attack: [[30, 890, 160, 180]]
+      }
+    },
+  caesar: {
+      sheet: REF + 'caesar/Atlas_caesar.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[20, 60, 160, 210]],
+        walk: [[20, 60, 160, 210], [210, 60, 165, 210], [400, 60, 165, 210], [595, 60, 165, 210]],
+        attack: [[815, 60, 185, 210]]
+      }
+    },
+  doflamingo: {
+      sheet: REF + 'doflamingo/Atlas_doflamingo.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[10, 55, 200, 200]],
+        walk: [[10, 55, 200, 200], [235, 55, 200, 200], [455, 55, 200, 200], [680, 55, 200, 200]],
+        attack: [[460, 310, 200, 200]]
+      }
+    },
+  jack: {
+      sheet: REF + 'jack/Atlas_jack.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[10, 10, 165, 240]],
+        walk: [[10, 10, 165, 240], [180, 10, 165, 240], [350, 10, 165, 240], [520, 10, 165, 240]],
+        attack: [[10, 1040, 190, 180]]
+      }
+    },
+  katakuri: {
+      sheet: REF + 'katakuri/Atlas_katakuri.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[0, 0, 110, 205]],
+        walk: [[0, 0, 110, 205], [120, 0, 110, 205], [245, 0, 110, 205], [370, 0, 110, 205]],
+        attack: [[500, 790, 170, 230]]
+      }
+    },
+  queen: {
+      sheet: REF + 'queen/Atlas_queen.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[10, 55, 240, 245]],
+        walk: [[10, 55, 240, 245], [260, 55, 240, 245], [495, 55, 240, 245], [725, 55, 240, 245]],
+        attack: [[5, 1085, 250, 215]]
+      }
+    },
+  kaido: {
+      sheet: REF + 'kaido/Atlas_kaido.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[300, 5, 210, 210]],
+        walk: [[300, 5, 210, 210], [510, 5, 210, 215], [300, 245, 210, 210], [510, 245, 210, 210]],
+        attack: [[110, 600, 215, 200]]
+      }
+    },
   }
 };

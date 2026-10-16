@@ -144,3 +144,9 @@ Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis
 - [ ] Seraphim (Final): sin atlas en la lista: sigue con dibujo provisional.
 - [ ] Gifter: el atlas mezcla un pájaro y una mantis; revisar si conviene otro.
 - [ ] Ataques de los enemigos nuevos en partida: revisar que no saturen la pantalla.
+
+## Jefes: poses de su atlas (esta sesión)
+- [x] Hechos con poses de su atlas: Smoker, Mr. 9, Miss Wednesday, Mr. 5, Miss Valentine, Bellamy, Foxy, Franky, Garp, Perona, Oars, Kizaru, Hancock, Magellan, Akainu, Rayleigh, Hody, Caesar, Doflamingo, Jack, Katakuri, Queen, Kaido (humano).
+- [ ] Kaido (forma de dragón, kaidodragon): usa temporalmente las poses humanas. Falta su atlas de dragón.
+- [ ] Imu: sigue con su atlas de Treasure Cruise (no tiene hoja de andar propia).
+- [ ] Seraphim, Loki, Gunko, Sommers, Killingham y Shamrock: sin atlas en ninguna lista.

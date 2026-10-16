@@ -46,5 +46,12 @@ G.CUSTOM_SPRITES = Object.assign(G.CUSTOM_SPRITES || {}, {
   hancock: {"file":"assets/chars/hancock.png","fw":46,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[11,0,25,46]},
   magellan: {"file":"assets/chars/magellan.png","fw":50,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[8,1,31,46]},
   akainu: {"file":"assets/chars/akainu.png","fw":72,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[22,0,29,46]},
-  rayleigh: {"file":"assets/chars/rayleigh.png","fw":62,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[19,0,26,46]}
+  rayleigh: {"file":"assets/chars/rayleigh.png","fw":62,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[19,0,26,46]},
+  hody: {"file":"assets/chars/hody.png","fw":48,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[12,1,27,46]},
+  caesar: {"file":"assets/chars/caesar.png","fw":48,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[7,0,36,46]},
+  doflamingo: {"file":"assets/chars/doflamingo.png","fw":56,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[7,0,46,46]},
+  jack: {"file":"assets/chars/jack.png","fw":40,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[5,0,32,46]},
+  katakuri: {"file":"assets/chars/katakuri.png","fw":42,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[10,0,25,46]},
+  queen: {"file":"assets/chars/queen.png","fw":50,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[0,0,45,46]},
+  kaido: {"file":"assets/chars/kaido.png","fw":56,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[9,1,45,46]}
 });
