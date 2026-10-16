@@ -99,11 +99,12 @@ js/
 
 Mientras se diseña el estilo, sólo están activos **Luffy** (de Elbaph) y **Sanji**.
 
-La historia entera está en `js/data/islands.js`: 11 sagas y 37 islas, una por arco. Cada saga
+La historia entera está en `js/data/islands.js`: 11 sagas y 41 islas, una por arco, y **se juega
+de un tirón**: una partida es el viaje entero, de Shells Town al Trono Vacío, y si caes vuelves a
+empezar. La dificultad crece isla a isla y la vida de los jefes, saga a saga. Para probar una isla
+concreta: `index.html?isla=<id>` (por ejemplo `?isla=onigashima`). Cada saga
 lleva su enemigo normal (de momento, dibujos provisionales) y su barco (el Thousand Sunny desde
-Post-Enies Lobby). Una isla se activa sola en cuanto existen todos sus jefes, y las sagas sin
-ninguna isla activa no salen en el puerto. Con `allSagas: false` (`js/data/scope.js`), cada
-saga se abre al completar la anterior. Hoja de ruta por fases: `tasks/todo.md`.
+Post-Enies Lobby). Una isla se activa sola en cuanto existen todos sus jefes. Hoja de ruta por fases: `tasks/todo.md`.
 
 Cada isla tiene su bioma (`G.World.BIOMES`, 17): colores del suelo, el agua y los caminos, y sus
 objetos grandes (`b.tree` / `b.palm`, uno o una lista). Punk Hazard está partida: la mitad oeste es

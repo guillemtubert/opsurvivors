@@ -14,7 +14,7 @@
  */
 G.Island = (() => {
   const OPEN_R = 46, USE_R = 74;
-  let def = null, idx = 0, t = 0, warned = false;
+  let def = null, idx = 0, t = 0, warned = false, saga = null, sagaIdx = 0;
   let chests = [], snail = null, dock = null;
   let boss = 'idle';                   // idle · called · dead
   let action = null;                   // { label, fn, off } lo que se puede hacer donde estás
@@ -29,8 +29,8 @@ G.Island = (() => {
 
   // ---------------- colocación ----------------
 
-  function setup(d, i, seed) {
-    def = d; idx = i; t = 0; warned = false; boss = 'idle'; action = null;
+  function setup(d, i, seed, sg, si) {
+    def = d; idx = i; t = 0; warned = false; boss = 'idle'; action = null; saga = sg; sagaIdx = si;
     chests = []; snail = null;
     let n = 0;
     const rnd = () => G.U.hash(n++, 7, seed);
@@ -55,9 +55,9 @@ G.Island = (() => {
     if (d.escape) snail = { x: 1e9, y: 1e9, none: true };      // sin Den Den Mushi (nunca está cerca)
     // Den Den Mushi: a media distancia, lejos del muelle y del centro.
     for (let k = 0; k < 200 && !snail; k++) {
-      const a = rnd() * 6.283, r = R * (0.35 + rnd() * 0.25);
+      const a = rnd() * 6.283, r = R * (0.2 + rnd() * 0.15);
       const x = Math.cos(a) * r, y = Math.sin(a) * r;
-      if (land(x, y) && far(x, y, taken, R * 0.45)) snail = { x, y };
+      if (land(x, y) && far(x, y, taken, R * 0.18)) snail = { x, y };
     }
     if (!snail) snail = { x: R * 0.3, y: 0 };
     if (!snail.none) { taken.push(snail); G.World.reserve(snail.x, snail.y, 2); }
@@ -204,7 +204,7 @@ G.Island = (() => {
         }
       } });
     }
-    const ship = def.ship || G.Islands.SAGA.ship || 'merry';
+    const ship = def.ship || saga.ship || 'merry';
     put(G.Props.has(ship) ? ship : 'merry', dock.shipX, dock.shipY, { bob: true, noShadow: true });
     if (!snail.none) put('denden', snail.x, snail.y, { glow: boss === 'idle' ? '#ff9ec4' : null, bob: boss === 'idle' });
     for (const c of chests) put(c.open ? 'chestOpen' : 'chest', c.x, c.y, { glow: c.open ? null : '#ffd23f' });
@@ -218,6 +218,9 @@ G.Island = (() => {
 
   return {
     setup, clear, update, act, collect, onBossKilled, busterT, goal, pois,
-    get def() { return def; }, get index() { return idx; }, get time() { return t; }
+    get def() { return def; }, get index() { return idx; }, get time() { return t; },
+    get saga() { return saga; }, get sagaIndex() { return sagaIdx; },
+    /** Segundos de dificultad: crece con cada isla del viaje y, dentro de la isla, con el tiempo. */
+    get difficulty() { return idx * 25 + Math.min(t, 150); }
   };
 })();

@@ -81,33 +81,36 @@ G.Game = (() => {
     pl.addMove(crew.start);
     G.HUD.show(true);
     G.HUD.moves(pl);
-    enterIsland(0);
+    enterIsland(G.Islands.startIndex());
     state = 'playing';
   }
 
-  /** Llega a la isla i de la saga: mapa nuevo, mismo tripulante. */
+  /** Llega a la isla i del viaje: mapa nuevo, mismo tripulante. */
   function enterIsland(i) {
-    const def = G.Islands.SAGA.islands[i];
+    const { def, saga, si } = G.Islands.JOURNEY[i];
+    const newSaga = i === 0 || G.Islands.JOURNEY[i - 1].si !== si;
     const seed = Math.floor(Math.random() * 1e6);
     G.FX.clear(); G.Projectiles.clear(); G.Combat.clear(); G.EnemyMgr.clear();
     G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();
     G.World.reset(seed, G.Islands.radius(def));
     G.World.setBiome(def.biome);
-    G.Island.setup(def, i, seed);
+    G.Island.setup(def, i, seed, saga, si);
     G.Minimap.build();
     pl.x = 0; pl.y = 0;
     for (const k in pl.fx) pl.fx[k] = 0;      // los efectos de un jefe no pasan a la isla siguiente
     pl.shove = null; pl.slowT = 0;
     G.Camera.x = 0; G.Camera.y = 0; G.Camera.shake = 0;
-    G.HUD.banner(def.name, def.sub, '#ffd23f');
+    // Al empezar una saga, su nombre; si no, el de la isla.
+    if (newSaga) G.HUD.banner(saga.name, def.name + ' · ' + def.sub, '#ffd23f');
+    else G.HUD.banner(def.name, def.sub, '#ffd23f');
     G.Audio.music('sea');
   }
 
-  /** Sube al Going Merry: siguiente isla o fin de la saga. */
+  /** Sube al barco: siguiente isla o fin del viaje. */
   function nextIsland() {
     const i = G.Island.index + 1;
     pl.islands++;
-    if (i >= G.Islands.SAGA.islands.length) { endRun(false, true); return; }
+    if (i >= G.Islands.JOURNEY.length) { endRun(false, true); return; }
     G.Audio.sfx('confirm');
     flashT = 0.6;
     pl.heal(pl.maxHp * 0.25);
@@ -193,13 +196,16 @@ G.Game = (() => {
     const best = save.best[pl.crew.id] || 0;
     const record = time > best;
     if (record) save.best[pl.crew.id] = Math.floor(time);
-    if (won && !save.sagas.includes(G.Islands.SAGA.id)) save.sagas.push(G.Islands.SAGA.id);
+    // Récord: la isla más lejana a la que has llegado.
+    const reached = G.Island.index + (won ? 1 : 0);
+    const recordIsland = reached > (save.bestIsland || 0);
+    if (recordIsland) save.bestIsland = reached;
     G.Save.commit();
     G.HUD.show(false);
     G.Audio.music('over');
     if (won) G.Audio.sfx('chest');
     else if (!quit) G.Audio.sfx('death');
-    G.UI.over({ time, level: pl.level, kills: pl.kills, bosses: pl.bosses, islands: pl.islands, earned, record, quit, won, crew: pl.crew });
+    G.UI.over({ time, level: pl.level, kills: pl.kills, bosses: pl.bosses, islands: pl.islands, earned, record, recordIsland, quit, won, crew: pl.crew });
   }
 
   function toMenu() {
@@ -256,7 +262,7 @@ G.Game = (() => {
     pl.update(dt, now);
     G.Combat.tick(dt, pl, now);
     G.Combat.update(dt, now);
-    G.Spawner.update(dt, pl, time, G.Island.busterT());
+    G.Spawner.update(dt, pl, G.Island.difficulty, G.Island.busterT());
     G.Island.update(dt, pl, now);
     G.Minimap.update(dt, pl, now);
     G.EnemyMgr.update(dt, pl, now);

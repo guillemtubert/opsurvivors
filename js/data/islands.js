@@ -1,5 +1,6 @@
 /* ============ islands.js — las islas del viaje, agrupadas en sagas ============
- * Una partida es una saga: sus islas en orden, manteniendo nivel y técnicas.
+ * Una partida es el viaje entero: todas las sagas seguidas, de Shells Town al Trono
+ * Vacío, manteniendo nivel, técnicas y objetos. Si caes, vuelves a empezar.
  * En cada isla: cofres repartidos, un Den Den Mushi que llama al jefe y el
  * barco en el muelle, que se abre al derrotarlo.
  *
@@ -19,11 +20,11 @@
  */
 G.Islands = (() => {
   /** Segundos de exploración antes del Buster Call. */
-  const BUSTER_AT = 180;
+  const BUSTER_AT = 120;
   /** Radio en tiles de una isla de escala 1. */
   const SIZE = 48;
   /** Segundos hasta que aparece el jefe de una isla de huida. */
-  const ESCAPE_AT = 12;
+  const ESCAPE_AT = 8;
 
   const SAGAS = [
     { id: 'eastblue', name: 'Saga de East Blue', enemies: ['marine'], islands: [
@@ -98,21 +99,20 @@ G.Islands = (() => {
   const on = i => (!G.SCOPE || G.SCOPE.islands === 'all' || G.SCOPE.islands.includes(i.id)) &&
                   bossIds(i).every(id => G.Enemies.BOSS_BY_ID[id]);
   const PLAYABLE = SAGAS.map(s => Object.assign({}, s, { islands: s.islands.filter(on) })).filter(s => s.islands.length);
-  let cur = 0;
 
-  /** ¿Se puede jugar la saga i? La primera siempre; las demás, al completar la anterior. */
-  function unlocked(i) {
-    if (i <= 0 || (G.SCOPE && G.SCOPE.allSagas)) return true;
-    return (G.Save.data.sagas || []).includes(PLAYABLE[i - 1].id);
-  }
+  /** El viaje: todas las islas jugables en orden, cada una con su saga y su número de saga. */
+  const JOURNEY = [];
+  PLAYABLE.forEach((saga, si) => saga.islands.forEach(def => JOURNEY.push({ def, saga, si })));
 
   /** Radio en tiles de una isla. */
   const radius = def => Math.round(SIZE * (def.scale || 1));
 
-  return {
-    BUSTER_AT, SIZE, ESCAPE_AT, SAGAS, PLAYABLE, radius, unlocked, bossIds,
-    /** La saga elegida en el puerto. */
-    get SAGA() { return PLAYABLE[cur]; }, get index() { return cur; },
-    select(i) { cur = Math.max(0, Math.min(PLAYABLE.length - 1, i)); }
-  };
+  /** Isla por la que empezar (sólo para probar): ?isla=<id> en la dirección. */
+  function startIndex() {
+    const id = new URLSearchParams(location.search).get('isla');
+    const i = id ? JOURNEY.findIndex(j => j.def.id === id) : -1;
+    return Math.max(0, i);
+  }
+
+  return { BUSTER_AT, SIZE, ESCAPE_AT, SAGAS, PLAYABLE, JOURNEY, radius, bossIds, startIndex };
 })();

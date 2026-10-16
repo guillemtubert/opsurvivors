@@ -814,7 +814,7 @@ G.Bosses = (() => {
         const p = besidePlayer(k.pl, 130);
         if (p) {
           G.FX.burst(p[0], p[1], '#9a6ad0', 14, 140);
-          G.EnemyMgr.add(new G.Enemy(G.Enemies.BY_ID.slime, { x: p[0], y: p[1], dmgK: 1 + G.Game.time / 300 }));
+          G.EnemyMgr.add(new G.Enemy(G.Enemies.BY_ID.slime, { x: p[0], y: p[1], dmgK: G.Spawner.dmgNow() }));
           G.HUD.banner('¡Shinokuni!', 'Se divide al golpearlo', '#9a6ad0');
         }
       }
@@ -1433,7 +1433,7 @@ G.Bosses = (() => {
             const p = besidePlayer(k.pl, G.U.rand(110, 170));
             if (!p) continue;
             G.FX.burst(p[0], p[1], '#5e5070', 12, 120);
-            e.ai.zombies.push(G.EnemyMgr.add(new G.Enemy(zdef, { x: p[0], y: p[1], dmgK: 1 + G.Game.time / 300 })));
+            e.ai.zombies.push(G.EnemyMgr.add(new G.Enemy(zdef, { x: p[0], y: p[1], dmgK: G.Spawner.dmgNow() })));
           }
           G.HUD.banner('¡Zombis!', '', '#9a8ad0');
         } else {

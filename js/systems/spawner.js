@@ -34,7 +34,7 @@ G.Spawner = (() => {
   }
 
   function pickDef(t) {
-    const bag = G.Enemies.bagAt(t, G.Islands.SAGA.enemies);
+    const bag = G.Enemies.bagAt(t, G.Island.saga.enemies);
     let r = Math.random() * bag.reduce((a, e) => a + e.w, 0);
     for (const e of bag) { r -= e.w; if (r <= 0) return e; }
     return bag[0];
@@ -48,11 +48,16 @@ G.Spawner = (() => {
     return G.EnemyMgr.add(new G.Enemy(pickDef(t), { x: p[0], y: p[1], hpK: hp, dmgK: dmgK(t), elite }));
   }
 
+  /** Multiplicador de daño de ahora (para lo que invocan los jefes). */
+  const dmgNow = () => dmgK(G.Island.difficulty);
+  /** Vida de los jefes a lo largo del viaje: cada saga, bastante más. */
+  const bossHpK = () => 1 + G.Island.sagaIndex * 0.9;
+
   /** El jefe de la isla, llamado con el Den Den Mushi: aparece cerca, en tierra. */
   function summon(def, pl, i = 0) {
     const a = Math.random() * 6.283 + i * 2.1;
     const [x, y] = landPoint(pl, a, 24) || [pl.x + 260, pl.y];
-    return G.EnemyMgr.add(new G.Enemy(def, { x, y, boss: true, dmgK: dmgK(G.Game.time) * 0.8 }));
+    return G.EnemyMgr.add(new G.Enemy(def, { x, y, boss: true, dmgK: dmgNow() * 0.8, hpK: def.invincible ? 1 : bossHpK() }));
   }
 
   /** t = segundos de la partida (dificultad) · bt = segundos de Buster Call, o -1. */
@@ -76,5 +81,5 @@ G.Spawner = (() => {
     }
   }
 
-  return { reset, update, summon, landPoint };
+  return { reset, update, summon, landPoint, dmgNow };
 })();

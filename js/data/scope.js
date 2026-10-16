@@ -4,6 +4,5 @@
  */
 G.SCOPE = {
   crew: ['luffy', 'sanji'],
-  islands: 'all',
-  allSagas: true            // mientras se prueba: todas las sagas abiertas sin completar la anterior
+  islands: 'all'
 };

@@ -27,7 +27,7 @@ G.UI = (() => {
   function init() {
     $('title-flag').innerHTML = G.Icons.html('flag', 64);
     $('scr-title').addEventListener('click', () => { G.Audio.sfx('confirm'); menu(); G.Audio.music('port'); });
-    $('btn-play').addEventListener('click', () => { if (G.Islands.unlocked(G.Islands.index)) G.Game.startRun(); else G.Audio.sfx('deny'); });
+    $('btn-play').addEventListener('click', () => G.Game.startRun());
     $('btn-crew').addEventListener('click', crew);
     $('btn-upg').addEventListener('click', upgrades);
     $('btn-settings').addEventListener('click', () => settings(menu));
@@ -87,25 +87,15 @@ G.UI = (() => {
     $('menu-berries').innerHTML = G.Icons.html('coin', 20) + ' ' + G.U.fmt(s.berries) + ' ฿';
     $('menu-captain').innerHTML = poster(c, true);
     const best = s.best[c.id];
-    sagaPick();
+    journey();
     $('menu-best').textContent = best ? 'Récord con ' + c.name.split(' ').pop() + ': ' + G.U.mmss(best) : 'Aún no has zarpado con ' + c.name.split(' ').pop();
   }
 
-  /** Selector de saga: ◀ nombre ▶ (las cerradas se ven pero no se pueden jugar). */
-  function sagaPick() {
-    const I = G.Islands, list = I.PLAYABLE, i = I.index, sg = I.SAGA, open = I.unlocked(i);
-    const isl = sg.islands;
-    $('menu-saga').innerHTML =
-      '<button class="btn small ghost" data-d="-1"' + (i <= 0 ? ' disabled' : '') + ' aria-label="Saga anterior">◀</button>' +
-      '<div class="saga-name"><b>' + (open ? '' : G.Icons.html('lock', 16) + ' ') + sg.name + '</b><small>' +
-        (open ? isl.length + (isl.length === 1 ? ' isla' : ' islas') + ' · ' + isl[0].name + (isl.length > 1 ? ' → ' + isl[isl.length - 1].name : '')
-              : 'Completa ' + list[i - 1].name + ' para zarpar') +
-        ((G.Save.data.sagas || []).includes(sg.id) ? ' · ✔' : '') + '</small></div>' +
-      '<button class="btn small ghost" data-d="1"' + (i >= list.length - 1 ? ' disabled' : '') + ' aria-label="Saga siguiente">▶</button>';
-    $('menu-saga').querySelectorAll('button[data-d]').forEach(b => b.addEventListener('click', () => {
-      I.select(i + +b.dataset.d); sagaPick();
-    }));
-    $('btn-play').disabled = !open;
+  /** El viaje: cuántas islas tiene y hasta dónde has llegado. */
+  function journey() {
+    const J = G.Islands.JOURNEY, best = Math.min(G.Save.data.bestIsland || 0, J.length);
+    const at = best >= J.length ? 'has llegado al final' : best ? 'hasta ' + J[best].def.name + ' (' + J[best].saga.name.replace('Saga de ', '') + ')' : 'aún no has zarpado';
+    $('menu-saga').innerHTML = '<div class="saga-name"><b>El viaje · ' + J.length + ' islas</b><small>Récord: ' + at + (best ? ' · isla ' + Math.min(best + 1, J.length) : '') + '</small></div>';
   }
 
   /** Cartel de "SE BUSCA" con el retrato pixel art. */
@@ -253,11 +243,11 @@ G.UI = (() => {
 
   function over(r) {
     show('scr-over');
-    $('over-title').textContent = r.won ? '¡' + G.Islands.SAGA.name + ' completada!' : r.quit ? 'Has vuelto a puerto' : '¡Has caído!';
+    $('over-title').textContent = r.won ? '¡Has llegado al final del viaje!' : r.quit ? 'Has vuelto a puerto' : '¡Has caído!';
     $('over-face').innerHTML = G.Pix.portrait(r.crew.id, 72);
     $('over-stats').innerHTML =
       '<span>Tiempo</span><b>' + G.U.mmss(r.time) + (r.record ? ' <em>¡récord!</em>' : '') + '</b>' +
-      '<span>Islas</span><b>' + r.islands + ' / ' + G.Islands.SAGA.islands.length + '</b>' +
+      '<span>Islas</span><b>' + r.islands + ' / ' + G.Islands.JOURNEY.length + (r.recordIsland ? ' <em>¡récord!</em>' : '') + '</b>' +
       '<span>Nivel</span><b>' + r.level + '</b>' +
       '<span>Enemigos</span><b>' + G.U.fmt(r.kills) + '</b>' +
       '<span>Jefes</span><b>' + r.bosses + '</b>' +
