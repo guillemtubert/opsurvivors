@@ -17,6 +17,7 @@ const P = require('./pixelize');
 
 const ROOT = path.join(__dirname, '..');
 const CONFIG = require('./sprites.config.js');
+CONFIG.chars = Object.assign({}, CONFIG.chars, require('./enemy.config.js').chars);   // enemigos normales (auto-enemy.js)
 const OUT_JS = path.join(ROOT, 'js/data/sprites-built.js');
 const ANIMS = ['idle', 'walk', 'attack', 'hurt'];
 
