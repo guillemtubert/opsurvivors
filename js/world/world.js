@@ -49,7 +49,109 @@ G.World = (() => {
       water: '#4a86b8', deep: '#2a5a8a', foam: '#ffffff', sparkle: '#d8f0ff',
       tree: 'tree', palm: 'tree', leaf: ['#24504a', '#33665a', '#c8dce4', '#ffffff'], trunk: ['#4a3a2a', '#6a5040'],
       rock: ['#7a8696', '#9aa6b6', '#c4ccd8'], flowers: ['#ffffff', '#bfe4ff', '#e8f0f4'], tuft: ['#c4d0de', '#ffffff'] }
+,
+    // 5 · Water 7: piedra y canales, casas de tejado azul.
+    { name: 'Water 7', sub: 'La ciudad del agua', music: 'sea',
+      ground: ['#b8b0a0', '#c0b8a8', '#aea696'], speck: '#9a9284', light: '#d8d0c0', path: ['#8a8478', '#7e786c'],
+      sand: ['#d8d0c0', '#d0c8b8', '#e0d8c8'], sandDot: '#b0a898',
+      water: '#3a8ad8', deep: '#2a6ab8', foam: '#e8f6ff', sparkle: '#bfe4ff',
+      tree: ['house', 'house', 'tree'], palm: 'house', wall: '#e8d8b8', roof: '#4a7ab8',
+      leaf: ['#2f7535', '#45943f', '#64b252', '#8ad06a'], trunk: ['#5b3b22', '#7a5130'],
+      rock: ['#7a7a84', '#9a9aa4', '#c0c0c8'], flowers: ['#f4d65c', '#f39ac0', '#ffffff'], tuft: ['#7a8a5a', '#9aaa6a'] },
+    // 6 · Selva (Little Garden, Amazon Lily, Zou, Rusukaina).
+    { name: 'Selva', sub: 'Árboles gigantes y lianas', music: 'sea',
+      ground: ['#3a7a32', '#408238', '#36722e'], speck: '#2a6226', light: '#5a9a44', path: ['#6a5030', '#5e4628'],
+      sand: ['#d8c890', '#d0c088', '#e0d098'], sandDot: '#b8a870',
+      water: '#3a9a8a', deep: '#2a7a70', foam: '#d8f8f0', sparkle: '#b8f0e0',
+      tree: ['jungletree', 'jungletree', 'tree'], palm: 'palm',
+      leaf: ['#1e5a24', '#2e7a30', '#46963c', '#6ab452'], trunk: ['#4a3018', '#6a4424'],
+      rock: ['#5a6a5a', '#7a8a78', '#9aaa98'], flowers: ['#e83a6a', '#f2c020', '#ffffff'], tuft: ['#2a6226', '#4a8a3a'] },
+    // 7 · Prisión (Impel Down): piedra oscura y columnas con cadenas.
+    { name: 'Impel Down', sub: 'La gran prisión submarina', music: 'sea',
+      ground: ['#5a5058', '#605660', '#544a52'], speck: '#463e46', light: '#7a7078', path: ['#3e363e', '#363036'],
+      sand: ['#6a5a5a', '#625454', '#726262'], sandDot: '#4e4242',
+      water: '#3a2a4a', deep: '#22182e', foam: '#8a7a9a', sparkle: '#a898b8',
+      tree: 'pillar', palm: 'pillar',
+      leaf: ['#3a3446', '#4a3e5a', '#5e5070', '#74688a'], trunk: ['#2e2638', '#463a50'],
+      rock: ['#4a4450', '#6a6270', '#8a8292'], flowers: ['#c83a3a', '#8a3ac0', '#5a5058'], tuft: ['#463e46', '#5a5058'] },
+    // 8 · Manglar (Sabaody): hierba húmeda y manglares con burbujas.
+    { name: 'Archipiélago Sabaody', sub: 'Manglares y burbujas', music: 'sea',
+      ground: ['#6a9a4a', '#72a250', '#629244'], speck: '#58843c', light: '#8aba62', path: ['#8a7a50', '#7e6e48'],
+      sand: ['#c8c098', '#c0b890', '#d0c8a0'], sandDot: '#a8a078',
+      water: '#4aa0b8', deep: '#2a7a98', foam: '#e8f8ff', sparkle: '#c8f0ff',
+      tree: ['mangrove', 'mangrove', 'tree'], palm: 'mangrove',
+      leaf: ['#3a7a3a', '#4e9444', '#6ab05a', '#8ccc72'], trunk: ['#6a5a3a', '#8a7a52'],
+      rock: ['#6e7680', '#8f98a3', '#b1bac4'], flowers: ['#f4d65c', '#bfe4ff', '#ffffff'], tuft: ['#58843c', '#7aaa58'] },
+    // 9 · Coral (Isla Gyojin): arena pálida bajo el mar, coral y algas.
+    { name: 'Isla Gyojin', sub: 'Bajo el mar', music: 'sea',
+      ground: ['#c8c0a0', '#d0c8a8', '#c0b898'], speck: '#a8a080', light: '#e0d8b8', path: ['#a89878', '#9a8a6c'],
+      sand: ['#e0d8b8', '#d8d0b0', '#e8e0c0'], sandDot: '#c0b898',
+      water: '#2a6ab8', deep: '#1a4a98', foam: '#a8d8ff', sparkle: '#c8e8ff',
+      tree: ['coral', 'coral', 'seaweed'], palm: 'seaweed',
+      leaf: ['#c83a6a', '#e86a8a', '#f89aaa', '#ffc8d0'], trunk: ['#5b3b22', '#7a5130'],
+      rock: ['#6a8aa0', '#8aaac0', '#aac8d8'], flowers: ['#ff9ec4', '#ffd23f', '#ffffff'], tuft: ['#2a7a5a', '#4aa07a'] },
+    // 10 · Punk Hazard: la mitad oeste es fuego y la este, hielo (halves).
+    null,
+    // 11 · Dressrosa: hierba alegre, girasoles y caminos de terracota.
+    { name: 'Dressrosa', sub: 'El reino del amor y los juguetes', music: 'sea',
+      ground: ['#7ab84a', '#82c050', '#72b044'], speck: '#66a03c', light: '#9ad862', path: ['#c87850', '#b86c48'],
+      sand: ['#f0d8a0', '#e8d098', '#f4e0b0'], sandDot: '#d0b878',
+      water: '#3a9ad8', deep: '#2a7ab8', foam: '#e8f6ff', sparkle: '#bfe4ff',
+      tree: ['sunflower', 'sunflower', 'tree'], palm: 'palm',
+      leaf: ['#2f7535', '#45943f', '#64b252', '#8ad06a'], trunk: ['#5b3b22', '#7a5130'],
+      rock: ['#a87a5a', '#c89a78', '#e0b898'], flowers: ['#f4d65c', '#ff6bb0', '#ffffff'], tuft: ['#4a8a30', '#7ab84a'] },
+    // 12 · Dulces (Whole Cake): suelo de nata rosa, caminos de chocolate, piruletas.
+    { name: 'Whole Cake', sub: 'El país de los dulces', music: 'sea',
+      ground: ['#f4c0d0', '#f8c8d8', '#f0b8c8'], speck: '#e8a8bc', light: '#ffe0e8', path: ['#7a4a2a', '#6a4024'],
+      sand: ['#f8e8c8', '#f4e0c0', '#fff0d8'], sandDot: '#e0c8a0',
+      water: '#c87ab8', deep: '#a85a98', foam: '#ffe8f8', sparkle: '#ffd8f0',
+      tree: ['lollipop', 'lollipop', 'candycane'], palm: 'candycane',
+      leaf: ['#e86a8a', '#f89aaa', '#ffc8d0', '#ffe8ec'], trunk: ['#7a4a2a', '#9a6a3a'],
+      rock: ['#a86a4a', '#c88a6a', '#e8aa8a'], flowers: ['#e83a6a', '#7ab8f0', '#ffd23f'], tuft: ['#e8a8bc', '#ffffff'] },
+    // 13 · Wano: hierba, cerezos en flor y toriis en la costa.
+    { name: 'Wano', sub: 'El país de los samuráis', music: 'sea',
+      ground: ['#6a9a48', '#72a250', '#629244'], speck: '#58843c', light: '#8aba62', path: ['#b89868', '#a88a5e'],
+      sand: ['#e0d0a0', '#d8c898', '#e8d8b0'], sandDot: '#c0b080',
+      water: '#3a7ac8', deep: '#2a5aa8', foam: '#e8f6ff', sparkle: '#bfe4ff',
+      tree: ['tree', 'tree', 'torii'], palm: 'torii',
+      leaf: ['#c86a8a', '#e88aa8', '#f8b0c8', '#ffd8e4'], trunk: ['#3a2418', '#5a3a28'],
+      rock: ['#6e7680', '#8f98a3', '#b1bac4'], flowers: ['#ff9ec4', '#ffffff', '#f4d65c'], tuft: ['#58843c', '#7aaa58'] },
+    // 14 · Egghead: suelo metálico claro y torres con luz.
+    { name: 'Egghead', sub: 'La isla del futuro', music: 'sea',
+      ground: ['#d8e0ea', '#e0e8f0', '#d0d8e4'], speck: '#b8c4d4', light: '#f4f8fc', path: ['#a8b8c8', '#98a8ba'],
+      sand: ['#e8eef4', '#e0e8f0', '#f0f4f8'], sandDot: '#c0ccd8',
+      water: '#3ab0d8', deep: '#2a90b8', foam: '#e8fbff', sparkle: '#c8f4ff',
+      tree: ['pylon', 'pylon', 'tree'], palm: 'pylon',
+      leaf: ['#3a8a6a', '#4aa07a', '#6abc94', '#9ad8b4'], trunk: ['#6a7a8a', '#8a9aaa'],
+      rock: ['#8a9aaa', '#a8b8c8', '#c8d8e8'], flowers: ['#ff6bb0', '#5fe0ff', '#ffffff'], tuft: ['#b8c4d4', '#ffffff'] },
+    // 15 · Elbaph: bosque de árboles gigantes.
+    { name: 'Elbaph', sub: 'La tierra de los gigantes', music: 'sea',
+      ground: ['#4a7a3a', '#528240', '#427234'], speck: '#38662c', light: '#6a9a50', path: ['#7a6040', '#6e5638'],
+      sand: ['#d8c898', '#d0c090', '#e0d0a0'], sandDot: '#b8a878',
+      water: '#3a7ab8', deep: '#2a5a98', foam: '#e8f6ff', sparkle: '#bfe4ff',
+      tree: ['giantree', 'tree', 'tree'], palm: 'tree',
+      leaf: ['#24502a', '#33683a', '#4a8a4a', '#6aa862'], trunk: ['#4a3420', '#6a4a2e'],
+      rock: ['#6a7068', '#8a9088', '#aab0a8'], flowers: ['#f4d65c', '#ffffff', '#c8a0f0'], tuft: ['#38662c', '#5a8a44'] },
+    // 16 · Mármol (Enies Lobby, Mary Geoise): suelo blanco y columnas.
+    { name: 'Mármol', sub: 'Los edificios del Gobierno Mundial', music: 'sea',
+      ground: ['#e8e4dc', '#ece8e0', '#e0dcd4'], speck: '#d0ccc4', light: '#ffffff', path: ['#c8c0b0', '#bcb4a4'],
+      sand: ['#f0ece4', '#e8e4dc', '#f8f4ec'], sandDot: '#d0c8bc',
+      water: '#3a8ad8', deep: '#2a6ab8', foam: '#e8f6ff', sparkle: '#bfe4ff',
+      tree: ['column', 'column', 'tree'], palm: 'column',
+      leaf: ['#2f7535', '#45943f', '#64b252', '#8ad06a'], trunk: ['#5b3b22', '#7a5130'],
+      rock: ['#b8b0a4', '#d8d0c4', '#ece8e0'], flowers: ['#f4d65c', '#ffffff', '#c8c0b0'], tuft: ['#a8b890', '#c8d0b0'] }
   ];
+
+  // Punk Hazard: la mitad oeste es fuego (lava, rocas volcánicas) y la este, hielo.
+  const FIRE = { name: 'Punk Hazard', sub: 'Fuego y hielo', music: 'sea', key: 'fire',
+    ground: ['#6a3a2a', '#723e2c', '#623426'], speck: '#4a2a20', light: '#8a4a34', path: ['#3a2420', '#32201c'],
+    sand: ['#4a2a22', '#42261e', '#523026'], sandDot: '#2e1a14',
+    water: '#e0581a', deep: '#a83a10', foam: '#ffd23f', sparkle: '#ffb040',
+    tree: 'lavarock', palm: 'lavarock',
+    leaf: ['#3a2a20', '#4a3428', '#5e4434', '#745840'], trunk: ['#2e1c14', '#46302a'],
+    rock: ['#2e1c1c', '#4a2a24', '#6a3a2a'], flowers: ['#ff8a2a', '#ffe14d', '#c83a1a'], tuft: ['#4a2a20', '#6a3a2a'] };
+  const ICE = Object.assign({}, BIOMES[4], { name: 'Punk Hazard', sub: 'Fuego y hielo', key: 'ice', tree: 'icecrystal', palm: 'icecrystal' });
+  BIOMES[10] = Object.assign({}, FIRE, { halves: [FIRE, ICE] });
 
   // ---------------- detalles pequeños (por bioma) ----------------
   // Los objetos grandes (árboles, rocas, barriles...) están en world/props.js.
@@ -72,7 +174,13 @@ G.World = (() => {
   const damage = new Map();             // "tx,ty" -> { hp, flash }
   const propCache = new Map();          // "bioma/prop" -> { img, white }
 
-  function B() { return BIOMES[biome]; }
+  /** El bioma actual; con tx (columna de tiles), la mitad que toca si está partido (Punk Hazard). */
+  function B(tx) {
+    const b = BIOMES[biome];
+    return b.halves && tx !== undefined ? b.halves[tx < 0 ? 0 : 1] : b;
+  }
+  /** Elige entre varios (b.tree puede ser una lista): siempre el mismo para el mismo tile. */
+  const pickOf = (v, tx, ty) => Array.isArray(v) ? v[Math.floor(G.U.hash(tx, ty, seed + 11) * v.length)] : v;
 
   function reset(s, r = 48) {
     seed = s | 0; radius = r;
@@ -151,13 +259,13 @@ G.World = (() => {
     if (reserved.has(tx + ',' + ty)) return null;
     const t = terrAt(tx, ty);
     const h = G.U.hash(tx, ty, seed + 5);
-    const b = B();
+    const b = B(tx);
     // Los grandes (árboles, palmeras) sólo en tiles pares: así nunca se pisan.
     const grid = !(tx & 1) && !(ty & 1);
     let p = null;
     if (t === 3) {
       if (isPath(tx, ty)) p = h < 0.04 ? 'flower' : null;
-      else if (grid && h < 0.085) p = b.tree;
+      else if (grid && h < 0.085) p = pickOf(b.tree, tx, ty);
       else if (!grid && h < 0.012) p = 'rock';
       else if (!grid && h < 0.022) p = 'barrel';
       else if (!grid && h < 0.028) p = 'crate';
@@ -165,7 +273,7 @@ G.World = (() => {
       else if (h < 0.24) p = 'flower';
       else if (h < 0.27) p = 'flower2';
     } else if (t === 2) {
-      if (grid && h < 0.07) p = b.palm;
+      if (grid && h < 0.07) p = pickOf(b.palm, tx, ty);
       else if (!grid && h < 0.008) p = 'crate';
       else if (!grid && h < 0.016) p = 'barrel';
       else if (h < 0.07) p = 'shell';
@@ -196,7 +304,7 @@ G.World = (() => {
   const rnd = (x, y) => RND[((y & 255) << 8) | (x & 255)];
 
   function bake(cx, cy) {
-    const b = B();
+    const b = B(cx * CH);
     const S = CH * T;
     const c = document.createElement('canvas');
     c.width = c.height = S;
@@ -305,12 +413,12 @@ G.World = (() => {
   function propDef(name) { return G.Props.has(name) ? G.Props.META[name] : PROPS[name]; }
 
   /** Imagen de un objeto en el bioma actual: { img, white, ox, oy }. */
-  function propImg(name) {
-    const k = biome + '/' + name;
+  function propImg(name, tx) {
+    const b = B(tx), k = biome + (b.key || '') + '/' + name;
     let p = propCache.get(k);
     if (!p) {
-      if (G.Props.has(name)) p = G.Props.make(name, B());
-      else { const d = PROPS[name]; p = { img: G.Pix.paint(d.rows, d.pal(B())), ox: d.ox, oy: d.oy }; }
+      if (G.Props.has(name)) p = G.Props.make(name, b);
+      else { const d = PROPS[name]; p = { img: G.Pix.paint(d.rows, d.pal(b)), ox: d.ox, oy: d.oy }; }
       p.white = G.Pix.white(p.img);
       propCache.set(k, p);
     }
@@ -334,7 +442,7 @@ G.World = (() => {
       list.push({
         y: flat ? fy - 1000 : fy,                 // lo plano siempre debajo
         draw(ctx) {
-          const p = propImg(name);
+          const p = propImg(name, tx);
           let sx = 0;
           if (dmg && now - dmg.at < 0.15) sx = Math.sin(now * 90) * 2;
           const img = dmg && now - dmg.at < 0.08 ? p.white : p.img;

@@ -12,7 +12,7 @@ Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ni
 - [x] Fase 4 — Caesar, Doflamingo, Jack, Katakuri, Big Mom (huida)
 - [x] Fase 5 — Queen, King, Kaido (dos fases), San Saturn, Loki, Sommers y Killingham, Gunko, Shamrock
 - [ ] Revisar los poderes de los Caballeros Sagrados con la wiki (no se pudo leer: los ataques son provisionales)
-- [ ] Biomas propios: canales, selva, prisión, manglar, coral, fuego/hielo, juguetes, dulces, Japón, futurista, bosque gigante
+- [x] Biomas propios con sus objetos: Water 7 (casas), selva, prisión (columnas con cadenas), manglar (burbujas), coral, Punk Hazard (mitad fuego, mitad hielo), Dressrosa (girasoles), dulces (piruletas), Wano (cerezos y torii), Egghead (torres), Elbaph (árboles gigantes) y mármol (Enies Lobby, Mary Geoise)
 - [ ] Hojas de 8 direcciones de los jefes nuevos y de los enemigos de cada saga
 
 # Islas con objetivo (estilo Megabonk, a lo One Piece)

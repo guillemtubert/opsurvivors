@@ -105,6 +105,10 @@ Post-Enies Lobby). Una isla se activa sola en cuanto existen todos sus jefes, y 
 ninguna isla activa no salen en el puerto. Con `allSagas: false` (`js/data/scope.js`), cada
 saga se abre al completar la anterior. Hoja de ruta por fases: `tasks/todo.md`.
 
+Cada isla tiene su bioma (`G.World.BIOMES`, 17): colores del suelo, el agua y los caminos, y sus
+objetos grandes (`b.tree` / `b.palm`, uno o una lista). Punk Hazard está partida: la mitad oeste es
+fuego y la este, hielo (`halves`).
+
 Tipos de isla: **jefe** (Den Den Mushi), **dúo** (dos jefes a la vez, una barra con la vida de los
 dos) y **huida** (`escape`: el jefe es invencible, aparece a los 12 s y hay que llegar al barco).
 

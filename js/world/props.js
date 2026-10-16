@@ -131,6 +131,182 @@ G.Props = (() => {
       return { cv, ox: 10, oy: 22 };
     },
 
+    // ---------- objetos de los biomas nuevos ----------
+
+    /** Casa de Water 7: paredes claras, tejado de color, ventanas y puerta. */
+    house(b) {
+      const cv = canvas(40, 50);
+      const wall = ramp(sh(b.wall, -0.35), sh(b.wall, -0.15), b.wall, sh(b.wall, 0.15));
+      const roof = ramp(sh(b.roof, -0.4), sh(b.roof, -0.2), b.roof, sh(b.roof, 0.25));
+      for (let y = 18; y < 48; y++) for (let x = 4; x < 36; x++) cv.set(x, y, tone(wall, 0.75 - x / 70, x, y));
+      for (let y = 4; y < 20; y++) {
+        const hw = (y - 2) * 1.25;
+        for (let x = Math.floor(20 - hw); x <= 20 + hw; x++) if (x >= 1 && x < 39) cv.set(x, y, tone(roof, 0.9 - (y - 4) / 26 - (x - 20) / 90, x, y), 1);
+      }
+      const glass = ramp('#3a6a9a', '#6aa8d8', '#bfe4ff');
+      for (const wx of [8, 26]) for (let y = 24; y < 31; y++) for (let x = wx; x < wx + 6; x++) cv.set(x, y, tone(glass, y < 26 ? 0.9 : 0.5, x, y), 2);
+      const door = ramp('#3a2414', '#5e3a1e', '#86562e');
+      for (let y = 36; y < 48; y++) for (let x = 17; x < 23; x++) cv.set(x, y, tone(door, 0.5, x, y), 2);
+      return { cv, ox: 20, oy: 48 };
+    },
+
+    /** Árbol de selva: tronco grueso, copa enorme y lianas colgando. */
+    jungletree(b) {
+      const cv = canvas(64, 82);
+      const leaf = ramp(sh(b.leaf[0], -0.35), b.leaf[0], b.leaf[1], b.leaf[2], b.leaf[3]);
+      const bark = ramp(sh(b.trunk[0], -0.35), b.trunk[0], b.trunk[1], sh(b.trunk[1], 0.25));
+      stroke(cv, 32, 80, 32, 34, 14, 9, bark);
+      stroke(cv, 32, 76, 22, 81, 6, 3, bark); stroke(cv, 32, 76, 42, 81, 6, 3, bark); stroke(cv, 32, 74, 26, 80, 4, 2, bark);
+      for (const [x, y, rx, ry, z] of [[32, 18, 20, 15, 0], [14, 28, 14, 12, 0.1], [50, 28, 14, 12, 0.1], [22, 38, 14, 10, 0.3], [42, 38, 14, 10, 0.3], [32, 30, 16, 12, 0.5]]) ball(cv, x, y, rx, ry, leaf, { tex: 0.4, z });
+      const vine = ramp(sh(b.leaf[0], -0.4), b.leaf[0], b.leaf[1]);
+      for (const [x, len] of [[12, 22], [24, 16], [41, 20], [53, 14]]) stroke(cv, x, 38, x + 1, 38 + len, 2, 1, vine, 0.8);
+      return { cv, ox: 32, oy: 80 };
+    },
+
+    /** Columna de piedra con cadenas (Impel Down). */
+    pillar(b) {
+      const cv = canvas(26, 54);
+      const r = ramp(sh(b.rock[0], -0.35), b.rock[0], b.rock[1], b.rock[2], sh(b.rock[2], 0.25));
+      stroke(cv, 13, 52, 13, 8, 13, 12, r);
+      ball(cv, 13, 7, 9, 4, r, { tex: 0.05, z: 0.2 }); ball(cv, 13, 51, 9, 3, r, { tex: 0.05, z: 0.1 });
+      const chain = ramp('#2a2a34', '#4a4a58', '#8a8a9a');
+      for (let y = 14; y < 40; y += 3) { cv.set(5 + (y % 6 ? 0 : 1), y, chain[1], 3); cv.set(20 - (y % 6 ? 0 : 1), y + 1, chain[2], 3); }
+      return { cv, ox: 13, oy: 52 };
+    },
+
+    /** Manglar gigante de Sabaody: raíces en arco y burbujas que suben. */
+    mangrove(b) {
+      const cv = canvas(62, 78);
+      const bark = ramp(sh(b.trunk[0], -0.35), b.trunk[0], b.trunk[1], sh(b.trunk[1], 0.25));
+      const leaf = ramp(sh(b.leaf[0], -0.35), b.leaf[0], b.leaf[1], b.leaf[2], b.leaf[3]);
+      for (const dx of [-16, -8, 8, 16]) { stroke(cv, 31, 56, 31 + dx * 0.6, 66, 5, 4, bark); stroke(cv, 31 + dx * 0.6, 66, 31 + dx, 76, 4, 3, bark); }
+      stroke(cv, 31, 60, 31, 36, 12, 10, bark);
+      ball(cv, 31, 30, 22, 12, leaf, { tex: 0.3 }); ball(cv, 18, 36, 12, 7, leaf, { tex: 0.3, z: 0.2 }); ball(cv, 44, 36, 12, 7, leaf, { tex: 0.3, z: 0.2 });
+      const bub = ramp('#8ac0e0', '#c8e8ff', '#ffffff');
+      for (const [x, y, r] of [[14, 14, 4], [26, 8, 3], [40, 11, 5], [50, 4, 3], [33, 2, 2]]) ball(cv, x, y, r, r, bub, { tex: 0, z: 2 });
+      return { cv, ox: 31, oy: 76 };
+    },
+
+    /** Coral ramificado (Isla Gyojin). */
+    coral(b) {
+      const cv = canvas(42, 48);
+      const c = ramp(sh(b.leaf[0], -0.35), b.leaf[0], b.leaf[1], b.leaf[2], b.leaf[3]);
+      const arm = (x0, y0, a, len, w, d) => {
+        const x1 = x0 + Math.cos(a) * len, y1 = y0 + Math.sin(a) * len;
+        stroke(cv, x0, y0, x1, y1, w, w * 0.7, c, 0.2 * d);
+        ball(cv, x1, y1, w * 0.45, w * 0.45, c, { tex: 0, z: 0.5 + d * 0.2 });
+        if (d < 2) { arm(x1, y1, a - 0.5, len * 0.65, w * 0.7, d + 1); arm(x1, y1, a + 0.5, len * 0.65, w * 0.7, d + 1); }
+      };
+      arm(21, 46, -Math.PI / 2, 16, 7, 0);
+      return { cv, ox: 21, oy: 46 };
+    },
+
+    /** Alga que se mece (Isla Gyojin, en la arena). */
+    seaweed(b) {
+      const cv = canvas(22, 42);
+      const g = ramp(sh(b.tuft[0], -0.3), b.tuft[0], b.tuft[1], sh(b.tuft[1], 0.25));
+      for (const [x, h] of [[7, 34], [12, 40], [16, 28]]) for (let y = 40; y > 40 - h; y -= 2) stroke(cv, x + Math.sin(y * 0.3) * 2, y, x + Math.sin((y - 2) * 0.3) * 2, y - 2, 3, 3, g);
+      return { cv, ox: 11, oy: 40 };
+    },
+
+    /** Roca volcánica con grietas de lava (Punk Hazard, lado del fuego). */
+    lavarock(b) {
+      const cv = canvas(36, 30);
+      const r = ramp('#1a1012', '#2e1c1c', '#4a2a24', '#6a3a2a');
+      ball(cv, 18, 18, 15, 10, r, { tex: 0.15 }); ball(cv, 12, 14, 8, 7, r, { tex: 0.15, z: 0.2 });
+      const lava = rgb('#ff8a2a'), hot = rgb('#ffe14d');
+      for (const [x, y] of [[10, 18], [11, 19], [12, 20], [13, 20], [20, 14], [21, 15], [21, 16], [22, 17], [26, 21], [27, 21]]) cv.set(x, y, (x + y) % 3 ? lava : hot, 9);
+      for (let x = 0; x < 36; x++) for (let y = 27; y < 30; y++) cv.data[(y * 36 + x) * 4 + 3] = 0;
+      return { cv, ox: 18, oy: 27 };
+    },
+
+    /** Cristales de hielo (Punk Hazard, lado del hielo). */
+    icecrystal() {
+      const cv = canvas(32, 48);
+      const ice = ramp('#4a86b8', '#8ac0e8', '#c8e8ff', '#ffffff');
+      for (const [x, h, w] of [[16, 40, 7], [9, 26, 5], [24, 30, 5], [12, 18, 3]]) {
+        stroke(cv, x, 46, x, 46 - h, w, 1, ice, 0.3);
+      }
+      return { cv, ox: 16, oy: 46 };
+    },
+
+    /** Girasol enorme (Dressrosa). */
+    sunflower(b) {
+      const cv = canvas(26, 52);
+      const stem = ramp(sh(b.tuft[0], -0.3), b.tuft[0], b.tuft[1]);
+      stroke(cv, 13, 50, 13, 16, 3, 3, stem);
+      stroke(cv, 13, 34, 6, 30, 3, 1, stem); stroke(cv, 13, 40, 20, 36, 3, 1, stem);
+      const pet = ramp('#c08a10', '#f2c020', '#ffd23f', '#fff0a0'), mid = ramp('#3a2414', '#5e3a1e', '#86562e');
+      for (let i = 0; i < 12; i++) { const a = i / 12 * 6.283; ball(cv, 13 + Math.cos(a) * 7, 12 + Math.sin(a) * 7, 3.2, 3.2, pet, { tex: 0, z: 0.5 }); }
+      ball(cv, 13, 12, 5.5, 5.5, mid, { tex: 0.3, z: 1 });
+      return { cv, ox: 13, oy: 50 };
+    },
+
+    /** Piruleta gigante (Whole Cake). */
+    lollipop(b) {
+      const cv = canvas(32, 58);
+      stroke(cv, 16, 56, 16, 26, 3, 3, ramp('#c4bdb0', '#e8e4dc', '#ffffff'));
+      const A = ramp(sh(b.flowers[0], -0.3), b.flowers[0], sh(b.flowers[0], 0.25)), B = ramp('#c8c0d0', '#f4f1ea', '#ffffff');
+      for (let y = 2; y < 30; y++) for (let x = 2; x < 30; x++) {
+        const dx = x - 16, dy = y - 16, d = Math.hypot(dx, dy);
+        if (d > 13.5) continue;
+        const sw = Math.floor((Math.atan2(dy, dx) + d * 0.35) / (Math.PI / 4)) & 1;
+        cv.set(x, y, tone(sw ? A : B, 0.8 - (dx + dy) / 50, x, y), 2);
+      }
+      return { cv, ox: 16, oy: 56 };
+    },
+
+    /** Bastón de caramelo (Whole Cake, en la arena). */
+    candycane() {
+      const cv = canvas(22, 48);
+      const R = ramp('#8a1a2a', '#c83a3a', '#f05a5a'), W = ramp('#c4bdb0', '#f4f1ea', '#ffffff');
+      const pts = [];
+      for (let y = 46; y > 14; y -= 2) pts.push([8, y]);
+      for (let a = Math.PI; a >= 0; a -= 0.3) pts.push([13 + Math.cos(a) * 5, 14 - Math.sin(a) * 6]);
+      for (let i = 0; i < pts.length - 1; i++) stroke(cv, pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1], 5, 5, (i >> 1) % 2 ? R : W);
+      return { cv, ox: 8, oy: 46 };
+    },
+
+    /** Torii rojo (Wano, en la costa). */
+    torii() {
+      const cv = canvas(46, 48);
+      const red = ramp('#6a1018', '#a82430', '#e0383e', '#f06a6a'), blk = ramp('#101018', '#2a2a34', '#4a4a58');
+      stroke(cv, 12, 46, 12, 10, 5, 5, red); stroke(cv, 34, 46, 34, 10, 5, 5, red);
+      stroke(cv, 4, 16, 42, 16, 4, 4, red);
+      stroke(cv, 2, 8, 44, 8, 5, 5, blk); stroke(cv, 1, 6, 45, 5, 2, 2, blk);
+      return { cv, ox: 23, oy: 46 };
+    },
+
+    /** Torre futurista con luz (Egghead). */
+    pylon(b) {
+      const cv = canvas(26, 62);
+      const m = ramp('#3a4a5a', '#6a7a8a', '#a8b8c8', '#e8f0f8');
+      stroke(cv, 13, 60, 13, 14, 10, 5, m);
+      for (const y of [24, 36, 48]) stroke(cv, 7, y, 19, y, 2, 2, ramp('#2a3a4a', '#4a5a6a'));
+      ball(cv, 13, 10, 6, 6, ramp(sh(b.flowers[1], -0.3), b.flowers[1], '#ffffff'), { tex: 0, z: 2 });
+      return { cv, ox: 13, oy: 60 };
+    },
+
+    /** Árbol gigante de Elbaph (el doble que uno normal). */
+    giantree(b) {
+      const cv = canvas(96, 120);
+      const leaf = ramp(sh(b.leaf[0], -0.35), b.leaf[0], b.leaf[1], b.leaf[2], b.leaf[3]);
+      const bark = ramp(sh(b.trunk[0], -0.35), b.trunk[0], b.trunk[1], sh(b.trunk[1], 0.25));
+      stroke(cv, 48, 118, 48, 60, 22, 14, bark);
+      stroke(cv, 48, 112, 30, 119, 8, 4, bark); stroke(cv, 48, 112, 66, 119, 8, 4, bark);
+      for (const [x, y, rx, ry, z] of [[48, 28, 30, 24, 0], [22, 44, 20, 18, 0.1], [74, 44, 20, 18, 0.1], [34, 58, 20, 14, 0.3], [62, 58, 20, 14, 0.3], [48, 46, 22, 18, 0.5]]) ball(cv, x, y, rx, ry, leaf, { tex: 0.35, z });
+      return { cv, ox: 48, oy: 118 };
+    },
+
+    /** Columna de mármol (Enies Lobby, Mary Geoise). */
+    column(b) {
+      const cv = canvas(26, 58);
+      const r = ramp(sh(b.rock[0], -0.3), b.rock[0], b.rock[1], b.rock[2], '#ffffff');
+      for (let y = 8; y < 52; y++) for (let x = 7; x < 19; x++) cv.set(x, y, tone(r, (x - 7) % 3 === 0 ? 0.35 : 0.8 - (x - 7) / 20, x, y));
+      for (const y of [4, 5, 6, 7, 52, 53, 54, 55]) for (let x = 4; x < 22; x++) cv.set(x, y, tone(r, 0.85 - (x - 4) / 30, x, y), 1);
+      return { cv, ox: 13, oy: 55 };
+    },
+
     crate() {
       const cv = canvas(24, 24);
       const wood = ramp('#5e3a1a', '#8a5a2a', '#b88a4a', '#d6a868');
@@ -213,7 +389,12 @@ G.Props = (() => {
   const META = {
     tree: { solid: 6, big: true }, palm: { solid: 5, big: true }, cactus: { solid: 6, big: true },
     cloudtree: { solid: 5, big: true }, dead: { solid: 5, big: true },
-    rock: { solid: 10 }, barrel: { solid: 8, hp: 18 }, crate: { solid: 9, hp: 26 }
+    rock: { solid: 10 }, barrel: { solid: 8, hp: 18 }, crate: { solid: 9, hp: 26 },
+    house: { solid: 14, big: true }, jungletree: { solid: 8, big: true }, pillar: { solid: 7, big: true },
+    mangrove: { solid: 8, big: true }, coral: { solid: 7, big: true }, seaweed: { solid: 0 },
+    lavarock: { solid: 10, big: true }, icecrystal: { solid: 7, big: true }, sunflower: { solid: 4, big: true },
+    lollipop: { solid: 5, big: true }, candycane: { solid: 4, big: true }, torii: { solid: 4, big: true },
+    pylon: { solid: 6, big: true }, giantree: { solid: 14, big: true }, column: { solid: 7, big: true }
   };
 
   // Objetos sacados de pixel art ya hecho (tools/build-props.js): un píxel del PNG
