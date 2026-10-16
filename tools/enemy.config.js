@@ -472,5 +472,16 @@ module.exports = {
         attack: [[265, 805, 280, 240]]
       }
     },
+  bigmom: {
+      sheet: REF + 'bigmom/Atlas_bigmom.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[36, 0, 211, 232]],
+        walk: [[36, 0, 211, 232], [294, 273, 211, 232], [546, 530, 211, 232], [790, 0, 211, 232]],
+        attack: [[10, 1310, 262, 210]]
+      }
+    },
   }
 };

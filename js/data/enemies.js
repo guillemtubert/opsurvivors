@@ -19,7 +19,6 @@ G.Enemies = (() => {
   const LIST = [
     { id: 'marine',    name: 'Marine',          sprite: 'marine',    from: 0,   w: 10, hp: 18,  spd: 73, dmg: 6,  xp: 3,  behavior: 'chase' },
     { id: 'pirate',    name: 'Pirata',          sprite: 'pirate',    from: 0,   w: 7,  hp: 13,  spd: 95, dmg: 5,  xp: 3,  behavior: 'chase' },
-    { id: 'rifle',     name: 'Marine tirador',  sprite: 'rifle',     from: 45,  w: 5,  hp: 16,  spd: 65, dmg: 5,  xp: 4,  behavior: 'ranged', shot: 9 },
     // Tres tipos por saga, cada uno con su ataque (los dibujos son provisionales: se cambian por Gemini).
     // behavior: chase (va a por ti) · dash (carga cada pocos segundos) · ranged (dispara) ·
     //           cone (escopeta: 5 proyectiles en abanico) · tank (lento, mucha vida)
