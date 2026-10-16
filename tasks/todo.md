@@ -116,3 +116,11 @@ Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis
 - [ ] Cada personaje: atlas → hoja de andar 5×4 → sprites.config.js (walk5, despill, pockets, sideRef) → comprobar en juego.
 - [x] Ataques de Mars, Jupiter, Venus y Mercury (bosses.js). Pendiente: sus hojas de andar (Gemini).
 - [x] Tres enemigos por saga con ataques distintos (dash, cone, ranged, tank). Pendiente: sus hojas (Gemini).
+
+## Generación automática de hojas (bloqueo y solución)
+- La subida de archivos en la web de Gemini no es automatizable desde el navegador (el campo de archivo no es
+  accesible y se abre un diálogo nativo). Por eso la generación pasa por la API.
+- La API gratuita no da imágenes (límite 0). Solución: activar facturación en el proyecto de Google Cloud de la clave
+  (AI Studio → clave → configurar facturación) y poner un tope de gasto. Coste estimado: unos 2-12 € para todo el juego
+  (Flash ~0,04 € por imagen; Pro más caro). Después `node tools/gemini-8d.js <id>` por cada personaje.
+- Pendiente de la generación: enemigos (33) y ancianos (Mars, Jupiter, Venus, Mercury) y jefes nuevos.
