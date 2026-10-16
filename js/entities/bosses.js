@@ -41,6 +41,16 @@
  *   katakuri   Haki de observación: lanzas de mochi y un puño gigante apuntados a donde VAS a estar
  *   bigmom     (huida) Soul Pocus: te roba la vida si estás cerca · ataques de hambre (mucho más rápida) ·
  *              Prometheus: bola de fuego que se parte en cuatro al caer
+ *   queen      Plague Rounds: dardos que contagian (veneno) · dos láseres que se cruzan en ti
+ *   king       sube y cae en picado en línea, dejando fuego · alas de fuego: anillo que se expande
+ *   kaido      humano: kanabō con tres ondas de choque · a media vida, dragón: Bolo Breath que te sigue
+ *              y anillos de bolas de fuego que se cierran sobre ti
+ *   saturn     mirada: si te mueves mientras le brillan los ojos, te paraliza · pentagrama de patas de araña
+ *   loki       Ragnir: clava el martillo y un rayo une el martillo con él · rugido de gigante que te aparta
+ *   sommers    enredaderas de espinas que crecen hacia ti y se quedan
+ *   killingham burbujas de sueño (te duermen) · su montura carga en zigzag
+ *   gunko      flechas que caen donde estuviste hace un momento (tu rastro)
+ *   shamrock   tres cabezas de perro que muerden por turnos · corte en X enorme sobre ti
  *   mr3        Candle Lock: jaula de cera con una salida · charcos de cera que frenan
  *   wapol      Baku Baku: te aspira y muerde · salto que aplasta
  *   crocodile  Desert Spada: grietas de arena que avanzan · Sables: tornado que te sigue
@@ -943,6 +953,287 @@ G.Bosses = (() => {
             }
           }
         });
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    // ---------------- Wano ----------------
+
+    queen(e, k) {
+      // Plague Rounds: dardos que te contagian (veneno unos segundos).
+      if (ready(e, k, 't1', 2.6, 3.2, 440)) {
+        e.atkAt = k.now;
+        const a0 = Math.atan2(k.dy, k.dx);
+        for (const da of [-0.15, 0, 0.15]) shot(e, a0 + da, 230, e.dmg * 0.3, { r: 5, color: '#8ad04a', hit: pl => pl.affect('poison', 4, e.dmg * 0.25) });
+        G.Audio.sfx('shoot');
+      }
+      // Láseres: dos rayos que salen de los lados y se cruzan donde estás.
+      if (ready(e, k, 't2', 5.5, 6.5, 460)) {
+        const tx = k.pl.x, ty = k.pl.y;
+        for (const side of [-1, 1]) {
+          const ox = e.x - k.ny * side * 60, oy = e.y + k.nx * side * 60, a = Math.atan2(ty - oy, tx - ox), L = Math.hypot(tx - ox, ty - oy) + 120;
+          warnLine(ox, oy, a, L, 10, '#ff3a3a', 0.8, () => {
+            const x1 = ox + Math.cos(a) * L, y1 = oy + Math.sin(a) * L;
+            G.FX.beam(ox, oy - 10, x1, y1 - 10, 8, '#ff5f5f', 0.25);
+            if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, ox, oy, x1, y1) < 8 + k.pl.r) k.pl.hurt(e.dmg * 0.8, G.Game.now);
+          });
+        }
+        G.Audio.sfx('thunder');
+      }
+      return { mx: k.nx * 0.8, my: k.ny * 0.8 };
+    },
+
+    king(e, k) {
+      // Picado: sube y cae en línea recta a través de ti, dejando fuego.
+      if (e.state === 'up') {
+        e.z = Math.min(200, (e.z || 0) + 500 * k.dt);
+        if ((e.stateT -= k.dt) <= 0) {
+          const a = Math.atan2(k.dy, k.dx) + G.U.rand(-0.3, 0.3);
+          e.ai.a = a; e.x = k.pl.x - Math.cos(a) * 260; e.y = k.pl.y - Math.sin(a) * 260;
+          warnLine(e.x, e.y, a, 520, 36, '#ff8a2a', 0.5);
+          e.state = 'aimdive'; e.stateT = 0.5;
+        }
+        return STOP;
+      }
+      if (e.state === 'aimdive') {
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'dive'; e.stateT = 0.85; e.hidden = false; e.z = 20; e.pose = true; }
+        return STOP;
+      }
+      if (e.state === 'dive') {
+        e.ai.fire = (e.ai.fire || 0) - k.dt;
+        if (e.ai.fire <= 0) { e.ai.fire = 0.05; zone(e.x, e.y, 18, '#ff5a1a', 2.0, hurtZone(k.pl, e.dmg * 0.3)); }
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'walk'; e.z = 0; e.pose = false; }
+        return { mx: Math.cos(e.ai.a), my: Math.sin(e.ai.a), spd: 8 };
+      }
+      if (ready(e, k, 't1', 5.0, 6.0, 500)) { e.state = 'up'; e.stateT = 0.5; e.hidden = true; }
+      // Alas de fuego: un anillo que se expande desde él.
+      if (ready(e, k, 't2', 4.0, 5.0, 300)) {
+        e.atkAt = k.now;
+        const x = e.x, y = e.y, R0 = 20, R1 = 220, T = 1.0;
+        G.FX.ring(x, y, R0, R1, '#ff8a2a', T, 10);
+        let hit = false;
+        zone(x, y, R0, '#ff8a2a', T, m => {
+          const R = R0 + (R1 - R0) * (1 - m.life / m.max);
+          if (!hit && Math.abs(G.U.dist(k.pl.x, k.pl.y, x, y) - R * 0.85) < 14 + k.pl.r) { hit = true; k.pl.hurt(e.dmg * 0.8, G.Game.now); }
+        }, 'hidden');
+        G.Audio.sfx('boom');
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    kaido(e, k) {
+      // A media vida se convierte en dragón (una vez): otro dibujo, vuela y ataca distinto.
+      if (!e.ai.dragon && e.hp < e.maxHp * 0.5) {
+        e.ai.dragon = true;
+        e.sprite = 'kaidodragon'; e.scale = G.Pix.sprite('kaidodragon').scale || 1; e.r *= 1.4;
+        e.def = Object.assign({}, e.def, { hover: true });
+        e.state = 'walk'; e.pose = false; e.t1 = 1.5; e.t2 = 3;
+        G.HUD.banner('¡Kaido se convierte en dragón!', '', '#5a9ad8');
+        G.FX.burst(e.x, e.y - 40, '#5a9ad8', 30, 240); G.Camera.kick(0.8);
+      }
+      if (!e.ai.dragon) {
+        // Kanabō: golpe al suelo con tres ondas de choque en abanico.
+        if (e.state === 'aim') {
+          e.pose = true;
+          if ((e.stateT -= k.dt) <= 0) {
+            e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+            for (const da of [-0.5, 0, 0.5]) {
+              const a = e.ai.aim + da, x1 = e.x + Math.cos(a) * 300, y1 = e.y + Math.sin(a) * 300;
+              G.FX.beam(e.x, e.y + G.LIFT, x1, y1 + G.LIFT, 10, '#c8a070', 0.3);
+              if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 12 + k.pl.r) k.pl.hurt(e.dmg, k.now);
+            }
+            G.Audio.sfx('boom'); G.Camera.kick(0.5);
+          }
+          return STOP;
+        }
+        if (ready(e, k, 't1', 3.4, 4.2, 400)) {
+          e.state = 'aim'; e.stateT = 0.8; e.ai.aim = Math.atan2(k.dy, k.dx);
+          for (const da of [-0.5, 0, 0.5]) warnLine(e.x, e.y, e.ai.aim + da, 300, 20, '#c8a070', 0.8);
+        }
+        return { mx: k.nx, my: k.ny };
+      }
+      // Dragón · Bolo Breath: un chorro de fuego que gira poco a poco hacia ti.
+      if (e.state === 'breath') {
+        e.pose = true;
+        const want = Math.atan2(k.dy, k.dx);
+        e.ai.ba += Math.max(-0.9 * k.dt, Math.min(0.9 * k.dt, Math.atan2(Math.sin(want - e.ai.ba), Math.cos(want - e.ai.ba))));
+        const L = 300, x1 = e.x + Math.cos(e.ai.ba) * L, y1 = e.y + Math.sin(e.ai.ba) * L;
+        G.FX.beam(e.x, e.y - 40, x1, y1 - 10, 16, '#ff8a2a', 0.06);
+        if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, e.x, e.y, x1, y1) < 14 + k.pl.r) k.pl.hurt(e.dmg * 0.7, k.now);
+        if ((e.stateT -= k.dt) <= 0) { e.state = 'walk'; e.pose = false; }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 4.5, 5.5, 420)) {
+        e.state = 'breath'; e.stateT = 1.8; e.ai.ba = Math.atan2(k.dy, k.dx) + (Math.random() < 0.5 ? -0.8 : 0.8);
+        G.HUD.banner('Bolo Breath', '', '#ff8a2a');
+      }
+      // Dragón · anillos de bolas de fuego que se cierran sobre ti.
+      if (ready(e, k, 't2', 5.0, 6.0, 500)) {
+        const cx = k.pl.x, cy = k.pl.y;
+        for (const [R, delay] of [[150, 0.9], [80, 1.5]]) for (let i = 0; i < 10; i++) {
+          const a = i / 10 * 6.283 + R, x = cx + Math.cos(a) * R, y = cy + Math.sin(a) * R * 0.8;
+          warn(x, y, 22, '#ff5a1a', delay, () => {
+            G.FX.burst(x, y, '#ff8a2a', 6, 120);
+            if (near(k.pl, x, y, 22)) k.pl.hurt(e.dmg * 0.6, G.Game.now);
+          });
+        }
+        G.Audio.sfx('boom');
+      }
+      return { mx: k.nx * 0.8, my: k.ny * 0.8 };
+    },
+
+    // ---------------- Saga Final ----------------
+
+    saturn(e, k) {
+      // Mirada: le brillan los ojos; si te estás moviendo cuando acaba, te paraliza.
+      if (e.state === 'glare') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          e.state = 'walk'; e.pose = false; e.atkAt = k.now;
+          G.FX.ring(e.x, e.y - 50, 4, 40, '#ff3a3a', 0.3, 4);
+          if (k.d < 420 && k.pl.walking) { k.pl.affect('stun', 1.6); k.pl.hurt(e.dmg * 0.5, k.now); }
+          else if (k.d < 420) G.FX.text(k.pl.x, k.pl.y - 44, '¡Quieto!', '#ffe14d');
+        }
+        return STOP;
+      }
+      if (ready(e, k, 't1', 5.0, 6.0, 420)) {
+        e.state = 'glare'; e.stateT = 1.1;
+        G.HUD.banner('Sus ojos brillan…', '¡No te muevas!', '#ff3a3a');
+      }
+      // Pentagrama: una estrella bajo tus pies; de sus líneas salen patas de araña.
+      if (ready(e, k, 't2', 4.0, 5.0, 460)) {
+        const cx = k.pl.x, cy = k.pl.y, R = 110;
+        const pts = [0, 1, 2, 3, 4].map(i => { const a = -Math.PI / 2 + i * 2 * 6.283 / 5; return [cx + Math.cos(a) * R, cy + Math.sin(a) * R * 0.8]; });
+        for (let i = 0; i < 5; i++) {
+          const [x0, y0] = pts[i], [x1, y1] = pts[(i + 1) % 5], a = Math.atan2(y1 - y0, x1 - x0), L = Math.hypot(x1 - x0, y1 - y0);
+          warnLine(x0, y0, a, L, 10, '#a01a3a', 1.0, () => {
+            G.FX.beam(x0, y0 + G.LIFT, x1, y1 + G.LIFT, 6, '#2a1a2a', 0.3);
+            if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, x0, y0, x1, y1) < 8 + k.pl.r) k.pl.hurt(e.dmg * 0.8, G.Game.now);
+          });
+        }
+        G.Audio.sfx('slash');
+      }
+      return { mx: k.nx * 0.7, my: k.ny * 0.7 };
+    },
+
+    loki(e, k) {
+      // Ragnir: clava el martillo; un rayo une el martillo con Loki mientras él se mueve.
+      if (ready(e, k, 't1', 7, 8, 460)) {
+        e.atkAt = k.now;
+        const hx = k.pl.x + G.U.rand(-60, 60), hy = k.pl.y + G.U.rand(-50, 50);
+        warn(hx, hy, 24, '#ffe14d', 0.6, () => {
+          G.FX.burst(hx, hy, '#ffe14d', 12, 160); G.Audio.sfx('thunder');
+          let hitT = -9;
+          zone(hx, hy, 14, '#ffe14d', 5, () => {
+            if (e.dead) return;
+            G.FX.bolt(hx, hy, e.x, e.y - 20, '#ffe14d', 0.06);
+            const t = G.Game.now;
+            if (t - hitT > 0.5 && !k.pl.dead && G.segDist(k.pl.x, k.pl.y, hx, hy, e.x, e.y) < 8 + k.pl.r) { hitT = t; k.pl.hurt(e.dmg * 0.6, t); }
+          });
+        });
+      }
+      // Rugido de gigante: te aparta lejos.
+      if (ready(e, k, 't2', 5.0, 6.0, 300)) {
+        G.FX.ring(e.x, e.y - 40, 10, 260, '#c8a070', 0.5, 6); G.Camera.kick(0.6);
+        if (k.d < 260) { k.pl.push(k.nx * 420, k.ny * 420, 0.5); k.pl.hurt(e.dmg * 0.4, k.now); }
+        G.HUD.banner('¡Rugido de gigante!', '', '#c8a070');
+      }
+      return { mx: k.nx * 0.7, my: k.ny * 0.7 };
+    },
+
+    sommers(e, k) {
+      // Enredaderas de espinas: crecen desde él hacia ti, tramo a tramo, y se quedan un rato.
+      if (ready(e, k, 't1', 3.4, 4.2, 440)) {
+        e.atkAt = k.now;
+        const a0 = Math.atan2(k.dy, k.dx);
+        for (const da of [-0.35, 0.35]) {
+          let x = e.x, y = e.y, a = a0 + da;
+          for (let i = 0; i < 9; i++) {
+            a += G.U.rand(-0.25, 0.25) - da * 0.15;
+            const nx = x + Math.cos(a) * 34, ny = y + Math.sin(a) * 34, sx = x, sy = y, ang = a;
+            warnLine(sx, sy, ang, 34, 10, '#3a7a3a', 0.25 + i * 0.08, () => {
+              const z = zone(sx, sy, 0, '#2a5a2a', 4, (m) => {
+                if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, sx, sy, sx + Math.cos(ang) * 34, sy + Math.sin(ang) * 34) < 7 + k.pl.r) {
+                  const t = G.Game.now; if (t - (e.ai.thornT || -9) > 0.5) { e.ai.thornT = t; k.pl.hurt(e.dmg * 0.4, t); }
+                }
+              }, 'line');
+              z.a = ang; z.len = 34; z.w = 8;
+            });
+            x = nx; y = ny;
+          }
+        }
+        G.Audio.sfx('slash');
+      }
+      return { mx: k.nx * 0.8, my: k.ny * 0.8 };
+    },
+
+    killingham(e, k) {
+      // Su montura carga en zigzag (tres tramos).
+      if (e.state === 'zig') {
+        e.pose = true;
+        if ((e.stateT -= k.dt) <= 0) {
+          if (--e.ai.legs > 0) {
+            e.stateT = 0.35;
+            const a = Math.atan2(k.dy, k.dx) + (e.ai.legs % 2 ? 0.7 : -0.7);
+            e.ai.vx = Math.cos(a); e.ai.vy = Math.sin(a);
+          } else { e.state = 'walk'; e.pose = false; }
+        }
+        if (Math.random() < 0.5) G.FX.puff(e.x, e.y, '#c8b0e0', 1);
+        return { mx: e.ai.vx, my: e.ai.vy, spd: 4 };
+      }
+      if (ready(e, k, 't1', 4.0, 5.0, 400)) {
+        e.state = 'zig'; e.stateT = 0.4; e.ai.legs = 3;
+        const a = Math.atan2(k.dy, k.dx) + 0.7; e.ai.vx = Math.cos(a); e.ai.vy = Math.sin(a);
+        warnLine(e.x, e.y, a, 120, e.r * 2, '#c8b0e0', 0.4);
+      }
+      // Burbujas de sueño: si te tocan, te duermes un momento.
+      if (ready(e, k, 't2', 3.0, 3.6, 440)) {
+        shot(e, Math.atan2(k.dy, k.dx), 90, 0, { vis: 'bubble', r: 12, life: 4, homing: 0.5, color: '#c8b0e0', hit: pl => pl.affect('stun', 1.8) });
+      }
+      return { mx: k.nx, my: k.ny };
+    },
+
+    gunko(e, k) {
+      // Recuerda por dónde has pasado (último par de segundos).
+      e.ai.trail = e.ai.trail || [];
+      e.ai.tt = (e.ai.tt || 0) - k.dt;
+      if (e.ai.tt <= 0) { e.ai.tt = 0.2; e.ai.trail.push([k.pl.x, k.pl.y]); if (e.ai.trail.length > 12) e.ai.trail.shift(); }
+      // Flechas que caen sobre tu rastro: donde estuviste hace un momento.
+      if (ready(e, k, 't1', 2.6, 3.2, 480)) {
+        e.atkAt = k.now;
+        e.ai.trail.forEach(([x, y], i) => warn(x, y, 20, '#ffd23f', 0.5 + i * 0.05, () => {
+          G.FX.beam(x - 20, y - 160, x, y, 3, '#ffd23f', 0.12);
+          if (near(k.pl, x, y, 20)) k.pl.hurt(e.dmg * 0.5, G.Game.now);
+        }));
+        G.Audio.sfx('shoot');
+      }
+      // Flecha directa, rápida.
+      if (ready(e, k, 't2', 1.6, 2.0, 480)) shot(e, Math.atan2(k.dy, k.dx), 380, e.dmg * 0.5, { vis: 'knife', r: 6 });
+      return { mx: k.nx * 0.9, my: k.ny * 0.9 };
+    },
+
+    shamrock(e, k) {
+      // Tres cabezas de perro que muerden por turnos, cada una desde un lado.
+      if (ready(e, k, 't1', 3.6, 4.4, 460)) {
+        e.atkAt = k.now;
+        [-1, 0, 1].forEach((side, i) => {
+          const a = Math.atan2(k.dy, k.dx) + side * 0.9;
+          shot(e, a, 160, e.dmg * 0.7, { vis: 'paw', r: 12, life: 3, homing: 2.2, delay: i * 0.35, color: '#3a2a3a' });
+        });
+        G.Audio.sfx('punch');
+      }
+      // Corte en X enorme sobre donde estás.
+      if (ready(e, k, 't2', 5.0, 6.0, 500)) {
+        const cx = k.pl.x, cy = k.pl.y, L = 300;
+        for (const a of [Math.PI / 4, -Math.PI / 4]) {
+          const x0 = cx - Math.cos(a) * L / 2, y0 = cy - Math.sin(a) * L / 2;
+          warnLine(x0, y0, a, L, 26, '#3a8a3a', 0.9, () => {
+            const x1 = x0 + Math.cos(a) * L, y1 = y0 + Math.sin(a) * L;
+            G.FX.beam(x0, y0 + G.LIFT, x1, y1 + G.LIFT, 10, '#9ad04a', 0.2);
+            if (!k.pl.dead && G.segDist(k.pl.x, k.pl.y, x0, y0, x1, y1) < 13 + k.pl.r) k.pl.hurt(e.dmg * 1.1, G.Game.now);
+          });
+        }
+        G.Audio.sfx('slash');
       }
       return { mx: k.nx, my: k.ny };
     },

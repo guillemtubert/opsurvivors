@@ -10,7 +10,8 @@ Guía acordada: una isla por arco, 11 sagas, 37 islas (`js/data/islands.js`). Ni
 - [x] Thousand Sunny (tools/build-props.js: ThousandSunny1, cortado por la línea del agua, en espejo y a 1,5×)
 - [x] Fase 3 — Kizaru (huida), Hancock, Magellan (huida), Akainu (huida), Rayleigh, PX-1, Hody
 - [x] Fase 4 — Caesar, Doflamingo, Jack, Katakuri, Big Mom (huida)
-- [ ] Fase 5 — Queen, King, Kaido (dos fases), San Saturn, Loki, Sommers y Killingham, Gunko, Shamrock (comprobar en la wiki)
+- [x] Fase 5 — Queen, King, Kaido (dos fases), San Saturn, Loki, Sommers y Killingham, Gunko, Shamrock
+- [ ] Revisar los poderes de los Caballeros Sagrados con la wiki (no se pudo leer: los ataques son provisionales)
 - [ ] Biomas propios: canales, selva, prisión, manglar, coral, fuego/hielo, juguetes, dulces, Japón, futurista, bosque gigante
 - [ ] Hojas de 8 direcciones de los jefes nuevos y de los enemigos de cada saga
 

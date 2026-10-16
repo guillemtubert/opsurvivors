@@ -144,10 +144,18 @@ Cada jefe tiene sus propios ataques, sin repetir ninguno (`js/entities/bosses.js
 | Whole Cake | Zou | Jack | Barrido con la trompa a su alrededor · forma de mamut a media vida |
 | | Isla Cacao | Katakuri | Lanzas de mochi y puño gigante apuntados a donde vas a estar |
 | | Tottoland | Big Mom (huida) | Soul Pocus: te roba vida si estás cerca · ataques de hambre · Prometheus se parte en cuatro |
-| Final | El Trono Vacío | Imu (jefe final) | Látigo negro que gira · anillos de espinas con un hueco |
+| Wano | Udon | Queen | Plague Rounds: dardos que contagian (veneno) · dos láseres que se cruzan en ti |
+| | Tejado de Onigashima | King | Picado en línea dejando fuego · alas de fuego: anillo que se expande |
+| | Onigashima | Kaido | Kanabō con tres ondas de choque · a media vida, dragón: Bolo Breath que te sigue y anillos de fuego |
+| Final | Egghead | San Saturn | Si te mueves mientras le brillan los ojos, te paraliza · pentagrama de patas de araña |
+| | Elbaph | Loki | Ragnir: el martillo clavado y él, unidos por un rayo · rugido de gigante que te aparta |
+| | Elbaph | Sommers y Killingham | Enredaderas de espinas · burbujas de sueño y montura en zigzag |
+| | Elbaph | Gunko | Flechas que caen sobre tu rastro · flecha directa |
+| | Elbaph | Shamrock | Tres cabezas de perro que muerden por turnos · corte en X enorme |
+| | El Trono Vacío | Imu (jefe final) | Látigo negro que gira · anillos de espinas con un hueco |
 
 Efectos que pueden poner los jefes al jugador (`player.affect`): aturdido, piedra, controles al
-revés, sin ataques; y empujones (`player.push`).
+revés, sin ataques, veneno; y empujones (`player.push`).
 
 Andan en 8 direcciones Luffy, Sanji, el marine y todos los jefes (Imu, sin isla, usa su atlas de
 Treasure Cruise). Al generar las hojas se quitan también las bolsas de fondo encerradas en el dibujo

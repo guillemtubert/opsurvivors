@@ -75,6 +75,15 @@ G.Enemies = (() => {
     { id: 'jack',      name: 'Jack',           title: 'La Sequía',              sprite: 'jack',      hp: 1600, spd: 66,  dmg: 28, xp: 240 },
     { id: 'katakuri',  name: 'Charlotte Katakuri', title: 'El Comandante Dulce', sprite: 'katakuri', hp: 2600, spd: 80,  dmg: 32, xp: 380 },
     { id: 'bigmom',    name: 'Big Mom',        title: 'Una de los Cuatro Emperadores', sprite: 'bigmom', hp: 9999, spd: 70, dmg: 32, xp: 0, invincible: true },
+    { id: 'queen',     name: 'Queen',          title: 'La Plaga',               sprite: 'queen',     hp: 1700, spd: 60,  dmg: 28, xp: 260 },
+    { id: 'king',      name: 'King',           title: 'El Incendio',            sprite: 'king',      hp: 2500, spd: 76,  dmg: 32, xp: 360 },
+    { id: 'kaido',     name: 'Kaido',          title: 'La Criatura Más Fuerte', sprite: 'kaido',     hp: 3600, spd: 64,  dmg: 36, xp: 520 },
+    { id: 'saturn',    name: 'San Saturn',     title: 'Gorosei',                sprite: 'saturn',    hp: 1800, spd: 58,  dmg: 28, xp: 260 },
+    { id: 'loki',      name: 'Loki',           title: 'El Príncipe Maldito',    sprite: 'loki',      hp: 2600, spd: 54,  dmg: 32, xp: 360 },
+    { id: 'sommers',   name: 'Sommers',        title: 'Caballero Sagrado',      sprite: 'sommers',   hp: 1500, spd: 66,  dmg: 28, xp: 220 },
+    { id: 'killingham', name: 'Killingham',    title: 'Caballero Sagrado',      sprite: 'killingham', hp: 1500, spd: 70, dmg: 28, xp: 220 },
+    { id: 'gunko',     name: 'Gunko',          title: 'Caballera Sagrada',      sprite: 'gunko',     hp: 3200, spd: 74,  dmg: 32, xp: 440 },
+    { id: 'shamrock',  name: 'Shamrock',       title: 'Jefe de los Caballeros Sagrados', sprite: 'shamrock', hp: 3800, spd: 78, dmg: 34, xp: 520 },
     { id: 'moria',     name: 'Gecko Moria',    title: 'Shichibukai',            sprite: 'moria',     hp: 4000, spd: 48, dmg: 36, xp: 500 },
     // Sin isla todavía
     { id: 'imu',       name: 'Imu',            title: 'Ocupante del Trono Vacío', sprite: 'imu',     hp: 4500, spd: 55, dmg: 38, xp: 600, hover: true }

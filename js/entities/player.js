@@ -40,7 +40,8 @@ G.Player = class Player {
     this.invuln = 0; this.flash = 0; this.slowT = 0;
     // Efectos de los jefes (segundos que quedan): stun no anda · stone ni anda ni ataca ·
     // invert controles al revés · silence no ataca. shove: empujón { vx, vy, t }.
-    this.fx = { stun: 0, stone: 0, invert: 0, silence: 0 };
+    this.fx = { stun: 0, stone: 0, invert: 0, silence: 0, poison: 0 };
+    this.poisonDps = 0; this.poisonTick = 0;
     this.shove = null;
     this.aim = Math.PI / 2;
     this.face = 1;
@@ -90,9 +91,10 @@ G.Player = class Player {
   get activeMove() { return this.moves[this.active]; }
 
   // ---------------- efectos ----------------
-  /** Aplica un efecto de jefe durante `secs` segundos (en modo dios no le afecta). */
-  affect(kind, secs) {
+  /** Aplica un efecto de jefe durante `secs` segundos (en modo dios no le afecta). dps: daño por segundo del veneno. */
+  affect(kind, secs, dps = 0) {
     if (this.dead || G.Game.god) return;
+    if (kind === 'poison') this.poisonDps = Math.max(this.poisonDps, dps);
     if (this.fx[kind] <= 0) G.FX.text(this.x, this.y - 44, Player.FX_NAMES[kind], Player.FX_COLORS[kind], true);
     this.fx[kind] = Math.max(this.fx[kind], secs);
   }
@@ -147,6 +149,15 @@ G.Player = class Player {
     if (this.invuln > 0) this.invuln -= dt;
     if (this.slowT > 0) this.slowT -= dt;
     for (const k in this.fx) if (this.fx[k] > 0) this.fx[k] -= dt;
+    // Veneno: daño cada medio segundo, sin parpadeo de invulnerable.
+    if (this.fx.poison > 0) {
+      if ((this.poisonTick -= dt) <= 0) {
+        this.poisonTick = 0.5;
+        const d = this.poisonDps * 0.5 * (1 - this.reduction);
+        this.hp -= d; G.FX.text(this.x, this.y - 30, '-' + Math.round(d), '#8ad04a');
+        if (this.hp <= 0) this.hurt(0, G.Game.now);
+      }
+    } else this.poisonDps = 0;
     // Empujón (respeta el mar profundo).
     if (this.shove) {
       const nx = this.x + this.shove.vx * dt, ny = this.y + this.shove.vy * dt;
@@ -224,7 +235,7 @@ G.Player = class Player {
     ctx.fillStyle = 'rgba(0,0,0,.3)';
     ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.1, this.r * 0.4, 0, 0, 6.283); ctx.fill();
     // Efectos: anillo bajo los pies del color de cada uno.
-    for (const k of ['stun', 'invert', 'silence']) if (this.fx[k] > 0) {
+    for (const k of ['stun', 'invert', 'silence', 'poison']) if (this.fx[k] > 0) {
       ctx.strokeStyle = Player.FX_COLORS[k]; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.ellipse(this.x, this.y, this.r * 1.4 + Math.sin(now * 8) * 2, this.r * 0.55, 0, 0, 6.283); ctx.stroke();
     }
@@ -244,5 +255,5 @@ G.Player = class Player {
     ctx.globalAlpha = 1;
   }
 };
-G.Player.FX_NAMES = { stun: '¡Aturdido!', stone: '¡Piedra!', invert: '¡Controles al revés!', silence: '¡Sin ataques!' };
-G.Player.FX_COLORS = { stun: '#ffe14d', stone: '#c8c8c8', invert: '#c86bff', silence: '#5e5070' };
+G.Player.FX_NAMES = { stun: '¡Aturdido!', stone: '¡Piedra!', invert: '¡Controles al revés!', silence: '¡Sin ataques!', poison: '¡Contagiado!' };
+G.Player.FX_COLORS = { stun: '#ffe14d', stone: '#c8c8c8', invert: '#c86bff', silence: '#5e5070', poison: '#8ad04a' };
