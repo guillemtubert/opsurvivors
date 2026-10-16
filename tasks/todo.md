@@ -129,7 +129,8 @@ Generación con Gemini Pro (tools/gemini-8d.js lo hace por API; sin cuota gratis
 - [x] Con poses automáticas (tools/auto-enemy.js → tools/enemy.config.js): baroque (8), fishman (8), toysoldier, chess, jupiter, venus, mercury, saturn.
 - [ ] Revisar a ojo los de pocos pasos (toysoldier, chess, mercury: 2 pasos).
 - [ ] Sin pasos detectados (siguen con dibujo provisional): enelsoldier, cp9agent, zombie, pacifista, gifter, mars.
-      Revisar sus atlas a mano o elegir fotogramas con tools/contact.js.
+      Motivo: sus atlas tienen marco/fondo o mezclan efectos con personajes; el detector automático no los separa.
+      Hay que elegir a mano las coordenadas de 4-6 poses por atlas (tools/contact.js + tools/auto-enemy.js con cajas fijas).
 - [ ] Tercer enemigo de Alabasta, Dressrosa, Whole Cake y Wano: sin atlas (el usado es el de la saga).
 - [ ] Seraphim (Final): sin atlas en la lista.
 - [ ] Ataques de los enemigos nuevos: comprobar en el juego que no sobrecargan la pantalla.
