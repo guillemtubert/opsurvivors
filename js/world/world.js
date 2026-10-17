@@ -182,8 +182,39 @@ G.World = (() => {
   /** Elige entre varios (b.tree puede ser una lista): siempre el mismo para el mismo tile. */
   const pickOf = (v, tx, ty) => Array.isArray(v) ? v[Math.floor(G.U.hash(tx, ty, seed + 11) * v.length)] : v;
 
+  // Mapa dibujado a mano (islands.js: map). Su imagen decide tierra y agua por tile.
+  let mapImg = null, mapMask = null, mapX0 = 0, mapY0 = 0, mapW = 0, mapH = 0;
+  /** Carga la imagen y calcula la máscara: 0 tierra, 1 agua, 2 mar profundo (fuera del mapa). */
+  function setMap(src, tiles, onReady) {
+    const img = new Image();
+    img.onload = () => {
+      mapW = Math.round(tiles); mapH = Math.round(mapW * img.height / img.width);
+      mapX0 = -mapW / 2; mapY0 = -mapH / 2;
+      const c = document.createElement('canvas');
+      c.width = mapW; c.height = mapH;
+      const x = c.getContext('2d');
+      x.drawImage(img, 0, 0, mapW, mapH);
+      const d = x.getImageData(0, 0, mapW, mapH).data;
+      const mask = new Uint8Array(mapW * mapH);
+      for (let i = 0; i < mask.length; i++) {
+        const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], lum = (r + g + b) / 3;
+        mask[i] = b > r + 40 ? (lum < 120 ? 2 : 1) : 0;
+      }
+      mapMask = mask; mapImg = img;
+      chunks.clear();
+      if (onReady) onReady();
+    };
+    img.src = src;
+  }
+  function clearMap() { mapImg = null; mapMask = null; }
+  function maskAt(x, y) {
+    const tx = Math.floor(x / G.TILE - mapX0), ty = Math.floor(y / G.TILE - mapY0);
+    if (tx < 0 || ty < 0 || tx >= mapW || ty >= mapH) return 2;
+    return mapMask[ty * mapW + tx];
+  }
+
   function reset(s, r = 48) {
-    seed = s | 0; radius = r;
+    seed = s | 0; radius = r; clearMap();
     chunks.clear(); broken.clear(); damage.clear(); reserved.clear(); terrCache.clear();
     pier = null;
   }
@@ -255,6 +286,7 @@ G.World = (() => {
 
   /** Objeto de un tile (o null). Mismo resultado siempre para la misma semilla. */
   function propAt(tx, ty) {
+    if (mapMask) return null;
     if (Math.abs(tx) < SPAWN_SAFE && Math.abs(ty) < SPAWN_SAFE) return null;
     if (reserved.has(tx + ',' + ty)) return null;
     const t = terrAt(tx, ty);
@@ -394,6 +426,11 @@ G.World = (() => {
    * listos y no haya tirones (cada uno cuesta ~15 ms).
    */
   function drawGround(ctx) {
+    if (mapImg) {
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(mapImg, mapX0 * G.TILE, mapY0 * G.TILE, mapW * G.TILE, mapH * G.TILE);
+      return;
+    }
     const cam = G.Camera, S = CH * G.TILE;
     const x0 = Math.floor((cam.x - cam.w / 2) / S), x1 = Math.floor((cam.x + cam.w / 2) / S);
     const y0 = Math.floor((cam.y - cam.h / 2) / S), y1 = Math.floor((cam.y + cam.h / 2) / S);
@@ -496,6 +533,7 @@ G.World = (() => {
 
   /** 0 tierra · 1 agua · 2 mar profundo (no se puede cruzar) */
   function waterAt(x, y) {
+    if (mapMask) return maskAt(x, y);
     if (onPier(x, y)) return 0;
     const t = classify(field(x / G.TILE, y / G.TILE));
     return t === 0 ? 2 : t === 1 ? 1 : 0;
@@ -527,6 +565,7 @@ G.World = (() => {
   return {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
-    drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier
+    drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier,
+    setMap
   };
 })();
