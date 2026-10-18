@@ -37,30 +37,26 @@ module.exports = {
   scale: { factor: 4.425 },
 
   chars: {
-    // Luffy de Elbaph: andar en 8 direcciones (hoja hecha para el juego, fondo blanco)
-    // y poses de ataque/daño del atlas #4583 de Treasure Cruise.
+    // Luffy (#0002 Gum-Gum Pistol de Treasure Cruise): hoja de lado y tres cuartos, fondo blanco.
+    // Frente y espalda no existen en el atlas: arriba usa los fotogramas de frente.
     luffy: {
-      walkSheet: REF + 'luffy/LuffyElbaph.png',
-      walkBg: { color: '#ffffff', thr: 40, r: 2, fringe: 2, pockets: true },
-      sheet: REF + 'luffy/Mobile - One Piece_ Treasure Cruise - Playable Characters - #4583 - Monkey D. Luffy - Adventure in the Land of Mystery.png',
-      bg: '#e69900',                          // el marco naranja del atlas
+      sheet: REF + 'luffy/GumGum8D.png',
+      bgFlat: { color: '#ffffff', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      // La hoja de andar no va por filas limpias: se cogen las direcciones con
-      // 4 pasos completos y las que miran a la izquierda salen en espejo.
       dirs8: {
-        down: [[10, 14, 130, 188], [159, 18, 130, 184], [312, 12, 124, 184], [459, 18, 130, 187]],
-        'down-right': [[17, 700, 101, 196], [162, 697, 109, 190], [306, 700, 114, 187], [459, 697, 111, 187]],
-        right: [[11, 253, 118, 184], [155, 247, 114, 192], [302, 249, 127, 181], [450, 249, 123, 184]],
-        'up-right': [[606, 247, 129, 189], [758, 242, 121, 194], [903, 237, 132, 191], [1056, 242, 121, 194]],
-        up: [[12, 468, 124, 190], [161, 465, 125, 198], [312, 468, 124, 190], [459, 468, 127, 197]],
+        down: [[45, 25, 110, 185], [240, 25, 110, 185], [430, 25, 110, 185]],
+        'down-right': [[40, 290, 165, 170], [275, 290, 165, 170], [250, 580, 110, 140], [480, 545, 120, 170]],
+        right: [[40, 290, 165, 170], [275, 290, 165, 170], [250, 580, 110, 140], [480, 545, 120, 170]],
+        'up-right': [[40, 290, 165, 170], [275, 290, 165, 170], [250, 580, 110, 140], [480, 545, 120, 170]],
+        up: [[45, 25, 110, 185], [240, 25, 110, 185], [430, 25, 110, 185]],
         'up-left': { mirror: 'up-right' },
         left: { mirror: 'right' },
         'down-left': { mirror: 'down-right' }
       },
       anims: {
-        attack: [{ f: [240, 1450, 145, 195], solo: true }, { f: [535, 268, 175, 124], solo: true }],   // sin el humo de debajo
-        hurt: [{ f: [130, 548, 175, 125], solo: true }]
+        attack: [{ f: [35, 835, 130, 170], solo: true }, { f: [230, 835, 140, 170], solo: true }, { f: [520, 835, 170, 170], solo: true }],
+        hurt: [{ f: [250, 580, 110, 140], solo: true }]
       }
     },
 
