@@ -38,7 +38,9 @@ G.Islands = (() => {
         gates: [{ x: 225, y: 490, w: 330, h: 95 }] },
       { id: 'arlong',     name: 'Arlong Park',   sub: 'Villa Cocoyashi',            biome: 0, boss: 'arlong', map: 'assets/maps/arlong.png',
         gates: [{ x: 712, y: 360, w: 48, h: 60 }, { x: 880, y: 535, w: 190, h: 130 }], chests: 6 },
-      { id: 'loguetown',  name: 'Loguetown',     sub: 'Huye de Smoker',             biome: 0, boss: 'smoker', escape: true }
+      { id: 'loguetown',  name: 'Loguetown',     sub: 'Huye de Smoker',             biome: 0, boss: 'smoker', escape: true, map: 'assets/maps/loguetown.png',
+        gates: [{ x: 567, y: 105, w: 52, h: 61 }, { x: 571, y: 462, w: 44, h: 52 }, { x: 759, y: 475, w: 235, h: 44 }, { x: 907, y: 515, w: 52, h: 113 }],
+        solids: [{ x: 349, y: 78, w: 497, h: 44 }, { x: 244, y: 170, w: 48, h: 292 }, { x: 907, y: 170, w: 44, h: 262 }, { x: 288, y: 436, w: 453, h: 31 }, { x: 746, y: 410, w: 218, h: 65 }, { x: 262, y: 458, w: 301, h: 61 }, { x: 288, y: 87, w: 65, h: 87 }, { x: 837, y: 78, w: 74, h: 131 }] }
     ] },
     { id: 'grandline', name: 'Saga de Alabasta', enemies: ['baroque', 'baroquegun', 'baroqueshield'], islands: [
       { id: 'reverse',      name: 'Reverse Mountain', sub: 'Cabo Gemelo y Laboon',          biome: 0, boss: ['mr9', 'wednesday'] },

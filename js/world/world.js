@@ -190,7 +190,7 @@ G.World = (() => {
    * un tile está bloqueado si al menos el 40 % de sus píxeles lo están.
    * gates: puertas en píxeles de la imagen (se pasa por ellas y son el punto de aparición).
    */
-  function setMap(src, tiles, gates = [], onReady) {
+  function setMap(src, tiles, gates = [], onReady, solids = []) {
     const img = new Image();
     img.onload = () => {
       const iw = img.width, ih = img.height;
@@ -198,7 +198,7 @@ G.World = (() => {
       c.width = iw; c.height = ih;
       const x = c.getContext('2d');
       x.drawImage(img, 0, 0);
-      const px = G.MapMask.build(x.getImageData(0, 0, iw, ih).data, iw, ih, gates);
+      const px = G.MapMask.build(x.getImageData(0, 0, iw, ih).data, iw, ih, gates, solids);
       mapW = Math.round(tiles); mapH = Math.round(mapW * ih / iw);
       mapX0 = -mapW / 2; mapY0 = -mapH / 2;
       const mask = new Uint8Array(mapW * mapH);

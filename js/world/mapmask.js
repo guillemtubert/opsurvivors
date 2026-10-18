@@ -6,7 +6,7 @@
  * gates: rectángulos en píxeles de la imagen por donde sí se pasa (las puertas).
  */
 const MapMask = (() => {
-  function build(data, w, h, gates = []) {
+  function build(data, w, h, gates = [], solids = []) {
     const n = w * h;
     const r = (i) => data[i * 4], g = (i) => data[i * 4 + 1], b = (i) => data[i * 4 + 2];
     const blue = new Uint8Array(n);
@@ -35,6 +35,11 @@ const MapMask = (() => {
       else if (lum < 60) mask[i] = 2;                              // contornos
       else if (lum >= 215 && mx - mn <= 40) mask[i] = 2;           // muros y edificios blancos
       else if (R > G + 15 && G > B && lum > 50 && lum < 140 && R < 175) mask[i] = 2;  // madera
+    }
+    for (const sd of solids) {
+      for (let y = sd.y; y < sd.y + sd.h; y++) for (let x = sd.x; x < sd.x + sd.w; x++) {
+        if (x >= 0 && y >= 0 && x < w && y < h && !sea[y * w + x]) mask[y * w + x] = 2;
+      }
     }
     for (const gt of gates) {
       for (let y = gt.y; y < gt.y + gt.h; y++) for (let x = gt.x; x < gt.x + gt.w; x++) {
