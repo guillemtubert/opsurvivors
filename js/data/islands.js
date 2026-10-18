@@ -43,8 +43,8 @@ G.Islands = (() => {
         solids: [{ x: 349, y: 78, w: 497, h: 44 }, { x: 244, y: 170, w: 48, h: 292 }, { x: 907, y: 170, w: 44, h: 262 }, { x: 288, y: 436, w: 453, h: 31 }, { x: 746, y: 410, w: 218, h: 65 }, { x: 262, y: 458, w: 301, h: 61 }, { x: 288, y: 87, w: 65, h: 87 }, { x: 837, y: 78, w: 74, h: 131 }] }
     ] },
     { id: 'grandline', name: 'Saga de Alabasta', enemies: ['baroque', 'baroquegun', 'baroqueshield'], islands: [
-      { id: 'reverse',      name: 'Reverse Mountain', sub: 'Cabo Gemelo y Laboon',          biome: 0, boss: ['mr9', 'wednesday'] },
-      { id: 'whisky',       name: 'Whisky Peak',      sub: 'El pueblo de los cazarrecompensas', biome: 1, boss: ['mr5', 'valentine'] },
+      { id: 'reverse',      name: 'Reverse Mountain', sub: 'Cabo Gemelo y Laboon',          biome: 0, boss: ['mr9', 'wednesday'], map: 'assets/maps/reverse.png' },
+      { id: 'whisky',       name: 'Whisky Peak',      sub: 'El pueblo de los cazarrecompensas', biome: 1, boss: ['mr5', 'valentine'], map: 'assets/maps/whisky.png' },
       { id: 'littlegarden', name: 'Little Garden',    sub: 'La isla de los gigantes',       biome: 6, boss: 'mr3' },
       { id: 'drum',         name: 'Isla de Drum',     sub: 'El reino nevado',               biome: 4, boss: 'wapol' },
       { id: 'alabasta',     name: 'Alabasta',         sub: 'El Reino de la Arena',          biome: 1, boss: 'crocodile', chests: 6 }
