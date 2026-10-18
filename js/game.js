@@ -95,7 +95,7 @@ G.Game = (() => {
     G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();
     G.World.reset(seed, G.Islands.radius(def));
     G.World.setBiome(def.biome);
-    if (def.map) G.World.setMap(def.map, 2.2 * G.Islands.radius(def));
+    if (def.map) G.World.setMap(def.map, 2.2 * G.Islands.radius(def), def.gates);
     G.Island.setup(def, i, seed, saga, si);
     G.Minimap.build();
     pl.x = 0; pl.y = 0;

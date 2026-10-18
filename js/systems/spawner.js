@@ -33,6 +33,14 @@ G.Spawner = (() => {
     return null;
   }
 
+  /** Punto de aparición en una puerta del mapa (si la isla la tiene): los enemigos salen de la base. */
+  function gatePoint() {
+    const gs = G.World.gates();
+    if (!gs.length) return null;
+    const g = gs[Math.floor(Math.random() * gs.length)];
+    return [g.x + G.U.rand(-6, 6), g.y + G.U.rand(-6, 6)];
+  }
+
   function pickDef(t) {
     const bag = G.Enemies.bagAt(t, G.Island.saga.enemies);
     let r = Math.random() * bag.reduce((a, e) => a + e.w, 0);
@@ -41,7 +49,7 @@ G.Spawner = (() => {
   }
 
   function spawnOne(pl, t, angle, bt) {
-    const p = landPoint(pl, angle);
+    const p = gatePoint() || landPoint(pl, angle);
     if (!p) return null;
     const elite = G.EnemyMgr.count >= CAP * 0.85 || (bt > 0 && Math.random() < Math.min(0.5, bt / 120));
     const hp = hpK(t) * (bt > 0 ? 1 + bt / 90 : 1);
@@ -56,7 +64,7 @@ G.Spawner = (() => {
   /** El jefe de la isla, llamado con el Den Den Mushi: aparece cerca, en tierra. */
   function summon(def, pl, i = 0) {
     const a = Math.random() * 6.283 + i * 2.1;
-    const [x, y] = landPoint(pl, a, 24) || [pl.x + 260, pl.y];
+    const [x, y] = gatePoint() || landPoint(pl, a, 24) || [pl.x + 260, pl.y];
     return G.EnemyMgr.add(new G.Enemy(def, { x, y, boss: true, dmgK: dmgNow() * 0.8, hpK: def.invincible ? 1 : bossHpK() }));
   }
 

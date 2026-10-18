@@ -183,30 +183,47 @@ G.World = (() => {
   const pickOf = (v, tx, ty) => Array.isArray(v) ? v[Math.floor(G.U.hash(tx, ty, seed + 11) * v.length)] : v;
 
   // Mapa dibujado a mano (islands.js: map). Su imagen decide tierra y agua por tile.
-  let mapImg = null, mapMask = null, mapX0 = 0, mapY0 = 0, mapW = 0, mapH = 0;
-  /** Carga la imagen y calcula la máscara: 0 tierra, 1 agua, 2 mar profundo (fuera del mapa). */
-  function setMap(src, tiles, onReady) {
+  let mapImg = null, mapMask = null, mapX0 = 0, mapY0 = 0, mapW = 0, mapH = 0, mapGates = [];
+  /**
+   * Carga la imagen y calcula la máscara de tiles (0 tierra, 1 agua somera, 2 bloqueado; fuera, 2).
+   * La máscara se calcula a resolución de imagen (muros finos) y se reduce a tiles:
+   * un tile está bloqueado si al menos el 40 % de sus píxeles lo están.
+   * gates: puertas en píxeles de la imagen (se pasa por ellas y son el punto de aparición).
+   */
+  function setMap(src, tiles, gates = [], onReady) {
     const img = new Image();
     img.onload = () => {
-      mapW = Math.round(tiles); mapH = Math.round(mapW * img.height / img.width);
-      mapX0 = -mapW / 2; mapY0 = -mapH / 2;
+      const iw = img.width, ih = img.height;
       const c = document.createElement('canvas');
-      c.width = mapW; c.height = mapH;
+      c.width = iw; c.height = ih;
       const x = c.getContext('2d');
-      x.drawImage(img, 0, 0, mapW, mapH);
-      const d = x.getImageData(0, 0, mapW, mapH).data;
+      x.drawImage(img, 0, 0);
+      const px = G.MapMask.build(x.getImageData(0, 0, iw, ih).data, iw, ih, gates);
+      mapW = Math.round(tiles); mapH = Math.round(mapW * ih / iw);
+      mapX0 = -mapW / 2; mapY0 = -mapH / 2;
       const mask = new Uint8Array(mapW * mapH);
-      for (let i = 0; i < mask.length; i++) {
-        const r = d[i * 4], g = d[i * 4 + 1], b = d[i * 4 + 2], lum = (r + g + b) / 3;
-        mask[i] = b > r + 40 ? (lum < 120 ? 2 : 1) : 0;
+      for (let ty = 0; ty < mapH; ty++) for (let tx = 0; tx < mapW; tx++) {
+        const x0 = Math.floor(tx * iw / mapW), x1 = Math.floor((tx + 1) * iw / mapW);
+        const y0 = Math.floor(ty * ih / mapH), y1 = Math.floor((ty + 1) * ih / mapH);
+        let blocked = 0, water = 0, total = 0;
+        for (let y = y0; y < y1; y++) for (let xx = x0; xx < x1; xx++) {
+          const v = px[y * iw + xx]; total++;
+          if (v === 2) blocked++; else if (v === 1) water++;
+        }
+        mask[ty * mapW + tx] = blocked >= total * 0.4 ? 2 : water >= total * 0.5 ? 1 : 0;
       }
-      mapMask = mask; mapImg = img;
+      mapMask = mask; mapImg = img; mapGates = gates.map(g => ({
+        x: (mapX0 + (g.x + g.w / 2) / iw * mapW) * G.TILE,
+        y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE
+      }));
       chunks.clear();
       if (onReady) onReady();
     };
     img.src = src;
   }
-  function clearMap() { mapImg = null; mapMask = null; }
+  function clearMap() { mapImg = null; mapMask = null; mapGates = []; }
+  /** Puertas del mapa (centros en unidades de mundo), o [] si la isla no tiene mapa dibujado. */
+  const gates = () => mapGates;
   function maskAt(x, y) {
     const tx = Math.floor(x / G.TILE - mapX0), ty = Math.floor(y / G.TILE - mapY0);
     if (tx < 0 || ty < 0 || tx >= mapW || ty >= mapH) return 2;
@@ -566,6 +583,6 @@ G.World = (() => {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
     drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier,
-    setMap
+    setMap, gates
   };
 })();
