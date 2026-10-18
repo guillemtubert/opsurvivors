@@ -214,14 +214,37 @@ G.World = (() => {
       }
       mapMask = mask; mapImg = img; mapGates = gates.map(g => ({
         x: (mapX0 + (g.x + g.w / 2) / iw * mapW) * G.TILE,
-        y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE
+        y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE,
+        w: g.w / iw * mapW * G.TILE, h: g.h / ih * mapH * G.TILE
       }));
       chunks.clear();
       if (onReady) onReady();
     };
     img.src = src;
   }
-  function clearMap() { mapImg = null; mapMask = null; mapGates = []; }
+  function clearMap() { mapImg = null; mapMask = null; mapGates = []; gateAnims.length = 0; }
+  /** Animación de una puerta que se abre (la hoja sube y se desvanece) al salir alguien por ella. */
+  const gateAnims = [];
+  const GATE_T = 0.9;
+  function openGate(k) { if (mapGates[k]) gateAnims.push({ g: mapGates[k], t0: performance.now() }); }
+  function drawGates(ctx) {
+    const now = performance.now();
+    for (let i = gateAnims.length - 1; i >= 0; i--) {
+      const a = gateAnims[i], p = (now - a.t0) / 1000 / GATE_T;
+      if (p >= 1) { gateAnims.splice(i, 1); continue; }
+      const { g } = a, e = 1 - (1 - p) * (1 - p);       // ease-out
+      const h = g.h * (1 - e), x = g.x - g.w / 2, y = g.y - g.h / 2;
+      ctx.globalAlpha = 1 - p * 0.6;
+      ctx.fillStyle = '#2a1e14';                         // hueco de la puerta
+      ctx.fillRect(x, y, g.w, g.h);
+      ctx.fillStyle = '#5b3b22';                         // hoja de madera que sube
+      ctx.fillRect(x, y + (g.h - h), g.w, h);
+      ctx.fillStyle = '#3a2414';
+      for (let s = 0; s < g.w; s += G.TILE * 0.5) ctx.fillRect(x + s, y + (g.h - h), 2, h);
+      ctx.globalAlpha = 1;
+    }
+  }
+  function gateCount() { return mapGates.length; }
   /** Puertas del mapa (centros en unidades de mundo), o [] si la isla no tiene mapa dibujado. */
   const gates = () => mapGates;
   function maskAt(x, y) {
@@ -446,6 +469,7 @@ G.World = (() => {
     if (mapImg) {
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(mapImg, mapX0 * G.TILE, mapY0 * G.TILE, mapW * G.TILE, mapH * G.TILE);
+      drawGates(ctx);
       return;
     }
     const cam = G.Camera, S = CH * G.TILE;
@@ -583,6 +607,6 @@ G.World = (() => {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
     drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier,
-    setMap, gates
+    setMap, gates, openGate, gateCount
   };
 })();
