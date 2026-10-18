@@ -142,7 +142,7 @@ function build(id, cfg, K) {
       const spec = cfg.dirs8[d];
       if (!spec) throw new Error(id + ': falta la dirección ' + d);
       if (spec.mirror) continue;
-      srcs[d] = spec.map(f => ({ src: source(Object.assign({}, cfg, { sheet: cfg.walkSheet || cfg.sheet, bgFlat: cfg.walkBg || cfg.bgFlat, bg: cfg.walkSheet ? null : cfg.bg }), f), dx: (f && f.dx) || 0 }));
+      srcs[d] = spec.map(f => ({ src: source(Object.assign({}, cfg, { sheet: (f && f.sheet) || cfg.walkSheet || cfg.sheet, bgFlat: cfg.walkBg || cfg.bgFlat, bg: cfg.walkSheet ? null : cfg.bg }), f), dx: (f && f.dx) || 0 }));
     }
     for (const d of DIRS8) {
       const m = cfg.dirs8[d].mirror;

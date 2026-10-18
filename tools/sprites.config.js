@@ -41,6 +41,7 @@ module.exports = {
     // Frente y espalda no existen en el atlas: arriba usa los fotogramas de frente.
     luffy: {
       sheet: REF + 'luffy/GumGum8D.png',
+      backSheet: REF + 'luffy/BackSheet.png',
       bgFlat: { color: '#ffffff', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
@@ -49,7 +50,7 @@ module.exports = {
         'down-right': [[40, 290, 165, 170], [275, 290, 165, 170], [250, 580, 110, 140], [480, 545, 120, 170]],
         right: [[40, 290, 165, 170], [275, 290, 165, 170], [250, 580, 110, 140], [480, 545, 120, 170]],
         'up-right': [[40, 290, 165, 170], [275, 290, 165, 170], [250, 580, 110, 140], [480, 545, 120, 170]],
-        up: [[45, 25, 110, 185], [240, 25, 110, 185], [430, 25, 110, 185]],
+        up: [{ f: [30, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' }, { f: [178, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' }, { f: [328, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' }, { f: [478, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' } ],
         'up-left': { mirror: 'up-right' },
         left: { mirror: 'right' },
         'down-left': { mirror: 'down-right' }
