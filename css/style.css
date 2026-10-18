@@ -354,3 +354,6 @@ ul.moves small, .upg-row small { display: block; color: var(--muted); font-size:
   .minimap { top: 82px; }
   .bossbar { top: 82px; left: max(8px, env(safe-area-inset-left)); transform: none; width: calc(100vw - 120px); }
 }
+
+/* Versión del juego: esquina inferior izquierda, sin tapar el HUD ni recibir clics. */
+#app-version { position: fixed; left: 6px; bottom: 4px; font: 10px monospace; color: rgba(255,255,255,0.55); text-shadow: 0 1px 0 #000; pointer-events: none; z-index: 50; }
