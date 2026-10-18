@@ -32,6 +32,7 @@ const MapMask = (() => {
       const lum = (R + G + B) / 3, mx = Math.max(R, G, B), mn = Math.min(R, G, B);
       if (sea[i]) mask[i] = lum > 150 ? 1 : 2;
       else if (blue[i]) mask[i] = 2;
+      else if (B >= R + 10 && B >= G && lum >= 120 && lum < 230) mask[i] = 2;     // piedra azulada de los muros
       else if (lum < 60) mask[i] = 2;                              // contornos
       else if (lum >= 215 && mx - mn <= 40) mask[i] = 2;           // muros y edificios blancos
       else if (R > G + 15 && G > B && lum > 50 && lum < 140 && R < 175) mask[i] = 2;  // madera
