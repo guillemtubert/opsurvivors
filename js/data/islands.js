@@ -29,7 +29,7 @@ G.Islands = (() => {
   const SAGAS = [
     { id: 'eastblue', name: 'Saga de East Blue', enemies: ['marine', 'marinegun', 'rifle'], islands: [
       { id: 'shells',     name: 'Shells Town',   sub: 'La base del capitán Morgan', biome: 0, boss: 'morgan', map: 'assets/maps/shells-town.png' },
-      { id: 'orange',     name: 'Orange Town',   sub: 'El pueblo tomado por Buggy', biome: 0, boss: 'buggy' },
+      { id: 'orange',     name: 'Orange Town',   sub: 'El pueblo tomado por Buggy', biome: 0, boss: 'buggy', map: 'assets/maps/orange.png' },
       { id: 'syrup',      name: 'Villa Syrup',   sub: 'La mansión de Kaya',         biome: 0, boss: 'kuro' },
       { id: 'baratie',    name: 'Baratie',       sub: 'El restaurante en el mar',   biome: 0, boss: 'krieg' },
       { id: 'arlong',     name: 'Arlong Park',   sub: 'Villa Cocoyashi',            biome: 0, boss: 'arlong', chests: 6 },
