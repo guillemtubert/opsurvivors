@@ -58,11 +58,13 @@ module.exports = {
     },
   fishman: {
       sheet: REF + 'fishman/Atlas_fishman.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
       height: 46, colors: 24,
-      fps: { idle: 1, walk: 7 },
+      fps: { idle: 1, walk: 7, attack: 6 },
       anims: {
-        idle: [[22, 284, 143, 176]],
-        walk: [[22, 284, 143, 176], [37, 818, 114, 183], [47, 24, 99, 180], [239, 26, 99, 178], [250, 820, 113, 181], [429, 534, 114, 178], [431, 28, 99, 176], [442, 820, 130, 180]]
+        idle: [[40, 25, 115, 180]],
+        walk: [[40, 25, 115, 180], [235, 25, 110, 180], [430, 25, 110, 180]],
+        attack: [[665, 825, 140, 180]]
       }
     },
   toysoldier: {
@@ -104,24 +106,13 @@ module.exports = {
       height: 46, colors: 24,
       fps: { idle: 1, walk: 7, attack: 6 },
       anims: {
-        idle: [[35, 5, 275, 260]],
-        walk: [[35, 5, 275, 260], [345, 5, 270, 260], [645, 5, 270, 260], [35, 285, 280, 240]],
-        attack: [[5, 1035, 350, 215]]
+        idle: [[31, 0, 280, 262]],
+        walk: [[31, 0, 280, 262], [331, 277, 285, 231], [647, 0, 277, 262], [631, 277, 293, 231]],
+        attack: [[631, 277, 293, 190]]
       }
     },
   jupiter: {
       sheet: REF + 'jupiter/Atlas_jupiter.png',
-      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
-      height: 46, colors: 24,
-      fps: { idle: 1, walk: 7, attack: 6 },
-      anims: {
-        idle: [[8, 250, 215, 230]],
-        walk: [[8, 250, 215, 230], [420, 250, 190, 230], [590, 250, 205, 230], [805, 250, 215, 230]],
-        attack: [[640, 0, 260, 250]]
-      }
-    },
-  venus: {
-      sheet: REF + 'venus/Atlas_venus.png',
       bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
       height: 46, colors: 24,
       fps: { idle: 1, walk: 7, attack: 6 },
@@ -131,15 +122,26 @@ module.exports = {
         attack: [[1038, 0, 470, 295]]
       }
     },
+  venus: {
+      sheet: REF + 'venus/Atlas_venus.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[8, 250, 215, 230]],
+        walk: [[8, 250, 215, 230], [420, 250, 190, 230], [590, 250, 205, 230], [805, 250, 215, 230]],
+        attack: [[640, 0, 260, 250]]
+      }
+    },
   mercury: {
       sheet: REF + 'mercury/Atlas_mercury.png',
       bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
       height: 46, colors: 24,
       fps: { idle: 1, walk: 7, attack: 6 },
       anims: {
-        idle: [[8, 8, 341, 293]],
-        walk: [[8, 8, 341, 293], [341, 8, 341, 293], [681, 8, 317, 293], [349, 309, 317, 277]],
-        attack: [[1038, 1030, 380, 301]]
+        idle: [[0, 0, 330, 300]],
+        walk: [[0, 0, 330, 300], [341, 0, 325, 300], [682, 0, 316, 300], [0, 301, 320, 250]],
+        attack: [[396, 1040, 300, 280]]
       }
     },
   saturn: {
@@ -458,7 +460,7 @@ module.exports = {
       anims: {
         idle: [[393, 8, 331, 238]],
         walk: [[393, 8, 331, 238], [8, 8, 362, 238]],
-        attack: [[0, 2056, 250, 240]]
+        attack: [[400, 5, 325, 255]]
       }
     },
   wapol: {
@@ -481,6 +483,28 @@ module.exports = {
         idle: [[36, 0, 211, 232]],
         walk: [[36, 0, 211, 232], [294, 273, 211, 232], [546, 530, 211, 232], [790, 0, 211, 232]],
         attack: [[10, 1310, 262, 210]]
+      }
+    },
+  fishsword: {
+      sheet: REF + 'fishsword/Atlas_fishsword.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[45, 30, 120, 175]],
+        walk: [[45, 30, 120, 175], [240, 30, 125, 175], [430, 30, 115, 175]],
+        attack: [[820, 605, 200, 175]]
+      }
+    },
+  fishspear: {
+      sheet: REF + 'fishspear/Atlas_fishspear.png',
+      bgFlat: { color: '#ebebeb', thr: 12, r: 2, fringe: 1 },
+      height: 46, colors: 24,
+      fps: { idle: 1, walk: 7, attack: 6 },
+      anims: {
+        idle: [[85, 45, 145, 160]],
+        walk: [[85, 45, 145, 160], [345, 45, 140, 160], [600, 45, 140, 160]],
+        attack: [[270, 840, 175, 165]]
       }
     },
   }

@@ -285,7 +285,7 @@ module.exports = {
     // Wapol: andar en 8 direcciones (Wapol8D.png, convertida del .jfif; sin diagonales de espaldas: usan las de espaldas). Las direcciones que faltan, en espejo.
     wapol: {
       sheet: REF + 'wapol/Wapol8D.png',
-      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1 },
+      bgFlat: { color: '#ffffff', thr: 30, r: 2, fringe: 1, pockets: 'auto' },
       height: 64, colors: 24,
       fps: { idle: 1, walk: 7 },
       dirs8: {
