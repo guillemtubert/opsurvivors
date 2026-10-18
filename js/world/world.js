@@ -217,12 +217,12 @@ G.World = (() => {
         y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE,
         w: g.w / iw * mapW * G.TILE, h: g.h / ih * mapH * G.TILE
       }));
-      chunks.clear();
+      chunks.clear(); bump();
       if (onReady) onReady();
     };
     img.src = src;
   }
-  function clearMap() { mapImg = null; mapMask = null; mapGates = []; gateAnims.length = 0; }
+  function clearMap() { mapImg = null; mapMask = null; mapGates = []; gateAnims.length = 0; bump(); }
   /** Animación de una puerta que se abre (la hoja sube y se desvanece) al salir alguien por ella. */
   const gateAnims = [];
   const GATE_T = 0.9;
@@ -268,7 +268,40 @@ G.World = (() => {
   }
 
   /** Muelle: rectángulo de mundo por el que se anda aunque haya agua debajo. */
-  function setPier(rect) { pier = rect; chunks.clear(); }
+  function setPier(rect) { pier = rect; chunks.clear(); bump(); }
+
+  // Alcance: tiles que el jugador puede pisar desde el centro (sin muros, edificios ni mar profundo).
+  // Los cofres, el Den Den Mushi y el muelle solo se colocan dentro de esta zona.
+  let ver = 0, reachVer = -1, reachGrid = null, rX0 = 0, rY0 = 0, rW = 0;
+  function bump() { ver++; }
+  function buildReach() {
+    reachVer = ver;
+    const S = Math.ceil(radius * 1.8) + 4;
+    rX0 = -S; rY0 = -S; rW = 2 * S + 1;
+    const ok = i => waterAt((i % rW + rX0 + 0.5) * G.TILE, ((i / rW | 0) + rY0 + 0.5) * G.TILE) < 2;
+    reachGrid = new Uint8Array(rW * rW);
+    const q = new Int32Array(rW * rW);
+    let head = 0, tail = 0;
+    const seedAt = Math.floor(rW / 2) * rW + Math.floor(rW / 2);
+    let seed = -1;
+    for (let r = 0; r < 12 && seed < 0; r++) for (let dy = -r; dy <= r && seed < 0; dy++) for (let dx = -r; dx <= r && seed < 0; dx++) {
+      const i = seedAt + dy * rW + dx; if (i >= 0 && i < rW * rW && ok(i)) seed = i;
+    }
+    if (seed < 0) return;
+    reachGrid[seed] = 1; q[tail++] = seed;
+    while (head < tail) {
+      const i = q[head++], x = i % rW, y = i / rW | 0;
+      const nb = [x > 0 ? i - 1 : -1, x < rW - 1 ? i + 1 : -1, y > 0 ? i - rW : -1, y < rW - 1 ? i + rW : -1];
+      for (const j of nb) if (j >= 0 && !reachGrid[j] && ok(j)) { reachGrid[j] = 1; q[tail++] = j; }
+    }
+  }
+  /** ¿Se puede llegar andando desde el centro hasta (x, y)? */
+  function reachable(x, y) {
+    if (reachVer !== ver) buildReach();
+    const tx = Math.floor(x / G.TILE) - rX0, ty = Math.floor(y / G.TILE) - rX0;
+    if (tx < 0 || ty < 0 || tx >= rW || ty >= rW) return false;
+    return reachGrid[ty * rW + tx] === 1;
+  }
   const onPier = (x, y) => pier && x >= pier.x0 && x <= pier.x1 && y >= pier.y0 && y <= pier.y1;
 
   function setBiome(i) {
@@ -574,8 +607,8 @@ G.World = (() => {
 
   /** 0 tierra · 1 agua · 2 mar profundo (no se puede cruzar) */
   function waterAt(x, y) {
-    if (mapMask) return maskAt(x, y);
     if (onPier(x, y)) return 0;
+    if (mapMask) return maskAt(x, y);
     const t = classify(field(x / G.TILE, y / G.TILE));
     return t === 0 ? 2 : t === 1 ? 1 : 0;
   }
@@ -606,7 +639,7 @@ G.World = (() => {
   return {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
-    drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier,
+    drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier, reachable,
     setMap, gates, openGate, gateCount
   };
 })();

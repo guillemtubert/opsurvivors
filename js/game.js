@@ -95,7 +95,8 @@ G.Game = (() => {
     G.Pickups.clear(); G.Spawner.reset(); G.Hazards.clear();
     G.World.reset(seed, G.Islands.radius(def));
     G.World.setBiome(def.biome);
-    if (def.map) G.World.setMap(def.map, 2.2 * G.Islands.radius(def), def.gates, null, def.solids);
+    // Con mapa dibujado, la isla se prepara cuando su máscara está lista (carga asíncrona).
+    const finish = () => {
     G.Island.setup(def, i, seed, saga, si);
     G.Minimap.build();
     pl.x = 0; pl.y = 0;
@@ -107,6 +108,9 @@ G.Game = (() => {
     if (newSaga) G.HUD.banner(saga.name, def.name + ' · ' + def.sub + extra, '#ffd23f');
     else G.HUD.banner(def.name, def.sub + extra, '#ffd23f');
     G.Audio.music('sea');
+    };
+    if (def.map) G.World.setMap(def.map, 2.2 * G.Islands.radius(def), def.gates, finish, def.solids);
+    else finish();
   }
 
   /** Sube al barco: siguiente isla o fin del viaje. */

@@ -54,14 +54,19 @@ G.Island = (() => {
     event = i > 0 && r < 0.5 ? keys[Math.floor(r / 0.5 * keys.length)] : null;
     const wa = rnd() * 6.283; wind = [Math.cos(wa), Math.sin(wa)];
     const R = G.World.radius;
-    const land = (x, y) => G.World.waterAt(x, y) === 0;
+    const land = (x, y) => G.World.waterAt(x, y) === 0 && G.World.reachable(x, y);
     const far = (x, y, pts, min) => pts.every(p => G.U.dist2(x, y, p.x, p.y) > min * min);
 
     // Muelle: de la costa sur (o norte) hacia el mar, con el barco al lado.
     const dir = rnd() < 0.5 ? 1 : -1;
-    const px = Math.round((rnd() - 0.5) * R * 0.5 / G.TILE) * G.TILE;
-    let py = 0;
-    while (Math.abs(py) < R * 1.4 && land(px, py + dir * 16)) py += dir * 16;
+    // La costa desde donde sale el muelle debe ser alcanzable andando (si no, se prueba otra).
+    let px = 0, py = 0;
+    for (let k = 0; k < 80; k++) {
+      const cx = Math.round((rnd() - 0.5) * R * 0.5 / G.TILE) * G.TILE;
+      let cy = 0;
+      while (Math.abs(cy) < R * 1.4 && land(cx, cy + dir * 16)) cy += dir * 16;
+      if (land(cx, cy)) { px = cx; py = cy; break; }
+    }
     const L = 7 * G.TILE, W = 2 * G.TILE;
     const y0 = dir > 0 ? py - 2 * G.TILE : py - L, y1 = dir > 0 ? py + L : py + 2 * G.TILE;
     dock = { x0: px - W / 2, x1: px + W / 2, y0, y1, dir, coastY: py,
@@ -73,18 +78,18 @@ G.Island = (() => {
     const taken = [{ x: 0, y: 0 }, { x: px, y: py }];
     if (d.escape) snail = { x: 1e9, y: 1e9, none: true };      // sin Den Den Mushi (nunca está cerca)
     // Den Den Mushi: a media distancia, lejos del muelle y del centro.
-    for (let k = 0; k < 200 && !snail; k++) {
+    for (let k = 0; k < 400 && !snail; k++) {
       const a = rnd() * 6.283, r = R * (0.2 + rnd() * 0.15);
       const x = Math.cos(a) * r, y = Math.sin(a) * r;
       if (land(x, y) && far(x, y, taken, R * 0.18)) snail = { x, y };
     }
-    if (!snail) snail = { x: R * 0.3, y: 0 };
+    if (!snail) snail = anySpot(R) || { x: 0, y: 0 };
     if (!snail.none) { taken.push(snail); G.World.reserve(snail.x, snail.y, 2); }
 
     // Cofres: repartidos en sectores alrededor del centro.
     // Mercader y cofre maldito: en tierra libre, lejos de lo demás.
     const spot = min => {
-      for (let k = 0; k < 150; k++) {
+      for (let k = 0; k < 400; k++) {
         const a = rnd() * 6.283, r = R * (0.2 + rnd() * 0.45), x = Math.cos(a) * r, y = Math.sin(a) * r;
         if (land(x, y) && far(x, y, taken, min)) { const p = { x, y }; taken.push(p); G.World.reserve(x, y, 2); return p; }
       }
@@ -94,17 +99,32 @@ G.Island = (() => {
     if (event === 'cursed') cursed = Object.assign(spot(R * 0.2) || { x: -R * 0.15, y: R * 0.15 }, { open: false });
 
     const nChests = d.chests || 5;
+    // Si la zona alcanzable es pequeña (p. ej. un barco), se acercan los cofres hasta encontrar sitio.
     for (let c = 0; c < nChests; c++) {
-      for (let k = 0; k < 120; k++) {
-        const a = (c + 0.15 + rnd() * 0.7) / nChests * 6.283, r = R * (0.25 + rnd() * 0.55);
-        const x = Math.cos(a) * r, y = Math.sin(a) * r;
-        if (!land(x, y) || !far(x, y, taken, R * 0.22)) continue;
-        const ch = { x, y, open: false };
-        chests.push(ch); taken.push(ch);
-        G.World.reserve(x, y, 1);
-        break;
+      for (const minD of [R * 0.22, R * 0.1, R * 0.03]) {
+        let done = false;
+        for (let k = 0; k < 400 && !done; k++) {
+          const a = (c + 0.15 + rnd() * 0.7) / nChests * 6.283, r = R * (0.25 + rnd() * 0.55);
+          const x = Math.cos(a) * r, y = Math.sin(a) * r;
+          if (!land(x, y) || !far(x, y, taken, minD)) continue;
+          const ch = { x, y, open: false };
+          chests.push(ch); taken.push(ch);
+          G.World.reserve(x, y, 1);
+          done = true;
+        }
+        if (done) break;
       }
     }
+  }
+
+  /** Un punto de tierra alcanzable cualquiera, buscando hacia fuera, o null. */
+  function anySpot(R) {
+    const land = (x, y) => G.World.waterAt(x, y) === 0 && G.World.reachable(x, y);
+    for (let r = 0.05; r <= 0.9; r += 0.05) for (let a = 0; a < 6.283; a += 0.4) {
+      const x = Math.cos(a) * R * r, y = Math.sin(a) * R * r;
+      if (land(x, y)) return { x, y };
+    }
+    return null;
   }
 
   // ---------------- partida ----------------
