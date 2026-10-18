@@ -357,3 +357,29 @@ ul.moves small, .upg-row small { display: block; color: var(--muted); font-size:
 
 /* Versión del juego: esquina inferior izquierda, sin tapar el HUD ni recibir clics. */
 #app-version { position: fixed; left: 6px; bottom: 4px; font: 10px monospace; color: rgba(255,255,255,0.55); text-shadow: 0 1px 0 #000; pointer-events: none; z-index: 50; }
+
+/* ---------- Propuestas de HUD (?hud=a|b|c) ---------- */
+/* A · Limpia, estilo Megabonk: sin marcos, fondos translúcidos redondeados */
+body.hud-a .hpbar { height: 12px; border: 0; box-shadow: none; border-radius: 6px; background: rgba(0,0,0,.5); overflow: hidden; }
+body.hud-a .hpbar i { background: #6fdc7e; }
+body.hud-a .hpbar i.low { background: #ff5d6c; }
+body.hud-a .hpbar span { font-size: 11px; line-height: 12px; }
+body.hud-a .pill { background: rgba(0,0,0,.5); border: 0; border-radius: 10px; padding: 3px 10px; }
+body.hud-a .face { border: 0; box-shadow: none; border-radius: 50%; background: rgba(0,0,0,.5); }
+body.hud-a .minimap { border: 0; box-shadow: none; border-radius: 50%; background: rgba(0,0,0,.5); }
+body.hud-a .time { font-size: 34px; }
+/* B · Marco pixel de madera: paneles tallados con borde oscuro */
+body.hud-b .hpbar { background: #120a05; border: 3px solid #7a5130; box-shadow: inset 0 0 0 2px #120a05; }
+body.hud-b .hpbar i { background: repeating-linear-gradient(90deg, #6fdc7e 0 8px, #3f9a52 8px 10px); }
+body.hud-b .pill { background: #3a2616; border: 3px solid #120a05; box-shadow: inset 0 0 0 2px #7a5130; border-radius: 0; color: #ffe9b8; }
+body.hud-b .face { border: 3px solid #120a05; box-shadow: inset 0 0 0 2px #7a5130; }
+body.hud-b .minimap { border: 3px solid #120a05; box-shadow: inset 0 0 0 2px #7a5130; background: #2a1a10; }
+body.hud-b .time { background: #3a2616; border: 3px solid #120a05; box-shadow: inset 0 0 0 2px #7a5130; padding: 2px 12px; color: #fff3cf; }
+/* C · Mínima flotante: sin paneles, solo texto y barras finas */
+body.hud-c .hpbar { border: 0; box-shadow: none; background: rgba(255,255,255,.25); height: 8px; border-radius: 4px; overflow: hidden; }
+body.hud-c .hpbar span { display: none; }
+body.hud-c .pill { background: transparent; border: 0; padding: 0; }
+body.hud-c .face { background: transparent; border: 0; box-shadow: none; }
+body.hud-c .minimap { background: transparent; border: 0; box-shadow: none; }
+body.hud-c .pause-btn { background: transparent; border: 0; }
+body.hud-c #hud { text-shadow: 0 2px 0 #000, 0 0 8px rgba(0,0,0,.7); }

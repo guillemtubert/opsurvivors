@@ -6,6 +6,9 @@ G.HUD = (() => {
   let el = {}, prev = {}, bannerT = null;
 
   function init() {
+    // Propuestas de HUD para comparar: ?hud=a | b | c (sin parámetro, el de siempre).
+    const skin = new URLSearchParams(location.search).get('hud');
+    if (['a', 'b', 'c'].includes(skin)) document.body.classList.add('hud-' + skin);
     el = {
       root: $('hud'), hp: $('hud-hp'), hpTxt: $('hud-hp-txt'), xp: $('hud-xp'), lvl: $('hud-lvl'),
       time: $('hud-time'), kills: $('hud-kills'), coins: $('hud-coins'), face: $('hud-face'),
