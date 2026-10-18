@@ -34,7 +34,8 @@ G.Islands = (() => {
         gates: [{ x: 280, y: 312, w: 34, h: 34 }, { x: 880, y: 400, w: 34, h: 40 }, { x: 735, y: 622, w: 60, h: 34 }] },
       { id: 'syrup',      name: 'Villa Syrup',   sub: 'La mansión de Kaya',         biome: 0, boss: 'kuro', map: 'assets/maps/syrup.png',
         gates: [{ x: 670, y: 655, w: 50, h: 45 }, { x: 325, y: 335, w: 34, h: 30 }] },
-      { id: 'baratie',    name: 'Baratie',       sub: 'El restaurante en el mar',   biome: 0, boss: 'krieg' },
+      { id: 'baratie',    name: 'Baratie',       sub: 'El restaurante en el mar',   biome: 0, boss: 'krieg', map: 'assets/maps/baratie.png',
+        gates: [{ x: 225, y: 490, w: 330, h: 95 }] },
       { id: 'arlong',     name: 'Arlong Park',   sub: 'Villa Cocoyashi',            biome: 0, boss: 'arlong', chests: 6 },
       { id: 'loguetown',  name: 'Loguetown',     sub: 'Huye de Smoker',             biome: 0, boss: 'smoker', escape: true }
     ] },
