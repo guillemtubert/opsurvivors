@@ -35,6 +35,7 @@ const MapMask = (() => {
       else if (lum < 60) mask[i] = 2;                              // contornos
       else if (lum >= 215 && mx - mn <= 40) mask[i] = 2;           // muros y edificios blancos
       else if (R > G + 15 && G > B && lum > 50 && lum < 140 && R < 175) mask[i] = 2;  // madera
+      else if (G > R + 25 && G > B + 25 && lum < 100) mask[i] = 2;                  // copas de árboles (verde oscuro)
     }
     for (const sd of solids) {
       for (let y = sd.y; y < sd.y + sd.h; y++) for (let x = sd.x; x < sd.x + sd.w; x++) {
