@@ -36,7 +36,8 @@ G.Islands = (() => {
         gates: [{ x: 670, y: 655, w: 50, h: 45 }, { x: 325, y: 335, w: 34, h: 30 }] },
       { id: 'baratie',    name: 'Baratie',       sub: 'El restaurante en el mar',   biome: 0, boss: 'krieg', map: 'assets/maps/baratie.png',
         gates: [{ x: 225, y: 490, w: 330, h: 95 }] },
-      { id: 'arlong',     name: 'Arlong Park',   sub: 'Villa Cocoyashi',            biome: 0, boss: 'arlong', chests: 6 },
+      { id: 'arlong',     name: 'Arlong Park',   sub: 'Villa Cocoyashi',            biome: 0, boss: 'arlong', map: 'assets/maps/arlong.png',
+        gates: [{ x: 712, y: 360, w: 48, h: 60 }, { x: 880, y: 535, w: 190, h: 130 }], chests: 6 },
       { id: 'loguetown',  name: 'Loguetown',     sub: 'Huye de Smoker',             biome: 0, boss: 'smoker', escape: true }
     ] },
     { id: 'grandline', name: 'Saga de Alabasta', enemies: ['baroque', 'baroquegun', 'baroqueshield'], islands: [
