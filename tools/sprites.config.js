@@ -61,6 +61,28 @@ module.exports = {
       }
     },
 
+    // Zoro (#0005 Spriters): lado y tres cuartos de la hoja; espaldas generadas con Gemini.
+    zoro: {
+      sheet: REF + 'zoro/ZoroSheet.png',
+      bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
+      height: 46, sideHeight: 48, colors: 24,
+      fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
+      dirs8: {
+        down: [[70, 20, 240, 195], [390, 20, 240, 195], [715, 20, 240, 195]],
+        'down-right': [[110, 255, 190, 190], [355, 245, 170, 180]],
+        right: [[110, 255, 190, 190], [355, 245, 170, 180]],
+        'up-right': [[110, 255, 190, 190], [355, 245, 170, 180]],
+        up: [{ f: [26, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }, { f: [143, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }, { f: [258, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }, { f: [375, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
+      anims: {
+        attack: [{ f: [65, 800, 180, 200], solo: true }, { f: [330, 795, 220, 200], solo: true }],
+        hurt: [{ f: [70, 20, 240, 195], solo: true }]
+      }
+    },
+
     // Marine: andar en 8 direcciones (Marine8D.png, convertida del .jfif; fondo blanco).
     // Sin 'pockets': la camisa y la gorra son blancas como el fondo.
     marine: {

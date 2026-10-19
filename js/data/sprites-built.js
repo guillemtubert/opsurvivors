@@ -60,5 +60,6 @@ G.CUSTOM_SPRITES = Object.assign(G.CUSTOM_SPRITES || {}, {
   kaidodragon: {"file":"assets/chars/kaidodragon.png","fw":74,"fh":49,"scale":1,"anims":{"idle":[0],"walk":[1,2],"attack":[3]},"fps":{"idle":1,"walk":7,"attack":6},"body":[5,3,63,46]},
   bigmom: {"file":"assets/chars/bigmom.png","fw":68,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3,4],"attack":[5]},"fps":{"idle":1,"walk":7,"attack":6},"body":[12,1,45,46]},
   fishsword: {"file":"assets/chars/fishsword.png","fw":60,"fh":46,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[17,0,32,46]},
-  fishspear: {"file":"assets/chars/fishspear.png","fw":68,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[23,1,41,46]}
+  fishspear: {"file":"assets/chars/fishspear.png","fw":68,"fh":47,"scale":1,"anims":{"idle":[0],"walk":[1,2,3],"attack":[4]},"fps":{"idle":1,"walk":7,"attack":6},"body":[23,1,41,46]},
+  zoro: {"file":"assets/chars/zoro.png","fw":72,"fh":49,"scale":1,"anims":{"idle":[1],"walk":[5,6],"attack":[19,20],"hurt":[21]},"fps":{"idle":1,"walk":9,"attack":8,"hurt":1},"body":[15,3,55,46],"dirs":{"down":{"idle":[1],"walk":[0,1,2,1]},"down-right":{"idle":[4],"walk":[3,4]},"right":{"idle":[6],"walk":[5,6]},"up-right":{"idle":[8],"walk":[7,8]},"up":{"idle":[11],"walk":[9,10,11,12]},"up-left":{"idle":[14],"walk":[13,14]},"left":{"idle":[16],"walk":[15,16]},"down-left":{"idle":[18],"walk":[17,18]}}}
 });
