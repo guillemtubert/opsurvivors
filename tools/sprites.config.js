@@ -83,6 +83,28 @@ module.exports = {
       }
     },
 
+    // Chopper (#0021 Treasure Cruise): hoja de lado y espaldas (las espaldas ya vienen en la hoja).
+    chopper: {
+      sheet: REF + 'chopper/ChopperSheet.png',
+      bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
+      height: 46, sideHeight: 48, colors: 24,
+      fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
+      dirs8: {
+        down: [[20, 85, 140, 170], [210, 85, 140, 170], [400, 85, 145, 170]],
+        'down-right': [[25, 655, 140, 145], [220, 655, 145, 145]],
+        right: [[25, 655, 140, 145], [220, 655, 145, 145]],
+        'up-right': [[25, 655, 140, 145], [220, 655, 145, 145]],
+        up: [[65, 325, 110, 155], [215, 325, 115, 155]],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
+      anims: {
+        attack: [{ f: [20, 885, 140, 170], solo: true }, { f: [245, 885, 140, 170], solo: true }],
+        hurt: [{ f: [20, 85, 140, 170], solo: true }]
+      }
+    },
+
     // Marine: andar en 8 direcciones (Marine8D.png, convertida del .jfif; fondo blanco).
     // Sin 'pockets': la camisa y la gorra son blancas como el fondo.
     marine: {
