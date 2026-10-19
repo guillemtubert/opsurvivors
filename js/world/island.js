@@ -91,13 +91,16 @@ G.Island = (() => {
              endX: px, endY: dir > 0 ? y1 - 24 : y0 + 24 };
     // El barco va en mar abierto junto al muelle (nunca encima de la tierra del mapa).
     const sea = (x, y) => G.World.seaAt(x, y);
-    const afloat = (x, y) => [[0, 0], [-120, 0], [120, 0], [0, -60], [0, 60], [-120, -60], [120, 60], [-120, 60], [120, -60]].every(([dx, dy]) => sea(x + dx, y + dy));
+    // El barco entero (con margen) tiene que caer en mar: ni casco, ni muelle, ni costa.
+    const hull = [];
+    for (let dx = -160; dx <= 160; dx += 40) for (let dy = -100; dy <= 100; dy += 50) hull.push([dx, dy]);
+    const afloat = (x, y) => hull.every(([dx, dy]) => sea(x + dx, y + dy));
     const sy = dock.endY + (dir > 0 ? 40 : 20);
     // Agua más cercana al final del muelle, lejos del propio muelle (si no hay, se queda donde estaba).
     const cands = [];
     for (let a = -24; a <= 24; a++) for (let b = -24; b <= 24; b++) {
       const x = px + a * 40, y = sy + b * 40;
-      if (Math.abs(x - px) > 170 && afloat(x, y)) cands.push([x, y]);
+      if (Math.abs(x - px) > 200 && afloat(x, y)) cands.push([x, y]);
     }
     const ref = [px + 130, sy];
     const dist = ([x, y]) => Math.hypot(x - ref[0], y - ref[1]);
