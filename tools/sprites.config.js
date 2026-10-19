@@ -45,16 +45,8 @@ module.exports = {
       bgFlat: { color: '#ffffff', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      dirs8: {
-        down: [[45, 25, 110, 185], [240, 25, 110, 185], [430, 25, 110, 185]],
-        'down-right': [[40, 290, 165, 170], [275, 290, 165, 170]],
-        right: [[40, 290, 165, 170], [275, 290, 165, 170]],
-        'up-right': [[40, 290, 165, 170], [275, 290, 165, 170]],
-        up: [{ f: [30, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' }, { f: [178, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' }, { f: [328, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' }, { f: [478, 15, 86, 184], sheet: REF + 'luffy/BackSheet.png' } ],
-        'up-left': { mirror: 'up-right' },
-        left: { mirror: 'right' },
-        'down-left': { mirror: 'down-right' }
-      },
+      // Andar: hoja de Gemini (5 direcciones × 4 pasos, fondo magenta); las izquierdas, en espejo.
+      layout: 'walk5', walkSheet: REF + 'luffy/LuffyWalk.png', walkBg: { color: '#ff00ff', thr: 60, r: 2, fringe: 2, pockets: true }, walkFacing: 'right',
       anims: {
         attack: [{ f: [35, 835, 130, 170], solo: true }, { f: [230, 835, 140, 170], solo: true }, { f: [520, 835, 170, 170], solo: true }],
         hurt: [{ f: [250, 580, 110, 140], solo: true }]
@@ -67,16 +59,8 @@ module.exports = {
       bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      dirs8: {
-        down: [[70, 20, 240, 195], [390, 20, 240, 195], [715, 20, 240, 195]],
-        'down-right': [[110, 255, 190, 190], [355, 245, 170, 180]],
-        right: [[110, 255, 190, 190], [355, 245, 170, 180]],
-        'up-right': [[110, 255, 190, 190], [355, 245, 170, 180]],
-        up: [{ f: [26, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }, { f: [143, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }, { f: [258, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }, { f: [375, 42, 74, 190], sheet: REF + 'zoro/ZoroBack.png' }],
-        'up-left': { mirror: 'up-right' },
-        left: { mirror: 'right' },
-        'down-left': { mirror: 'down-right' }
-      },
+      // Andar: hoja de Gemini (5 direcciones × 4 pasos, fondo magenta); las izquierdas, en espejo.
+      layout: 'walk5', walkSheet: REF + 'zoro/ZoroWalk.png', walkBg: { color: '#ff00ff', thr: 60, r: 2, fringe: 2, pockets: true }, walkFacing: 'right',
       anims: {
         attack: [{ f: [65, 800, 180, 200], solo: true }, { f: [330, 795, 220, 200], solo: true }],
         hurt: [{ f: [70, 20, 240, 195], solo: true }]
@@ -89,16 +73,8 @@ module.exports = {
       bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      dirs8: {
-        down: [[20, 85, 140, 170], [210, 85, 140, 170], [400, 85, 145, 170]],
-        'down-right': [[25, 655, 140, 145], [220, 655, 145, 145]],
-        right: [[25, 655, 140, 145], [220, 655, 145, 145]],
-        'up-right': [[25, 655, 140, 145], [220, 655, 145, 145]],
-        up: [[65, 325, 110, 155], [215, 325, 115, 155]],
-        'up-left': { mirror: 'up-right' },
-        left: { mirror: 'right' },
-        'down-left': { mirror: 'down-right' }
-      },
+      // Andar: hoja de Gemini (5 direcciones × 4 pasos, fondo magenta); las izquierdas, en espejo.
+      layout: 'walk5', walkSheet: REF + 'chopper/ChopperWalk.png', walkBg: { color: '#ff00ff', thr: 120, r: 2, fringe: 2, pockets: true }, walkFacing: 'right',
       anims: {
         attack: [{ f: [20, 885, 140, 170], solo: true }, { f: [245, 885, 140, 170], solo: true }],
         hurt: [{ f: [20, 85, 140, 170], solo: true }]
@@ -111,16 +87,8 @@ module.exports = {
       bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      dirs8: {
-        down: [[70, 10, 165, 195], [325, 10, 165, 195], [585, 10, 160, 195]],
-        'down-right': [[15, 230, 165, 180], [200, 230, 170, 180]],
-        right: [[15, 230, 165, 180], [200, 230, 170, 180]],
-        'up-right': [[15, 230, 165, 180], [200, 230, 170, 180]],
-        up: [{ f: [14, 19, 76, 190], sheet: REF + 'usopp/UsoppBack.png' }, { f: [116, 19, 78, 190], sheet: REF + 'usopp/UsoppBack.png' }, { f: [219, 19, 78, 190], sheet: REF + 'usopp/UsoppBack.png' }, { f: [319, 19, 78, 190], sheet: REF + 'usopp/UsoppBack.png' }],
-        'up-left': { mirror: 'up-right' },
-        left: { mirror: 'right' },
-        'down-left': { mirror: 'down-right' }
-      },
+      // Andar: hoja de Gemini (5 direcciones × 4 pasos, fondo magenta); las izquierdas, en espejo.
+      layout: 'walk5', walkSheet: REF + 'usopp/UsoppWalk.png', walkBg: { color: '#ff00ff', thr: 60, r: 2, fringe: 2, pockets: true }, walkFacing: 'right',
       anims: {
         attack: [{ f: [55, 815, 140, 190], solo: true }, { f: [370, 815, 140, 190], solo: true }, { f: [690, 815, 190, 190], solo: true }],
         hurt: [{ f: [70, 10, 165, 195], solo: true }]
@@ -133,16 +101,8 @@ module.exports = {
       bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      dirs8: {
-        down: [[55, 20, 115, 180], [245, 20, 110, 180], [435, 20, 110, 180]],
-        'down-right': [[35, 270, 140, 165], [55, 20, 115, 180]],
-        right: [[35, 270, 140, 165], [55, 20, 115, 180]],
-        'up-right': [[35, 270, 140, 165], [55, 20, 115, 180]],
-        up: [{ f: [25, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }, { f: [146, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }, { f: [265, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }, { f: [386, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }],
-        'up-left': { mirror: 'up-right' },
-        left: { mirror: 'right' },
-        'down-left': { mirror: 'down-right' }
-      },
+      // Andar: hoja de Gemini (5 direcciones × 4 pasos, fondo magenta); las izquierdas, en espejo.
+      layout: 'walk5', walkSheet: REF + 'nami/NamiWalk.png', walkBg: { color: '#ff00ff', thr: 60, r: 2, fringe: 2, pockets: true }, walkFacing: 'right',
       anims: {
         attack: [{ f: [15, 830, 185, 170], solo: true }, { f: [265, 830, 175, 170], solo: true }, { f: [565, 830, 180, 170], solo: true }],
         hurt: [{ f: [55, 20, 115, 180], solo: true }]
@@ -179,16 +139,8 @@ module.exports = {
       bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
       height: 46, sideHeight: 48, colors: 24,
       fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
-      dirs8: {
-        down: [[64, 80, 88, 175], [262, 80, 80, 175], [453, 80, 72, 175]],
-        'down-right': [[24, 890, 95, 160], [223, 880, 135, 170]],
-        right: [[24, 890, 95, 160], [223, 880, 135, 170]],
-        'up-right': [[24, 890, 95, 160], [223, 880, 135, 170]],
-        up: [{ f: [15, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }, { f: [126, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }, { f: [234, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }, { f: [340, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }],
-        'up-left': { mirror: 'up-right' },
-        left: { mirror: 'right' },
-        'down-left': { mirror: 'down-right' }
-      },
+      // Andar: hoja de Gemini (5 direcciones × 4 pasos, fondo magenta); las izquierdas, en espejo.
+      layout: 'walk5', walkSheet: REF + 'sanjiS/SanjiWalk.png', walkBg: { color: '#ff00ff', thr: 60, r: 2, fringe: 2, pockets: true }, walkFacing: 'right',
       anims: {
         attack: [{ f: [509, 882, 160, 160], solo: true }, { f: [779, 874, 135, 143], solo: true }],
         hurt: [{ f: [64, 80, 88, 175], solo: true }]
