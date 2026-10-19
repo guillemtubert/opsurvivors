@@ -212,6 +212,11 @@ G.World = (() => {
         }
         mask[ty * mapW + tx] = blocked >= total * 0.4 ? 2 : water >= total * 0.5 ? 1 : 0;
       }
+      // Zona libre alrededor del centro (donde aparece el jugador): nunca se empieza encajonado.
+      const cx0 = Math.round(-mapX0), cy0 = Math.round(-mapY0);
+      for (let ty = 0; ty < mapH; ty++) for (let tx = 0; tx < mapW; tx++) {
+        if ((tx - cx0) * (tx - cx0) + (ty - cy0) * (ty - cy0) <= 64) mask[ty * mapW + tx] = 0;
+      }
       mapMask = mask; mapImg = img; mapGates = gates.map(g => ({
         x: (mapX0 + (g.x + g.w / 2) / iw * mapW) * G.TILE,
         y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE,
