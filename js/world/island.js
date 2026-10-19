@@ -58,17 +58,32 @@ G.Island = (() => {
     const far = (x, y, pts, min) => pts.every(p => G.U.dist2(x, y, p.x, p.y) > min * min);
 
     // Muelle: de la costa sur (o norte) hacia el mar, con el barco al lado.
-    const dir = rnd() < 0.5 ? 1 : -1;
+    let dir = rnd() < 0.5 ? 1 : -1;
+    const dir0 = dir;
     // La costa desde donde sale el muelle debe ser alcanzable andando (si no, se prueba otra).
     // El muelle nace en el último tramo alcanzable antes del mar y lo cruza hasta el agua.
     let px = 0, py = 0, L = 7 * G.TILE;
     for (let k = 0; k < 80; k++) {
-      const cx = Math.round((rnd() - 0.5) * R * 0.5 / G.TILE) * G.TILE;
-      let sy = 0;
+      const rc = Math.round((rnd() - 0.5) * R * 0.5 / G.TILE) * G.TILE;
+      // Primero las puertas de la isla (el muelle sale por ellas), luego al azar.
+      const gl = G.World.gates();
+      const st = gl.filter(g => g.closed).concat(gl.filter(g => !g.closed))[k];   // primero la puerta que se abre con el jefe
+      const cx = st ? Math.round(st.x / G.TILE) * G.TILE : rc;
+      dir = st ? (st.y >= 0 ? 1 : -1) : dir0;
+      // Desde una puerta, el muelle sale de ella hacia el mar (si se cierra, queda cortado).
+      const gy = st ? Math.round(st.y / G.TILE) * G.TILE : 0;
+      let sy = gy;
       while (Math.abs(sy) < R * 1.4 && !G.World.seaAt(cx, sy + dir * 16)) sy += dir * 16;
+      // Una puerta abierta solo vale si se llega a ella desde el centro (las cerradas, siempre).
+      // El tramo del muelle no puede cruzar muros (solo agua o suelo), ni desde una puerta.
+      const cleanRun = (y0, y1) => { for (let t = y0; dir * (y1 - t) >= 0; t += dir * 16) if (G.World.waterAt(cx, t) === 2 && !G.World.seaAt(cx, t)) return false; return true; };
+      if (st && Math.abs(sy) < R * 1.4 && (st.closed || G.World.reachable(st.x, gy)) && cleanRun(gy, sy)) { px = cx; py = gy; L = Math.abs(sy - gy) + 3 * G.TILE; break; }
       let cy = sy;
       while (Math.abs(cy) > 0 && !land(cx, cy)) cy -= dir * 16;
-      if (land(cx, cy) && Math.abs(sy - cy) < R * 1.4) { px = cx; py = cy; L = Math.abs(sy - cy) + 3 * G.TILE; break; }
+      // El muelle no puede cruzar muros: entre la costa y el mar solo puede haber suelo o agua.
+      let clear = true;
+      for (let t = cy; dir * (sy - t) >= 0 && clear; t += dir * 16) if (G.World.waterAt(cx, t) === 2 && !G.World.seaAt(cx, t)) clear = false;
+      if (clear && land(cx, cy) && Math.abs(sy - cy) < R * 1.4) { px = cx; py = cy; L = Math.abs(sy - cy) + 3 * G.TILE; break; }
     }
     const W = 2 * G.TILE;
     const y0 = dir > 0 ? py - 2 * G.TILE : py - L, y1 = dir > 0 ? py + L : py + 2 * G.TILE;
@@ -85,6 +100,8 @@ G.Island = (() => {
     }
     G.World.setPier(dock);
     G.World.reserve(px, py, 3);
+    // Puertas que se cierran hasta derrotar al jefe (p. ej. la salida de Shells Town).
+    G.World.gates().forEach((g, k) => { if (g.closed) G.World.setGateClosed(k, true); });
 
     const taken = [{ x: 0, y: 0 }, { x: px, y: py }];
     if (d.escape) snail = { x: 1e9, y: 1e9, none: true };      // sin Den Den Mushi (nunca está cerca)
@@ -255,6 +272,8 @@ G.Island = (() => {
     // Dúo: el barco se abre cuando caen todos.
     if (G.EnemyMgr.bosses().some(b => b !== e)) { G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Aún queda otro', '#ffd23f'); return; }
     boss = 'dead';
+    // Se abren las puertas cerradas: ahora se puede salir al barco.
+    G.World.gates().forEach((g, k) => { if (g.closed) { G.World.setGateClosed(k, false); G.World.openGate(k); } });
     G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Coge su cofre y sube al barco', '#ffd23f');
   }
 

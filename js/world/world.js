@@ -233,10 +233,26 @@ G.World = (() => {
         y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE,
         w: g.w / iw * mapW * G.TILE, h: g.h / ih * mapH * G.TILE
       }));
+      // Casillas de cada puerta (para cerrarla o abrirla después) y si empieza cerrada.
+      mapGates.forEach((mg, k) => {
+        const g = gates[k], tiles = [];
+        for (let ty = Math.floor(g.y / ih * mapH); ty <= Math.floor((g.y + g.h - 1) / ih * mapH); ty++)
+          for (let tx = Math.floor(g.x / iw * mapW); tx <= Math.floor((g.x + g.w - 1) / iw * mapW); tx++)
+            tiles.push(ty * mapW + tx);
+        mg.tiles = tiles; mg.closed = !!g.closed;
+      });
       chunks.clear(); bump();
       if (onReady) onReady();
     };
     img.src = src;
+  }
+  /** Cierra (bloquea) o abre una puerta del mapa: su hueco pasa a muro o a suelo. */
+  function setGateClosed(k, closed) {
+    const g = mapGates[k];
+    if (!g || !mapMask) return;
+    g.closed = closed;
+    for (const i of g.tiles) mapMask[i] = closed ? 2 : 0;
+    bump();
   }
   function clearMap() { mapImg = null; mapMask = null; mapSea = null; mapGates = []; gateAnims.length = 0; bump(); }
   /** Animación de una puerta que se abre (la hoja sube y se desvanece) al salir alguien por ella. */
@@ -516,6 +532,9 @@ G.World = (() => {
    */
   function drawGround(ctx) {
     if (mapImg) {
+      // Fuera de la imagen, mar (no arena): el barco y el muelle siempre caen en el agua.
+      ctx.fillStyle = '#2a4f8a';
+      ctx.fillRect(-6000, -6000, 12000, 12000);
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(mapImg, mapX0 * G.TILE, mapY0 * G.TILE, mapW * G.TILE, mapH * G.TILE);
       drawGates(ctx);
@@ -623,7 +642,8 @@ G.World = (() => {
 
   /** 0 tierra · 1 agua · 2 mar profundo (no se puede cruzar) */
   function waterAt(x, y) {
-    if (onPier(x, y)) return 0;
+    // El muelle es pisable sobre el agua y el suelo, nunca sobre muros o edificios.
+    if (onPier(x, y) && !(mapMask && maskAt(x, y) === 2 && !seaAt(x, y))) return 0;
     if (mapMask) return maskAt(x, y);
     const t = classify(field(x / G.TILE, y / G.TILE));
     return t === 0 ? 2 : t === 1 ? 1 : 0;
@@ -655,7 +675,7 @@ G.World = (() => {
   return {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
-    drawGround, collectProps, resolve, isFree, isLand, waterAt, seaAt, hitBreakables, solidsNear, reserve, setPier, reachable,
+    drawGround, collectProps, resolve, isFree, isLand, waterAt, seaAt, hitBreakables, solidsNear, reserve, setPier, reachable, setGateClosed,
     setMap, gates, openGate, gateCount
   };
 })();

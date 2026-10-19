@@ -34,9 +34,14 @@ G.Spawner = (() => {
   }
 
   /** Punto de aparición en una puerta del mapa (si la isla la tiene): los enemigos salen de la base. */
-  function gatePoint(k = Math.floor(Math.random() * G.World.gates().length)) {
+  /** Una puerta abierta al azar (índice), o -1. */
+  function randomGate() {
+    const gs = G.World.gates(), open = gs.map((g, i) => i).filter(i => !gs[i].closed);
+    return open.length ? open[Math.floor(Math.random() * open.length)] : -1;
+  }
+  function gatePoint(k = randomGate()) {
     const g = G.World.gates()[k];
-    return g ? [g.x + G.U.rand(-6, 6), g.y + G.U.rand(-6, 6)] : null;
+    return g && !g.closed ? [g.x + G.U.rand(-6, 6), g.y + G.U.rand(-6, 6)] : null;
   }
 
   function pickDef(t) {
@@ -63,7 +68,7 @@ G.Spawner = (() => {
   function summon(def, pl, i = 0) {
     const a = Math.random() * 6.283 + i * 2.1;
     // El jefe sale por una puerta, con la animación de la puerta abriéndose y polvo.
-    const k = G.World.gateCount() ? Math.floor(Math.random() * G.World.gateCount()) : -1;
+    const k = randomGate();
     const gp = k >= 0 ? gatePoint(k) : null;
     if (gp) { G.World.openGate(k); G.FX.puff(gp[0], gp[1], '#c9b28a', 10); }
     const [x, y] = gp || landPoint(pl, a, 24) || [pl.x + 260, pl.y];
