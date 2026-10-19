@@ -21,7 +21,7 @@ G.Save = (() => {
     bestIsland: 0,
     trophies: [],
     stats: { kills: 0, runs: 0, bosses: 0, time: 0 },
-    settings: { music: 0.5, sfx: 0.7, shake: true, dmgNums: true }
+    settings: { music: 0, sfx: 0.7, shake: true, dmgNums: true }
   });
 
   let data = DEFAULT();
