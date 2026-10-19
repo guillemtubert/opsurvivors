@@ -93,11 +93,16 @@ G.Island = (() => {
     const sea = (x, y) => G.World.seaAt(x, y);
     const afloat = (x, y) => [[0, 0], [-120, 0], [120, 0], [0, -60], [0, 60], [-120, -60], [120, 60], [-120, 60], [120, -60]].every(([dx, dy]) => sea(x + dx, y + dy));
     const sy = dock.endY + (dir > 0 ? 40 : 20);
-    dock.shipX = px + 130; dock.shipY = sy;
-    let placed = false;
-    for (const dy of [0, 60, -60, 120, -120, 180, -180]) for (const dx of [160, 220, 280, 340, -160, -220, -280, -340]) {
-      if (!placed && afloat(px + dx, sy + dy)) { dock.shipX = px + dx; dock.shipY = sy + dy; placed = true; }
+    // Agua más cercana al final del muelle, lejos del propio muelle (si no hay, se queda donde estaba).
+    const cands = [];
+    for (let a = -24; a <= 24; a++) for (let b = -24; b <= 24; b++) {
+      const x = px + a * 40, y = sy + b * 40;
+      if (Math.abs(x - px) > 170 && afloat(x, y)) cands.push([x, y]);
     }
+    const ref = [px + 130, sy];
+    const dist = ([x, y]) => Math.hypot(x - ref[0], y - ref[1]);
+    const shipAt = cands.reduce((best, c) => (!best || dist(c) < dist(best) ? c : best), null);
+    dock.shipX = shipAt ? shipAt[0] : px + 130; dock.shipY = shipAt ? shipAt[1] : sy;
     G.World.setPier(dock);
     G.World.reserve(px, py, 3);
     // Puertas que se cierran hasta derrotar al jefe (p. ej. la salida de Shells Town).
