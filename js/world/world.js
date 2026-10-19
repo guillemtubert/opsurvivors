@@ -184,6 +184,7 @@ G.World = (() => {
 
   // Mapa dibujado a mano (islands.js: map). Su imagen decide tierra y agua por tile.
   let mapImg = null, mapMask = null, mapSea = null, mapX0 = 0, mapY0 = 0, mapW = 0, mapH = 0, mapGates = [];
+  let loading = false;   // mapa en carga: no se pinta nada del mundo anterior
   /** ¿Es mar de verdad (no un edificio ni un muro)? Fuera del mapa, sí. */
   function seaAt(x, y) {
     if (!mapSea) return waterAt(x, y) === 2;
@@ -199,7 +200,9 @@ G.World = (() => {
    */
   function setMap(src, tiles, gates = [], onReady, solids = []) {
     const img = new Image();
+    loading = true;   // hasta que la imagen esté lista no se pinta el terreno de antes (ni su bosque)
     img.onload = () => {
+      loading = false;
       const iw = img.width, ih = img.height;
       const c = document.createElement('canvas');
       c.width = iw; c.height = ih;
@@ -254,7 +257,7 @@ G.World = (() => {
     for (const i of g.tiles) mapMask[i] = closed ? 2 : 0;
     bump();
   }
-  function clearMap() { mapImg = null; mapMask = null; mapSea = null; mapGates = []; gateAnims.length = 0; bump(); }
+  function clearMap() { loading = false; mapImg = null; mapMask = null; mapSea = null; mapGates = []; gateAnims.length = 0; bump(); }
   /** Animación de una puerta que se abre (la hoja sube y se desvanece) al salir alguien por ella. */
   const gateAnims = [];
   const GATE_T = 0.9;
@@ -531,6 +534,7 @@ G.World = (() => {
    * listos y no haya tirones (cada uno cuesta ~15 ms).
    */
   function drawGround(ctx) {
+    if (loading) { ctx.fillStyle = '#2a4f8a'; ctx.fillRect(-6000, -6000, 12000, 12000); return; }
     if (mapImg) {
       // Fuera de la imagen, mar (no arena): el barco y el muelle siempre caen en el agua.
       ctx.fillStyle = '#2a4f8a';
@@ -573,6 +577,7 @@ G.World = (() => {
 
   /** Mete en `list` los objetos visibles: { y, draw(ctx) } para ordenar por altura. */
   function collectProps(list, now) {
+    if (loading) return;
     const cam = G.Camera, TL = G.TILE;
     // Margen amplio: un árbol que está debajo de la vista asoma por arriba.
     const x0 = Math.floor((cam.x - cam.w / 2) / TL) - 2, x1 = Math.floor((cam.x + cam.w / 2) / TL) + 2;
@@ -675,7 +680,7 @@ G.World = (() => {
   return {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
-    drawGround, collectProps, resolve, isFree, isLand, waterAt, seaAt, hitBreakables, solidsNear, reserve, setPier, reachable, setGateClosed,
+    drawGround, collectProps, loading: () => loading, resolve, isFree, isLand, waterAt, seaAt, hitBreakables, solidsNear, reserve, setPier, reachable, setGateClosed,
     setMap, gates, openGate, gateCount
   };
 })();

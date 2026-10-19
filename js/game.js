@@ -302,7 +302,7 @@ G.Game = (() => {
     lctx.imageSmoothingEnabled = false;
     G.World.drawGround(lctx);
 
-    if (state !== 'ui' && pl) {
+    if (state !== 'ui' && pl && !G.World.loading()) {
       G.FX.drawUnder(lctx, now);
       const list = [];
       G.World.collectProps(list, now);
