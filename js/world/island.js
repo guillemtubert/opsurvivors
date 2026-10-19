@@ -64,14 +64,22 @@ G.Island = (() => {
     for (let k = 0; k < 80; k++) {
       const cx = Math.round((rnd() - 0.5) * R * 0.5 / G.TILE) * G.TILE;
       let cy = 0;
-      while (Math.abs(cy) < R * 1.4 && land(cx, cy + dir * 16)) cy += dir * 16;
+      // Avanza hasta el mar abierto (no se para en un muro o edificio interior).
+      while (Math.abs(cy) < R * 1.4 && G.World.waterAt(cx, cy + dir * 16) !== 2) cy += dir * 16;
       if (land(cx, cy)) { px = cx; py = cy; break; }
     }
     const L = 7 * G.TILE, W = 2 * G.TILE;
     const y0 = dir > 0 ? py - 2 * G.TILE : py - L, y1 = dir > 0 ? py + L : py + 2 * G.TILE;
     dock = { x0: px - W / 2, x1: px + W / 2, y0, y1, dir, coastY: py,
              endX: px, endY: dir > 0 ? y1 - 24 : y0 + 24 };
-    dock.shipX = px + 130; dock.shipY = dock.endY + (dir > 0 ? 40 : 20);
+    // El barco va en mar abierto junto al muelle (nunca encima de la tierra del mapa).
+    const sea = (x, y) => G.World.waterAt(x, y) === 2;
+    const afloat = (x, y) => sea(x, y) && sea(x - 40, y) && sea(x + 40, y) && sea(x, y - 20) && sea(x, y + 20);
+    const sy = dock.endY + (dir > 0 ? 40 : 20);
+    dock.shipX = px + 130; dock.shipY = sy;
+    for (const dx of [130, 170, 210, 250, -130, -170, -210, -250]) {
+      if (afloat(px + dx, sy)) { dock.shipX = px + dx; break; }
+    }
     G.World.setPier(dock);
     G.World.reserve(px, py, 3);
 
