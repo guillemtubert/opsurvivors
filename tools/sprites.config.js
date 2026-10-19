@@ -105,6 +105,28 @@ module.exports = {
       }
     },
 
+    // Usopp (#0013 Treasure Cruise): lado y tres cuartos de la hoja; espaldas generadas con Gemini.
+    usopp: {
+      sheet: REF + 'usopp/UsoppSheet.png',
+      bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
+      height: 46, sideHeight: 48, colors: 24,
+      fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
+      dirs8: {
+        down: [[70, 10, 165, 195], [325, 10, 165, 195], [585, 10, 160, 195]],
+        'down-right': [[15, 230, 165, 180], [200, 230, 170, 180]],
+        right: [[15, 230, 165, 180], [200, 230, 170, 180]],
+        'up-right': [[15, 230, 165, 180], [200, 230, 170, 180]],
+        up: [{ f: [14, 19, 76, 190], sheet: REF + 'usopp/UsoppBack.png' }, { f: [116, 19, 78, 190], sheet: REF + 'usopp/UsoppBack.png' }, { f: [219, 19, 78, 190], sheet: REF + 'usopp/UsoppBack.png' }, { f: [319, 19, 78, 190], sheet: REF + 'usopp/UsoppBack.png' }],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
+      anims: {
+        attack: [{ f: [55, 815, 140, 190], solo: true }, { f: [370, 815, 140, 190], solo: true }, { f: [690, 815, 190, 190], solo: true }],
+        hurt: [{ f: [70, 10, 165, 195], solo: true }]
+      }
+    },
+
     // Marine: andar en 8 direcciones (Marine8D.png, convertida del .jfif; fondo blanco).
     // Sin 'pockets': la camisa y la gorra son blancas como el fondo.
     marine: {
