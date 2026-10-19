@@ -3,6 +3,6 @@
  * solas en cuanto existen sus jefes ('all'); también se puede dar una lista de ids.
  */
 G.SCOPE = {
-  crew: ['luffy', 'sanji'],
+  crew: ['luffy', 'zoro', 'nami', 'usopp', 'sanji', 'chopper'],
   islands: 'all'
 };
