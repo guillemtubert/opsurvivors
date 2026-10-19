@@ -60,25 +60,28 @@ G.Island = (() => {
     // Muelle: de la costa sur (o norte) hacia el mar, con el barco al lado.
     const dir = rnd() < 0.5 ? 1 : -1;
     // La costa desde donde sale el muelle debe ser alcanzable andando (si no, se prueba otra).
-    let px = 0, py = 0;
+    // El muelle nace en el último tramo alcanzable antes del mar y lo cruza hasta el agua.
+    let px = 0, py = 0, L = 7 * G.TILE;
     for (let k = 0; k < 80; k++) {
       const cx = Math.round((rnd() - 0.5) * R * 0.5 / G.TILE) * G.TILE;
-      let cy = 0;
-      // Avanza hasta el mar abierto (no se para en un muro o edificio interior).
-      while (Math.abs(cy) < R * 1.4 && G.World.waterAt(cx, cy + dir * 16) !== 2) cy += dir * 16;
-      if (land(cx, cy)) { px = cx; py = cy; break; }
+      let sy = 0;
+      while (Math.abs(sy) < R * 1.4 && !G.World.seaAt(cx, sy + dir * 16)) sy += dir * 16;
+      let cy = sy;
+      while (Math.abs(cy) > 0 && !land(cx, cy)) cy -= dir * 16;
+      if (land(cx, cy) && Math.abs(sy - cy) < R * 1.4) { px = cx; py = cy; L = Math.abs(sy - cy) + 3 * G.TILE; break; }
     }
-    const L = 7 * G.TILE, W = 2 * G.TILE;
+    const W = 2 * G.TILE;
     const y0 = dir > 0 ? py - 2 * G.TILE : py - L, y1 = dir > 0 ? py + L : py + 2 * G.TILE;
     dock = { x0: px - W / 2, x1: px + W / 2, y0, y1, dir, coastY: py,
              endX: px, endY: dir > 0 ? y1 - 24 : y0 + 24 };
     // El barco va en mar abierto junto al muelle (nunca encima de la tierra del mapa).
-    const sea = (x, y) => G.World.waterAt(x, y) === 2;
-    const afloat = (x, y) => sea(x, y) && sea(x - 40, y) && sea(x + 40, y) && sea(x, y - 20) && sea(x, y + 20);
+    const sea = (x, y) => G.World.seaAt(x, y);
+    const afloat = (x, y) => [[0, 0], [-120, 0], [120, 0], [0, -60], [0, 60], [-120, -60], [120, 60], [-120, 60], [120, -60]].every(([dx, dy]) => sea(x + dx, y + dy));
     const sy = dock.endY + (dir > 0 ? 40 : 20);
     dock.shipX = px + 130; dock.shipY = sy;
-    for (const dx of [130, 170, 210, 250, -130, -170, -210, -250]) {
-      if (afloat(px + dx, sy)) { dock.shipX = px + dx; break; }
+    let placed = false;
+    for (const dy of [0, 60, -60, 120, -120, 180, -180]) for (const dx of [160, 220, 280, 340, -160, -220, -280, -340]) {
+      if (!placed && afloat(px + dx, sy + dy)) { dock.shipX = px + dx; dock.shipY = sy + dy; placed = true; }
     }
     G.World.setPier(dock);
     G.World.reserve(px, py, 3);

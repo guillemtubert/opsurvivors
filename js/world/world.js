@@ -183,7 +183,14 @@ G.World = (() => {
   const pickOf = (v, tx, ty) => Array.isArray(v) ? v[Math.floor(G.U.hash(tx, ty, seed + 11) * v.length)] : v;
 
   // Mapa dibujado a mano (islands.js: map). Su imagen decide tierra y agua por tile.
-  let mapImg = null, mapMask = null, mapX0 = 0, mapY0 = 0, mapW = 0, mapH = 0, mapGates = [];
+  let mapImg = null, mapMask = null, mapSea = null, mapX0 = 0, mapY0 = 0, mapW = 0, mapH = 0, mapGates = [];
+  /** ¿Es mar de verdad (no un edificio ni un muro)? Fuera del mapa, sí. */
+  function seaAt(x, y) {
+    if (!mapSea) return waterAt(x, y) === 2;
+    const tx = Math.floor(x / G.TILE - mapX0), ty = Math.floor(y / G.TILE - mapY0);
+    if (tx < 0 || ty < 0 || tx >= mapW || ty >= mapH) return true;
+    return mapSea[ty * mapW + tx] === 1;
+  }
   /**
    * Carga la imagen y calcula la máscara de tiles (0 tierra, 1 agua somera, 2 bloqueado; fuera, 2).
    * La máscara se calcula a resolución de imagen (muros finos) y se reduce a tiles:
@@ -199,25 +206,29 @@ G.World = (() => {
       const x = c.getContext('2d');
       x.drawImage(img, 0, 0);
       const px = G.MapMask.build(x.getImageData(0, 0, iw, ih).data, iw, ih, gates, solids);
+      const seaPx = G.MapMask.lastSea();
       mapW = Math.round(tiles); mapH = Math.round(mapW * ih / iw);
       mapX0 = -mapW / 2; mapY0 = -mapH / 2;
       const mask = new Uint8Array(mapW * mapH);
+      const seaT = new Uint8Array(mapW * mapH);
       for (let ty = 0; ty < mapH; ty++) for (let tx = 0; tx < mapW; tx++) {
         const x0 = Math.floor(tx * iw / mapW), x1 = Math.floor((tx + 1) * iw / mapW);
         const y0 = Math.floor(ty * ih / mapH), y1 = Math.floor((ty + 1) * ih / mapH);
-        let blocked = 0, water = 0, total = 0;
+        let blocked = 0, water = 0, total = 0, sea = 0;
         for (let y = y0; y < y1; y++) for (let xx = x0; xx < x1; xx++) {
           const v = px[y * iw + xx]; total++;
           if (v === 2) blocked++; else if (v === 1) water++;
+          if (seaPx && seaPx[y * iw + xx]) sea++;
         }
         mask[ty * mapW + tx] = blocked >= total * 0.4 ? 2 : water >= total * 0.5 ? 1 : 0;
+        seaT[ty * mapW + tx] = sea >= total * 0.5 ? 1 : 0;
       }
       // Zona libre alrededor del centro (donde aparece el jugador): nunca se empieza encajonado.
       const cx0 = Math.round(-mapX0), cy0 = Math.round(-mapY0);
       for (let ty = 0; ty < mapH; ty++) for (let tx = 0; tx < mapW; tx++) {
         if ((tx - cx0) * (tx - cx0) + (ty - cy0) * (ty - cy0) <= 64) mask[ty * mapW + tx] = 0;
       }
-      mapMask = mask; mapImg = img; mapGates = gates.map(g => ({
+      mapMask = mask; mapSea = seaT; mapImg = img; mapGates = gates.map(g => ({
         x: (mapX0 + (g.x + g.w / 2) / iw * mapW) * G.TILE,
         y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE,
         w: g.w / iw * mapW * G.TILE, h: g.h / ih * mapH * G.TILE
@@ -227,7 +238,7 @@ G.World = (() => {
     };
     img.src = src;
   }
-  function clearMap() { mapImg = null; mapMask = null; mapGates = []; gateAnims.length = 0; bump(); }
+  function clearMap() { mapImg = null; mapMask = null; mapSea = null; mapGates = []; gateAnims.length = 0; bump(); }
   /** Animación de una puerta que se abre (la hoja sube y se desvanece) al salir alguien por ella. */
   const gateAnims = [];
   const GATE_T = 0.9;
@@ -644,7 +655,7 @@ G.World = (() => {
   return {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
-    drawGround, collectProps, resolve, isFree, isLand, waterAt, hitBreakables, solidsNear, reserve, setPier, reachable,
+    drawGround, collectProps, resolve, isFree, isLand, waterAt, seaAt, hitBreakables, solidsNear, reserve, setPier, reachable,
     setMap, gates, openGate, gateCount
   };
 })();

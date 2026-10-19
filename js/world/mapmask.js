@@ -6,6 +6,8 @@
  * gates: rectángulos en píxeles de la imagen por donde sí se pasa (las puertas).
  */
 const MapMask = (() => {
+  // Último mar calculado: distingue el agua de verdad de los edificios bloqueados.
+  let lastSea = null;
   function build(data, w, h, gates = [], solids = []) {
     const n = w * h;
     const r = (i) => data[i * 4], g = (i) => data[i * 4 + 1], b = (i) => data[i * 4 + 2];
@@ -47,9 +49,10 @@ const MapMask = (() => {
         if (x >= 0 && y >= 0 && x < w && y < h && !sea[y * w + x]) mask[y * w + x] = 0;
       }
     }
+    lastSea = sea;
     return mask;
   }
-  return { build };
+  return { build, lastSea: () => lastSea };
 })();
 if (typeof module === 'object' && module.exports) module.exports = MapMask;
 if (typeof G !== 'undefined') G.MapMask = MapMask;
