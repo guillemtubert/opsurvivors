@@ -281,7 +281,7 @@ G.Island = (() => {
     if (G.EnemyMgr.bosses().some(b => b !== e)) { G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Aún queda otro', '#ffd23f'); return; }
     boss = 'dead';
     // Se abren las puertas cerradas: ahora se puede salir al barco.
-    G.World.gates().forEach((g, k) => { if (g.closed) { G.World.setGateClosed(k, false); G.World.openGate(k); } });
+    G.World.gates().forEach((g, k) => { if (g.closed) G.World.openDoor(k); });
     G.HUD.banner('¡Has derrotado a ' + e.name + '!', 'Coge su cofre y sube al barco', '#ffd23f');
   }
 

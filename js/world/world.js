@@ -231,7 +231,8 @@ G.World = (() => {
       for (let ty = 0; ty < mapH; ty++) for (let tx = 0; tx < mapW; tx++) {
         if ((tx - cx0) * (tx - cx0) + (ty - cy0) * (ty - cy0) <= 64) mask[ty * mapW + tx] = 0;
       }
-      mapMask = mask; mapSea = seaT; mapImg = img; mapGates = gates.map(g => ({
+      // El mapa se pinta desde su canvas (así una puerta que se abre puede borrarse del dibujo).
+      mapMask = mask; mapSea = seaT; mapImg = c; mapGates = gates.map(g => ({
         x: (mapX0 + (g.x + g.w / 2) / iw * mapW) * G.TILE,
         y: (mapY0 + (g.y + g.h / 2) / ih * mapH) * G.TILE,
         w: g.w / iw * mapW * G.TILE, h: g.h / ih * mapH * G.TILE
@@ -242,7 +243,7 @@ G.World = (() => {
         for (let ty = Math.floor(g.y / ih * mapH); ty <= Math.floor((g.y + g.h - 1) / ih * mapH); ty++)
           for (let tx = Math.floor(g.x / iw * mapW); tx <= Math.floor((g.x + g.w - 1) / iw * mapW); tx++)
             tiles.push(ty * mapW + tx);
-        mg.tiles = tiles; mg.closed = !!g.closed;
+        mg.tiles = tiles; mg.closed = !!g.closed; mg.raw = g;
       });
       chunks.clear(); bump();
       if (onReady) onReady();
@@ -261,22 +262,37 @@ G.World = (() => {
   /** Animación de una puerta que se abre (la hoja sube y se desvanece) al salir alguien por ella. */
   const gateAnims = [];
   const GATE_T = 0.9;
+  /** Animación de una puerta (los guardias la abren al salir alguien): la hoja pintada sube y se desvanece. */
   function openGate(k) { if (mapGates[k]) gateAnims.push({ g: mapGates[k], t0: performance.now() }); }
+  /** Abre para siempre una puerta cerrada (p. ej. al derrotar al jefe): sube y su dibujo desaparece del mapa. */
+  function openDoor(k) {
+    const g = mapGates[k];
+    if (!g) return;
+    setGateClosed(k, false);
+    gateAnims.push({ g, t0: performance.now(), reveal: true });
+  }
+  /** Quita el dibujo de la puerta: la zona queda con el suelo de justo encima (la plaza). */
+  function paintGate(g) {
+    const s = g.raw, cx = mapImg && mapImg.getContext && mapImg.getContext('2d');
+    if (!s || !cx) return;
+    if (s.y - s.h >= 0) cx.drawImage(mapImg, s.x, s.y - s.h, s.w, s.h, s.x, s.y, s.w, s.h);
+    else { cx.fillStyle = '#d9b77a'; cx.fillRect(s.x, s.y, s.w, s.h); }
+    bump();
+  }
   function drawGates(ctx) {
     const now = performance.now();
     for (let i = gateAnims.length - 1; i >= 0; i--) {
       const a = gateAnims[i], p = (now - a.t0) / 1000 / GATE_T;
-      if (p >= 1) { gateAnims.splice(i, 1); continue; }
-      const { g } = a, e = 1 - (1 - p) * (1 - p);       // ease-out
-      const h = g.h * (1 - e), x = g.x - g.w / 2, y = g.y - g.h / 2;
-      ctx.globalAlpha = 1 - p * 0.6;
-      ctx.fillStyle = '#2a1e14';                         // hueco de la puerta
+      const { g } = a, x = g.x - g.w / 2, y = g.y - g.h / 2;
+      if (p >= 1) { if (a.reveal) paintGate(g); gateAnims.splice(i, 1); continue; }
+      const e = 1 - (1 - p) * (1 - p);                  // ease-out
+      ctx.save();
+      ctx.beginPath(); ctx.rect(x, y, g.w, g.h); ctx.clip();
+      ctx.fillStyle = '#2a1e14';                         // hueco oscuro que queda al subir la puerta
       ctx.fillRect(x, y, g.w, g.h);
-      ctx.fillStyle = '#5b3b22';                         // hoja de madera que sube
-      ctx.fillRect(x, y + (g.h - h), g.w, h);
-      ctx.fillStyle = '#3a2414';
-      for (let s = 0; s < g.w; s += G.TILE * 0.5) ctx.fillRect(x + s, y + (g.h - h), 2, h);
-      ctx.globalAlpha = 1;
+      ctx.globalAlpha = 1 - p * 0.5;
+      if (g.raw) ctx.drawImage(mapImg, g.raw.x, g.raw.y, g.raw.w, g.raw.h, x, y - e * g.h, g.w, g.h);
+      ctx.restore();
     }
   }
   function gateCount() { return mapGates.length; }
@@ -681,6 +697,6 @@ G.World = (() => {
     BIOMES, reset, setBiome, get biome() { return biome; }, get info() { return B(); },
     get radius() { return radius * G.TILE; },
     drawGround, collectProps, loading: () => loading, resolve, isFree, isLand, waterAt, seaAt, hitBreakables, solidsNear, reserve, setPier, reachable, setGateClosed,
-    setMap, gates, openGate, gateCount
+    setMap, gates, openGate, openDoor, gateCount
   };
 })();
