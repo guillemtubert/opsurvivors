@@ -127,6 +127,28 @@ module.exports = {
       }
     },
 
+    // Nami (#0012 Treasure Cruise): lado y tres cuartos de la hoja; espaldas generadas con Gemini.
+    nami: {
+      sheet: REF + 'nami/NamiSheet.png',
+      bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
+      height: 46, sideHeight: 48, colors: 24,
+      fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
+      dirs8: {
+        down: [[55, 20, 115, 180], [245, 20, 110, 180], [435, 20, 110, 180]],
+        'down-right': [[35, 270, 140, 165], [55, 20, 115, 180]],
+        right: [[35, 270, 140, 165], [55, 20, 115, 180]],
+        'up-right': [[35, 270, 140, 165], [55, 20, 115, 180]],
+        up: [{ f: [25, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }, { f: [146, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }, { f: [265, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }, { f: [386, 37, 86, 190], sheet: REF + 'nami/NamiBack.png' }],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
+      anims: {
+        attack: [{ f: [15, 830, 185, 170], solo: true }, { f: [265, 830, 175, 170], solo: true }, { f: [565, 830, 180, 170], solo: true }],
+        hurt: [{ f: [55, 20, 115, 180], solo: true }]
+      }
+    },
+
     // Marine: andar en 8 direcciones (Marine8D.png, convertida del .jfif; fondo blanco).
     // Sin 'pockets': la camisa y la gorra son blancas como el fondo.
     marine: {
