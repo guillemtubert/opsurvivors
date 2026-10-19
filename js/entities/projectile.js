@@ -12,9 +12,12 @@
  */
 G.Projectiles = (() => {
   let list = [];
+  // Tope de balas enemigas vivas: con más, la pantalla se llena y no hay hueco por donde esquivar.
+  const MAX_FOE = 40;
 
   function clear() { list = []; }
   function spawn(p) {
+    if (p.foe && list.reduce((n, q) => n + (q.foe ? 1 : 0), 0) >= MAX_FOE) return p;
     p.age = 0;
     p.hits = p.hits || new Set();
     list.push(p);

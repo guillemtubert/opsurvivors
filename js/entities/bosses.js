@@ -487,8 +487,8 @@ G.Bosses = (() => {
         const want = Math.atan2(k.dy, k.dx);
         e.ai.gunA += Math.max(-1.3 * k.dt, Math.min(1.3 * k.dt, Math.atan2(Math.sin(want - e.ai.gunA), Math.cos(want - e.ai.gunA))));
         if ((e.ai.fire -= k.dt) <= 0) {
-          e.ai.fire = 0.08;
-          shot(e, e.ai.gunA + G.U.rand(-0.05, 0.05), 300, e.dmg * 0.18, { r: 4, color: '#ffe14d', life: 1.6 });
+          e.ai.fire = 0.25;
+          shot(e, e.ai.gunA + G.U.rand(-0.05, 0.05), 230, e.dmg * 0.18, { r: 4, color: '#ffe14d', life: 1.6 });
           if (Math.random() < 0.3) G.Audio.sfx('shoot');
         }
         if ((e.stateT -= k.dt) <= 0) { e.state = 'walk'; e.pose = false; }
@@ -500,7 +500,7 @@ G.Bosses = (() => {
           e.state = 'aim'; e.stateT = 1.0; e.ai.aim = Math.atan2(k.dy, k.dx);
           warnLine(e.x, e.y, e.ai.aim, 320, 70, '#9ad0ff', 1.0);
         } else {
-          e.state = 'gun'; e.stateT = 1.8; e.ai.fire = 0.3;
+          e.state = 'gun'; e.stateT = 1.6; e.ai.fire = 0.3;
           e.ai.gunA = Math.atan2(k.dy, k.dx) + (Math.random() < 0.5 ? -0.9 : 0.9);
         }
       }
