@@ -173,19 +173,27 @@ module.exports = {
 
     // Sanji: andar generado con Gemini a partir del atlas #4156 «Puzzled Aloha» (tools/gemini-8d.js,
     // 5 filas × 4 pasos sobre magenta, mirando a la izquierda) y poses de ataque y daño del atlas.
+    // Sanji (#0017 Treasure Cruise): lado y tres cuartos de la hoja; espaldas generadas con Gemini.
     sanji: {
-      walkSheet: REF + 'sanji/SanjiWalk.png',
-      walkBg: { color: '#ff00ff', thr: 70, r: 1, fringe: 2, pockets: true, despill: 3 },      // ningún personaje lleva este magenta: fuera también los huecos
-      layout: 'walk5', walkFacing: 'left',
-      sheet: REF + 'sanji/#4156 - Sanji - Puzzled Aloha.png',      // fondo transparente
-      height: 46, sideHeight: 46, sideRef: 198, colors: 24,      // sideRef: Sanji de pie en el atlas
-      fps: { idle: 1, walk: 8, attack: 7, hurt: 1 },
+      sheet: REF + 'sanjiS/SanjiSheet.png',
+      bgFlat: { color: '#ebebeb', thr: 40, r: 2, fringe: 2, pockets: true },
+      height: 46, sideHeight: 48, colors: 24,
+      fps: { idle: 1, walk: 9, attack: 8, hurt: 1 },
+      dirs8: {
+        down: [[64, 80, 88, 175], [262, 80, 80, 175], [453, 80, 72, 175]],
+        'down-right': [[24, 890, 95, 160], [223, 880, 135, 170]],
+        right: [[24, 890, 95, 160], [223, 880, 135, 170]],
+        'up-right': [[24, 890, 95, 160], [223, 880, 135, 170]],
+        up: [{ f: [15, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }, { f: [126, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }, { f: [234, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }, { f: [340, 29, 75, 190], sheet: REF + 'sanjiS/SanjiBack.png' }],
+        'up-left': { mirror: 'up-right' },
+        left: { mirror: 'right' },
+        'down-left': { mirror: 'down-right' }
+      },
       anims: {
-        attack: [{ f: [423, 225, 183, 113], solo: true }, { f: [3, 224, 190, 117], solo: true }],   // patada en carrera, patada voladora
-        hurt: [{ f: [874, 325, 126, 116], solo: true }]
+        attack: [{ f: [509, 882, 160, 160], solo: true }, { f: [779, 874, 135, 143], solo: true }],
+        hurt: [{ f: [64, 80, 88, 175], solo: true }]
       }
     },
-
     // Su atlas guarda la cabeza (capucha) y la túnica por separado.
     imu: {
       sheet: REF + 'imu/Mobile - One Piece_ Treasure Cruise - Playable Characters - #4571 - Imu - Occupant of the Empty Throne.png',
